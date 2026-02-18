@@ -1,65 +1,79 @@
-using Fusion;
+ï»¿using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 {
     private NetworkRunner _runner = null;
 
-
     /// <summary>
-    /// ƒQ[ƒ€‚ğŠJn‚·‚éˆ—
-    /// async ‚ğ‚Â‚¯‚Ä‚¢‚é‚Ì‚ÅAƒlƒbƒgƒ[ƒNˆ—‚ÌŠ®—¹‚ğ‘Ò‚Á‚Ä‚àƒQ[ƒ€‚ª~‚Ü‚ç‚È‚¢
+    /// ãƒãƒƒãƒã™ã‚‹å‡¦ç†ã€€ãƒ›ã‚¹ãƒˆãƒãƒ¼ã‚¸ãƒ§ãƒ³
+    /// async ã‚’ã¤ã‘ã¦ã„ã‚‹ã®ã§ã€ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯å‡¦ç†ã®å®Œäº†ã‚’å¾…ã£ã¦ã‚‚ã‚²ãƒ¼ãƒ ãŒæ­¢ã¾ã‚‰ãªã„
     /// </summary>
-    public async void StartGame(GameMode mode,string sessionName)
+    public async void CreateHostRoom(string sessionName)
     {
-        // NetworkRunnerƒRƒ“ƒ|[ƒlƒ“ƒg‚ğì‚Á‚ÄAƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚É’Ç‰Á
-        // NetworkRunner‚ÍFusion‚Ìƒlƒbƒgƒ[ƒNƒZƒbƒVƒ‡ƒ“‚ğŠÇ—‚·‚é–ğŠ„
+        TitleUIManager.Instance.nowLoadingImage.SetActive(true);
+
+        // NetworkRunnerã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’ä½œã£ã¦ã€ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«è¿½åŠ 
+        // NetworkRunnerã¯Fusionã®ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’ç®¡ç†ã™ã‚‹å½¹å‰²
         _runner = gameObject.AddComponent<NetworkRunner>();
 
-        // ƒvƒŒƒCƒ„[‚©‚ç‚Ì“ü—Í‚ğFusion‚É“n‚·İ’è
-        // true‚É‚·‚é‚ÆA©•ª‚Ì“ü—Í‚ğƒlƒbƒgƒ[ƒN‚É‘—‚ê‚é‚æ‚¤‚É‚È‚é
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã®å…¥åŠ›ã‚’Fusionã«æ¸¡ã™è¨­å®š
+        // trueã«ã™ã‚‹ã¨ã€è‡ªåˆ†ã®å…¥åŠ›ã‚’ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã«é€ã‚Œã‚‹ã‚ˆã†ã«ãªã‚‹
         _runner.ProvideInput = true;
 
-        // Œ»İ‚ÌƒV[ƒ“‚Ìî•ñ‚ğæ“¾
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-
-        // Fusion—p‚ÉƒV[ƒ“î•ñ‚ğ‚Ü‚Æ‚ß‚éƒIƒuƒWƒFƒNƒg‚ğì‚é
-        var sceneInfo = new NetworkSceneInfo();
-
-        // ƒV[ƒ“‚ª³‚µ‚­æ“¾‚Å‚«‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN
-        if (scene.IsValid)
-        {
-            // ƒV[ƒ“î•ñ‚É¡‚ÌƒV[ƒ“‚ğ’Ç‰Á
-            // LoadSceneMode.Additive‚É‚·‚é‚ÆAŠù‘¶‚ÌƒV[ƒ“‚Éd‚Ë‚Ä“Ç‚İ‚ß‚é
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-        }
-
-        // Fusion‚ÅƒQ[ƒ€ƒZƒbƒVƒ‡ƒ“‚ğŠJn‚Ü‚½‚ÍQ‰Á‚·‚é
-        // await ‚ğ‚Â‚¯‚é‚±‚Æ‚ÅuŠJnˆ—‚ªI‚í‚é‚Ü‚Å‘Ò‚Âv‚¯‚ÇAƒQ[ƒ€©‘Ì‚Í~‚Ü‚ç‚È‚¢
+        // Fusionã§ã‚²ãƒ¼ãƒ ã‚»ãƒƒã‚·ãƒ§ãƒ³ã«å‚åŠ ã™ã‚‹
+        // await ã‚’ã¤ã‘ã‚‹ã“ã¨ã§ã€Œé–‹å§‹å‡¦ç†ãŒçµ‚ã‚ã‚‹ã¾ã§å¾…ã¤ã€ã‘ã©ã€ã‚²ãƒ¼ãƒ è‡ªä½“ã¯æ­¢ã¾ã‚‰ãªã„
         await _runner.StartGame(new StartGameArgs()
         {
-            // ƒQ[ƒ€ƒ‚[ƒh‚ğw’èi—á‚¦‚ÎAHost‚âClient‚È‚Çj
-            GameMode = mode,
+            // ã‚²ãƒ¼ãƒ ãƒ¢ãƒ¼ãƒ‰ã‚’æŒ‡å®šï¼ˆä¾‹ãˆã°ã€Hostã‚„Clientãªã©ï¼‰
+            GameMode = GameMode.Host,
 
-            // ƒZƒbƒVƒ‡ƒ“–¼‚ğw’èi“¯‚¶–¼‘O‚¾‚ÆQ‰Á‚Å‚«‚éj
+            // ã‚»ãƒƒã‚·ãƒ§ãƒ³åã‚’æŒ‡å®šï¼ˆåŒã˜åå‰ã ã¨å‚åŠ ã§ãã‚‹ï¼‰
             SessionName = sessionName,
 
-            // “Ç‚İ‚ŞƒV[ƒ“‚ğw’è
-            Scene = scene,
-
-            // NetworkSceneManagerDefault ‚ğg‚Á‚ÄƒV[ƒ“‚Ì“Ç‚İ‚İŠÇ—‚ğ”C‚¹‚é
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
+
+        TitleUIManager.Instance.titleCanvas.SetActive(false);
+        TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+
+        Debug.Log("ãƒ›ã‚¹ãƒˆå´æ¥ç¶šå®Œäº†");
     }
 
 
     /// <summary>
-    /// V‚µ‚¢ƒvƒŒƒCƒ„[‚ªƒZƒbƒVƒ‡ƒ“‚ÉQ‰Á‚µ‚½‚É©“®‚ÅŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒvƒŒƒCƒ„[—pƒLƒƒƒ‰ƒNƒ^[‚Ì¶¬‚âAQ‰Á‚Ì‰Šúİ’è‚È‚Ç‚ğs‚¤êŠB
+    /// ãƒãƒƒãƒã™ã‚‹å‡¦ç†ã€€ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒãƒ¼ã‚¸ãƒ§ãƒ³
+    /// </summary>
+    public async void JoinHostRoom(string sessionName)
+    {
+        TitleUIManager.Instance.nowLoadingImage.SetActive(true);
+
+        _runner = gameObject.AddComponent<NetworkRunner>();
+        _runner.ProvideInput = true;
+
+        // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¨ã—ã¦ã‚²ãƒ¼ãƒ é–‹å§‹
+        await _runner.StartGame(new StartGameArgs()
+        {
+            GameMode = GameMode.Client,
+            SessionName = sessionName,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+        });
+
+        // ã“ã“ã¾ã§æ¥ã‚Œã°æ¥ç¶šæˆåŠŸ
+        TitleUIManager.Instance.titleCanvas.SetActive(false);
+        TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+
+        Debug.Log("ã‚²ã‚¹ãƒˆå´æ¥ç¶šå®Œäº†");
+    }
+
+
+    /// <summary>
+    /// æ–°ã—ã„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚»ãƒƒã‚·ãƒ§ãƒ³ã«å‚åŠ ã—ãŸæ™‚ã«è‡ªå‹•ã§å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”¨ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®ç”Ÿæˆã‚„ã€å‚åŠ æ™‚ã®åˆæœŸè¨­å®šãªã©ã‚’è¡Œã†å ´æ‰€ã€‚
     /// </summary>
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
 
@@ -67,17 +81,17 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ªƒZƒbƒVƒ‡ƒ“‚©‚ç—£’E‚µ‚½‚É©“®‚ÅŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒvƒŒƒCƒ„[‚ª‘€ì‚µ‚Ä‚¢‚½ƒlƒbƒgƒ[ƒNƒIƒuƒWƒFƒNƒg‚Ìíœˆ—‚âA
-    /// l”ŠÇ—EUIXVEƒvƒŒƒCƒ„[ƒŠƒXƒg®—‚È‚Ç‚ğs‚¤B
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚»ãƒƒã‚·ãƒ§ãƒ³ã‹ã‚‰é›¢è„±ã—ãŸæ™‚ã«è‡ªå‹•ã§å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ“ä½œã—ã¦ã„ãŸãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å‰Šé™¤å‡¦ç†ã‚„ã€
+    /// äººæ•°ç®¡ç†ãƒ»UIæ›´æ–°ãƒ»ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆæ•´ç†ãªã©ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
 
     /// <summary>
-    /// NetworkRunner ‚ªƒVƒƒƒbƒgƒ_ƒEƒ“‚µ‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒZƒbƒVƒ‡ƒ“I—¹‚âƒGƒ‰[”­¶Aè“®‚É‚æ‚é Shutdown() ŒÄ‚Ño‚µ‚È‚Ç‚Å”­¶B
-    /// ƒlƒbƒgƒ[ƒNI—¹‚ÌŒã•Ğ•t‚¯iUI–ß‚µAƒIƒuƒWƒFƒNƒg”jŠüAó‘ÔƒŠƒZƒbƒg‚È‚Çj‚ğs‚¤B
+    /// NetworkRunner ãŒã‚·ãƒ£ãƒƒãƒˆãƒ€ã‚¦ãƒ³ã—ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã‚»ãƒƒã‚·ãƒ§ãƒ³çµ‚äº†ã‚„ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿã€æ‰‹å‹•ã«ã‚ˆã‚‹ Shutdown() å‘¼ã³å‡ºã—ãªã©ã§ç™ºç”Ÿã€‚
+    /// ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯çµ‚äº†æ™‚ã®å¾Œç‰‡ä»˜ã‘ï¼ˆUIæˆ»ã—ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç ´æ£„ã€çŠ¶æ…‹ãƒªã‚»ãƒƒãƒˆãªã©ï¼‰ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
 
@@ -90,79 +104,93 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// –ˆƒtƒŒ[ƒ€ŒÄ‚Î‚ê‚é“ü—Í‘—MƒR[ƒ‹ƒoƒbƒNB
-    /// ƒL[ƒ{[ƒhEƒ}ƒEƒXEƒQ[ƒ€ƒpƒbƒh‚È‚Ç‚Ìƒ[ƒJƒ‹“ü—Í‚ğæ“¾‚µA
-    /// NetworkInputData ‚É‹l‚ß‚ÄƒT[ƒo[‚Ö‘—M‚·‚éB
-    /// ƒvƒŒƒCƒ„[ˆÚ“®‚âƒAƒNƒVƒ‡ƒ“‚È‚ÇA‘SƒvƒŒƒCƒ„[‚Ì“¯Šú‚É•K—v‚È“ü—Í‚Í‚±‚±‚Åˆµ‚¤B
+    /// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã°ã‚Œã‚‹å…¥åŠ›é€ä¿¡ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ»ãƒã‚¦ã‚¹ãƒ»ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ãªã©ã®ãƒ­ãƒ¼ã‚«ãƒ«å…¥åŠ›ã‚’å–å¾—ã—ã€
+    /// NetworkInputData ã«è©°ã‚ã¦ã‚µãƒ¼ãƒãƒ¼ã¸é€ä¿¡ã™ã‚‹ã€‚
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç§»å‹•ã‚„ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãªã©ã€å…¨ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åŒæœŸã«å¿…è¦ãªå…¥åŠ›ã¯ã“ã“ã§æ‰±ã†ã€‚
     /// </summary>
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
 
 
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚©‚ç“ü—Í‚ª“Í‚©‚È‚©‚Á‚½ tick ‚ÅŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ‰ñü’x‰„Eƒ‰ƒOEˆê“I‚ÈØ’f‚È‚Ç‚Å“ü—Í‚ªŒ‡‚¯‚½ê‡‚ÉA
-    /// ‘ã‚í‚è‚É‚Ç‚ñ‚È“ü—Í‚Æ‚µ‚Äˆµ‚¤‚©‚ğw’è‚Å‚«‚éB
-    /// ’Êí‚Í‘O‰ñ‚Ì“ü—Í‚ğŒp‘±‚µ‚½‚èA‹ó‚Ì“ü—Í‚ğ“n‚µ‚½‚è‚µ‚Ä•âŠ®‚·‚éB
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å…¥åŠ›ãŒå±Šã‹ãªã‹ã£ãŸ tick ã§å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// å›ç·šé…å»¶ãƒ»ãƒ©ã‚°ãƒ»ä¸€æ™‚çš„ãªåˆ‡æ–­ãªã©ã§å…¥åŠ›ãŒæ¬ ã‘ãŸå ´åˆã«ã€
+    /// ä»£ã‚ã‚Šã«ã©ã‚“ãªå…¥åŠ›ã¨ã—ã¦æ‰±ã†ã‹ã‚’æŒ‡å®šã§ãã‚‹ã€‚
+    /// é€šå¸¸ã¯å‰å›ã®å…¥åŠ›ã‚’ç¶™ç¶šã—ãŸã‚Šã€ç©ºã®å…¥åŠ›ã‚’æ¸¡ã—ãŸã‚Šã—ã¦è£œå®Œã™ã‚‹ã€‚
     /// </summary>
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚ªƒT[ƒo[iƒzƒXƒgj‚Ö‚ÌÚ‘±‚É¬Œ÷‚µ‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒZƒbƒVƒ‡ƒ“Q‰Á‚ÌŠm’èƒ^ƒCƒ~ƒ“ƒO‚ÅAUIXV‚âƒ[ƒhˆ—A
-    /// ƒvƒŒƒCƒ„[¶¬‚Ì€”õ‚È‚Ç‚ğs‚¤B
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãŒã‚µãƒ¼ãƒãƒ¼ï¼ˆãƒ›ã‚¹ãƒˆï¼‰ã¸ã®æ¥ç¶šã«æˆåŠŸã—ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã‚»ãƒƒã‚·ãƒ§ãƒ³å‚åŠ ã®ç¢ºå®šã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ã€UIæ›´æ–°ã‚„ãƒ­ãƒ¼ãƒ‰å‡¦ç†ã€
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”Ÿæˆã®æº–å‚™ãªã©ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnConnectedToServer(NetworkRunner runner) { }
 
 
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚ªƒT[ƒo[‚Æ‚ÌÚ‘±‚ğ¸‚Á‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ‰ñüØ’fEƒ^ƒCƒ€ƒAƒEƒgEƒzƒXƒg‘¤‚ÌI—¹‚È‚ÇA
-    /// ‰½‚ç‚©‚Ì——R‚Å’ÊM‚ªˆÛ‚Å‚«‚È‚­‚È‚Á‚½Û‚ÌŒãˆ—‚ğs‚¤B
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãŒã‚µãƒ¼ãƒãƒ¼ã¨ã®æ¥ç¶šã‚’å¤±ã£ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// å›ç·šåˆ‡æ–­ãƒ»ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆãƒ»ãƒ›ã‚¹ãƒˆå´ã®çµ‚äº†ãªã©ã€
+    /// ä½•ã‚‰ã‹ã®ç†ç”±ã§é€šä¿¡ãŒç¶­æŒã§ããªããªã£ãŸéš›ã®å¾Œå‡¦ç†ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
 
 
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚ªƒT[ƒo[‚ÖÚ‘±—v‹‚ğ‘—‚Á‚Ä‚«‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ‚±‚±‚ÅÚ‘±‚ğ‹–‰ÂiApprovej‚·‚é‚©A‹‘”ÛiRefuse/Rejectj‚·‚é‚©”»’f‚Å‚«‚éB
-    /// ƒpƒXƒ[ƒh”FØ‚âl”§ŒÀƒ`ƒFƒbƒN‚È‚ÇA“üº‰Â”Û‚Ì”»’è‚Ég—p‚·‚éB
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãŒã‚µãƒ¼ãƒãƒ¼ã¸æ¥ç¶šè¦æ±‚ã‚’é€ã£ã¦ããŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã“ã“ã§æ¥ç¶šã‚’è¨±å¯ï¼ˆApproveï¼‰ã™ã‚‹ã‹ã€æ‹’å¦ï¼ˆRefuse/Rejectï¼‰ã™ã‚‹ã‹åˆ¤æ–­ã§ãã‚‹ã€‚
+    /// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰èªè¨¼ã‚„äººæ•°åˆ¶é™ãƒã‚§ãƒƒã‚¯ãªã©ã€å…¥å®¤å¯å¦ã®åˆ¤å®šã«ä½¿ç”¨ã™ã‚‹ã€‚
     /// </summary>
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
 
 
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚ªƒT[ƒo[‚Ö‚ÌÚ‘±‚ğ‚İ‚½‚ª¸”s‚µ‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒlƒbƒgƒ[ƒN•s—ÇEƒT[ƒo[‚ª‘¶İ‚µ‚È‚¢Eƒ‚[ƒh•sˆê’v‚È‚Ç‚ªŒ´ˆöB
-    /// UI‚ÅƒGƒ‰[ƒƒbƒZ[ƒW•\¦‚âƒŠƒgƒ‰ƒCˆ—‚Ég—p‚·‚éB
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãŒã‚µãƒ¼ãƒãƒ¼ã¸ã®æ¥ç¶šã‚’è©¦ã¿ãŸãŒå¤±æ•—ã—ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ä¸è‰¯ãƒ»ã‚µãƒ¼ãƒãƒ¼ãŒå­˜åœ¨ã—ãªã„ãƒ»ãƒ¢ãƒ¼ãƒ‰ä¸ä¸€è‡´ãªã©ãŒåŸå› ã€‚
+    /// UIã§ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºã‚„ãƒªãƒˆãƒ©ã‚¤å‡¦ç†ã«ä½¿ç”¨ã™ã‚‹ã€‚
     /// </summary>
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
 
 
     /// <summary>
-    /// ‘¼‚ÌƒvƒŒƒCƒ„[i‚Ü‚½‚ÍƒT[ƒo[j‚ª SendUserSimulationMessage() ‚ğg‚Á‚Ä
-    /// ”CˆÓƒf[ƒ^‚ğ‘—M‚µ‚Ä‚«‚½‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒQ[ƒ€“à‚ÌƒJƒXƒ^ƒ€ƒCƒxƒ“ƒg“`’B‚É•Ö—˜iƒ`ƒƒƒbƒgA’Ê’mAƒGƒ‚[ƒg‚È‚ÇjB
+    /// ä»–ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ˆã¾ãŸã¯ã‚µãƒ¼ãƒãƒ¼ï¼‰ãŒ SendUserSimulationMessage() ã‚’ä½¿ã£ã¦
+    /// ä»»æ„ãƒ‡ãƒ¼ã‚¿ã‚’é€ä¿¡ã—ã¦ããŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã‚²ãƒ¼ãƒ å†…ã®ã‚«ã‚¹ã‚¿ãƒ ã‚¤ãƒ™ãƒ³ãƒˆä¼é”ã«ä¾¿åˆ©ï¼ˆãƒãƒ£ãƒƒãƒˆã€é€šçŸ¥ã€ã‚¨ãƒ¢ãƒ¼ãƒˆãªã©ï¼‰ã€‚
     /// </summary>
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
 
 
 
     /// <summary>
-    /// Œ»İQ‰Á‰Â”\‚ÈƒZƒbƒVƒ‡ƒ“iƒQ[ƒ€•”‰®j‚Ìˆê——‚ªXV‚³‚ê‚½‚ÉŒÄ‚Î‚ê‚éB
-    /// ƒƒr[‰æ–Ê‚ÌƒŠƒXƒgXV‚âAu•”‰®‚ª‘‚¦‚½EÁ‚¦‚½v‚ğUI‚É”½‰f‚·‚é‚Ì‚Ég‚¤B
+    /// ç¾åœ¨å‚åŠ å¯èƒ½ãªã‚»ãƒƒã‚·ãƒ§ãƒ³ï¼ˆã‚²ãƒ¼ãƒ éƒ¨å±‹ï¼‰ã®ä¸€è¦§ãŒæ›´æ–°ã•ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// ãƒ­ãƒ“ãƒ¼ç”»é¢ã®ãƒªã‚¹ãƒˆæ›´æ–°ã‚„ã€ã€Œéƒ¨å±‹ãŒå¢—ãˆãŸãƒ»æ¶ˆãˆãŸã€ã‚’UIã«åæ˜ ã™ã‚‹ã®ã«ä½¿ã†ã€‚
     /// </summary>
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+        //string targetSessionName = "MyRoom";
+
+        //bool exists = sessionList.Any(s => s.Name == targetSessionName);
+
+        //if (exists)
+        //{
+        //    Debug.Log($"âœ… ã‚»ãƒƒã‚·ãƒ§ãƒ³ '{targetSessionName}' ã¯å­˜åœ¨ã—ã¾ã™ã€‚");
+        //}
+        //else
+        //{
+        //    Debug.Log($"âŒ ã‚»ãƒƒã‚·ãƒ§ãƒ³ '{targetSessionName}' ã¯å­˜åœ¨ã—ã¾ã›ã‚“ã€‚");
+        //}
+    }
 
 
 
     /// <summary>
-    /// ƒJƒXƒ^ƒ€”FØiŠO•”ƒT[ƒrƒX‚â“Æ©API‚È‚Çj‚ğg‚Á‚½A
-    /// ƒT[ƒo[‚©‚ç”FØŒ‹‰Ê‚ª•Ô‚Á‚Ä‚«‚½uŠÔ‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNB
-    /// ƒƒOƒCƒ“¬Œ÷/¸”s‚âAƒ†[ƒU[ŒÅ—Lƒf[ƒ^‚ÌóM‚Ég‚¦‚éB
+    /// ã‚«ã‚¹ã‚¿ãƒ èªè¨¼ï¼ˆå¤–éƒ¨ã‚µãƒ¼ãƒ“ã‚¹ã‚„ç‹¬è‡ªAPIãªã©ï¼‰ã‚’ä½¿ã£ãŸæ™‚ã€
+    /// ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰èªè¨¼çµæœãŒè¿”ã£ã¦ããŸç¬é–“ã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ãƒ­ã‚°ã‚¤ãƒ³æˆåŠŸ/å¤±æ•—ã‚„ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼å›ºæœ‰ãƒ‡ãƒ¼ã‚¿ã®å—ä¿¡ã«ä½¿ãˆã‚‹ã€‚
     /// </summary>
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
 
@@ -170,25 +198,25 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// ƒzƒXƒgƒ‚[ƒh‚ÅƒzƒXƒg‚ªØ’f‚³‚ê‚½A
-    /// V‚µ‚¢ƒzƒXƒg‚É©“®‚Åˆø‚«Œp‚ª‚ê‚éˆ—‚ğs‚¤‚½‚ß‚ÌƒR[ƒ‹ƒoƒbƒNB
-    /// ƒQ[ƒ€‚ÌŒp‘±EƒIƒuƒWƒFƒNƒg‚ÌÄŠ„‚è“–‚Ä‚È‚Ç‚ğs‚¤B
+    /// ãƒ›ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰ã§ãƒ›ã‚¹ãƒˆãŒåˆ‡æ–­ã•ã‚ŒãŸæ™‚ã€
+    /// æ–°ã—ã„ãƒ›ã‚¹ãƒˆã«è‡ªå‹•ã§å¼•ãç¶™ãŒã‚Œã‚‹å‡¦ç†ã‚’è¡Œã†ãŸã‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
+    /// ã‚²ãƒ¼ãƒ ã®ç¶™ç¶šãƒ»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å†å‰²ã‚Šå½“ã¦ãªã©ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
 
 
     /// <summary>
-    /// ‘SƒNƒ‰ƒCƒAƒ“ƒg‚ÌƒV[ƒ“ƒ[ƒhŠ®—¹‚ÉŒÄ‚Î‚ê‚éB
-    /// ƒ[ƒhŠ®—¹Œã‚Ì‰Šú‰»ˆ—‚âƒXƒ|[ƒ“ˆ—‚ğŠJn‚·‚é‚½‚ß‚ÌƒR[ƒ‹ƒoƒbƒNB
+    /// å…¨ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰å®Œäº†æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// ãƒ­ãƒ¼ãƒ‰å®Œäº†å¾Œã®åˆæœŸåŒ–å‡¦ç†ã‚„ã‚¹ãƒãƒ¼ãƒ³å‡¦ç†ã‚’é–‹å§‹ã™ã‚‹ãŸã‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã€‚
     /// </summary>
     public void OnSceneLoadDone(NetworkRunner runner) { }
 
 
 
     /// <summary>
-    /// ƒlƒbƒgƒ[ƒNƒV[ƒ“‚Ìƒ[ƒhŠJn‚ÉŒÄ‚Î‚ê‚éB
-    /// ƒ[ƒfƒBƒ“ƒO‰æ–Ê‚Ì•\¦‚È‚ÇA‘JˆÚ’†‚Ì€”õˆ—‚ğs‚¤B
+    /// ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚·ãƒ¼ãƒ³ã®ãƒ­ãƒ¼ãƒ‰é–‹å§‹æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢ã®è¡¨ç¤ºãªã©ã€é·ç§»ä¸­ã®æº–å‚™å‡¦ç†ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnSceneLoadStart(NetworkRunner runner) { }
 
@@ -196,8 +224,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// ƒIƒuƒWƒFƒNƒg‚ªƒvƒŒƒCƒ„[‚ÌAOI(‹»–¡—Ìˆæ)‚©‚çŠO‚ê‚½‚ÉŒÄ‚Î‚ê‚éB
-    /// ‹ŠEŠO‚Éo‚½ƒIƒuƒWƒFƒNƒg‚Ì”ñ•\¦ˆ—‚âXV’â~‚È‚Ç‚ğs‚¤B
+    /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®AOI(èˆˆå‘³é ˜åŸŸ)ã‹ã‚‰å¤–ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// è¦–ç•Œå¤–ã«å‡ºãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®éè¡¨ç¤ºå‡¦ç†ã‚„æ›´æ–°åœæ­¢ãªã©ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 
@@ -206,24 +234,24 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// ƒIƒuƒWƒFƒNƒg‚ªƒvƒŒƒCƒ„[‚ÌAOI(‹»–¡—Ìˆæ)‚É“ü‚Á‚½‚ÉŒÄ‚Î‚ê‚éB
-    /// •\¦‚â“®ì‚Ì—LŒø‰»‚È‚ÇA‹ŠE‚É“ü‚Á‚½ƒIƒuƒWƒFƒNƒg‚Ì‰Šúˆ—‚ğs‚¤B
+    /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®AOI(èˆˆå‘³é ˜åŸŸ)ã«å…¥ã£ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// è¡¨ç¤ºã‚„å‹•ä½œã®æœ‰åŠ¹åŒ–ãªã©ã€è¦–ç•Œã«å…¥ã£ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åˆæœŸå‡¦ç†ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 
 
 
     /// <summary>
-    /// ‘¼ƒNƒ‰ƒCƒAƒ“ƒg‚©‚ç‘—‚ç‚ê‚½Reliableƒf[ƒ^óM‚ÉŒÄ‚Î‚ê‚éB
-    /// ŠmÀ‚É“Í‚¯‚½‚¢d—vƒf[ƒ^‚Ìˆ—‚ğs‚¤B
+    /// ä»–ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰é€ã‚‰ã‚ŒãŸReliableãƒ‡ãƒ¼ã‚¿å—ä¿¡æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// ç¢ºå®Ÿã«å±Šã‘ãŸã„é‡è¦ãƒ‡ãƒ¼ã‚¿ã®å‡¦ç†ã‚’è¡Œã†ã€‚
     /// </summary>
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
 
 
 
     /// <summary>
-    /// Reliableƒf[ƒ^‚Ì‘—óMi’»‚ªXV‚³‚ê‚½‚ÉŒÄ‚Î‚ê‚éB
-    /// ‘å—e—Êƒf[ƒ^‚Ìi’»•\¦‚â“]‘—ó‹µ‚ÌŠÄ‹‚Ég—p‚·‚éB
+    /// Reliableãƒ‡ãƒ¼ã‚¿ã®é€å—ä¿¡é€²æ—ãŒæ›´æ–°ã•ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚
+    /// å¤§å®¹é‡ãƒ‡ãƒ¼ã‚¿ã®é€²æ—è¡¨ç¤ºã‚„è»¢é€çŠ¶æ³ã®ç›£è¦–ã«ä½¿ç”¨ã™ã‚‹ã€‚
     /// </summary>
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
 }
