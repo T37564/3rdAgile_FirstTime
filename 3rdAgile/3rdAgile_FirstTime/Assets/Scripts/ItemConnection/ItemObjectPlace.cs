@@ -29,17 +29,43 @@ public class ItemObjectPlace: MonoBehaviour
     [Header("アイテムを配置するz軸範囲（最大値）")]
     [SerializeField] private float maxZ = 0.0f;
 
-    [Header("アイテムを配置する際のレイヤーマスク")]
-    [SerializeField] private LayerMask layerMask;
+    private Vector3 randomPosition;
+
+    [SerializeField] private List<RegenerationCallOut> items = new List<RegenerationCallOut>();
 
     private void Start()
     {
         for (int i = 0; i < maxItemObjectCount; i++)
         {
-            Vector3 randomPosition = GetRandomPosition();
-            Instantiate(itemObjectPrefab, randomPosition, Quaternion.identity);
+            //randomPosition = GetRandomPosition();
+            //GameObject obj = Instantiate(itemObjectPrefab, randomPosition, Quaternion.identity);
+
+            //RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
+            //if (regenerationCallOut != null)
+            //    items.Add(regenerationCallOut);
+            SpawnItem();
         }
     }
+
+    private void Update()
+    {
+        for(int i = 0; i < items.Count; i++)
+        {
+             if (items[i].isGenerateRequest)
+             {
+                 Vector3 randomPosition = GetRandomPosition();
+                 GameObject obj = Instantiate(itemObjectPrefab, randomPosition, Quaternion.identity);
+                 Debug.Log("再配置完了");
+                RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
+                if (regenerationCallOut != null)
+                    items.Add(regenerationCallOut);
+
+                items[i].isGenerateRequest = false; // 再配置後にフラグをリセット
+             }
+        }
+    }
+
+    
 
     /// <summary>
     /// 座標をランダムに決めるメソッド
@@ -55,5 +81,29 @@ public class ItemObjectPlace: MonoBehaviour
         Debug.Log($"Random Y Position: {randomY}"); // デバッグ用ログ
 
         return new Vector3(randomX, randomY, randomZ);
+    }
+
+    private void SpawnItem()
+    {
+        GameObject obj = Instantiate(itemObjectPrefab, GetRandomPosition(), Quaternion.identity);
+
+        RegenerationCallOut callOut = obj.GetComponent<RegenerationCallOut>();
+
+        if (callOut != null)
+        {
+            // イベント登録
+            callOut.OnNeedRegenerate += HandleRegenerate;
+        }
+    }
+
+    void HandleRegenerate(RegenerationCallOut item)
+    {
+        Debug.Log("再生成開始");
+
+        // 古いアイテム削除
+        Destroy(item.gameObject);
+
+        // 新しく生成
+        SpawnItem();
     }
 }

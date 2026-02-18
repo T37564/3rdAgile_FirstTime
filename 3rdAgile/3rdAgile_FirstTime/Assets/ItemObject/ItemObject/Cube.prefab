@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2380889171472837861}
   - component: {fileID: 3917181395533769747}
   - component: {fileID: 6089126295371903787}
+  - component: {fileID: 1397100366237517205}
   - component: {fileID: 2142278982236377383}
   m_Layer: 0
   m_Name: Cube
@@ -113,6 +114,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1397100366237517205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 218da7ee613a163458b76c769a691d8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RegenerationCallOut
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  rayLength: 1
+  isGenerateRequest: 0
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
