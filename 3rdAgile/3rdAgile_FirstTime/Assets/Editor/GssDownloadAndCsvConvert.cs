@@ -275,7 +275,11 @@ public class GssDownloadAndCsvConvert : EditorWindow
             {
                 string rawId = columns[0].Trim().Trim('"').Trim('\uFEFF');
                 int id = int.Parse(rawId);
-                string assetPath = $"{SAVE_FOLDER}/{id}.asset";
+
+                string rawName = columns[1].Trim().Trim('"');
+                string assetName = SanitizeFileName(rawName);
+
+                string assetPath = $"{SAVE_FOLDER}/{assetName}.asset";
 
                 SampleMasterData data =
                     AssetDatabase.LoadAssetAtPath<SampleMasterData>(assetPath);
@@ -286,6 +290,7 @@ public class GssDownloadAndCsvConvert : EditorWindow
                 }
 
                 // ‰Šú‰»(‘Sã‘‚«)
+                //data.name = assetFileName;
                 data.id = id;
                 data.intValues.Clear();
                 data.floatValues.Clear();
@@ -322,6 +327,15 @@ public class GssDownloadAndCsvConvert : EditorWindow
         return line.Split(',')
                    .Select(v => v.Trim())
                    .ToArray();
+    }
+
+    private string SanitizeFileName(string name)
+    {
+        foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(c.ToString(), "");
+        }
+        return name;
     }
 
     private void ApplyRule(SampleMasterData data, CsvConvertRule rule, string raw)
