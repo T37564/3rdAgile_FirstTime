@@ -1,10 +1,12 @@
+using Fusion;
 using System;
 using UnityEngine;
 
+//NetworkBehaviourを継承することでネットワーク状態で扱えて権限制御ができる
 /// <summary>
 /// ランダム生成時にアイテムが地面に配置されていない場合、再配置するクラス
 /// </summary>
-public class RegenerationCallOut : MonoBehaviour
+public class RegenerationCallOut : NetworkBehaviour
 {
     [Header("アイテムを配置する際のレイヤーマスク")]
     [SerializeField] private LayerMask layerMask;
@@ -20,13 +22,20 @@ public class RegenerationCallOut : MonoBehaviour
 
     private void Update()
     {
+        if (!HasStateAuthority)
+        {
+            return;
+        }
+
+        //アイテムのY座標が一定以下でなおかつ地面についていないとき
         if(transform.position.y <= -10 && !IsGround())
         {
             isGenerateRequest = true;
             Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
 
             //RegenerationCallOutクラスにイベントを通知する
-            OnNeedRegenerate.Invoke(this);
+            //？があることで登録されているメソッドが無ければ呼び出さないようにする
+            OnNeedRegenerate?.Invoke(this);
         }
     }
 

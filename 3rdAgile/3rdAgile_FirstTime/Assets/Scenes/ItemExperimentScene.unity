@@ -461,6 +461,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1559792074}
   - component: {fileID: 1559792073}
+  - component: {fileID: 1559792075}
   m_Layer: 0
   m_Name: ItemObjectPlace
   m_TagString: Untagged
@@ -480,7 +481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03f28f6b2f246fe42bdd09210b8398a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlace
-  itemObjectPrefab: {fileID: 5854831717035632874, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
+  itemObjectPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
   maxItemObjectCount: 10
   minX: -15
   maxX: 15
@@ -489,11 +490,6 @@ MonoBehaviour:
   - 10.5
   minZ: -15
   maxZ: 15
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 8
-  rayLength: 0
-  items: []
 --- !u!4 &1559792074
 Transform:
   m_ObjectHideFlags: 0
@@ -509,6 +505,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1559792075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1559792072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 1704493149
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1559792073}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &1593701468
 GameObject:
   m_ObjectHideFlags: 0

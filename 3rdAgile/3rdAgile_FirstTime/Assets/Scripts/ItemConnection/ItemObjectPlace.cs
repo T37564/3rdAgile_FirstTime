@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using UnityEditor.Rendering;
+using Fusion;
 using UnityEngine;
 
 /// <summary>
 /// 生成したアイテムをランダム配置するクラス
 /// </summary>
-public class ItemObjectPlace: MonoBehaviour
+public class ItemObjectPlace : NetworkBehaviour
 {
     [Header("配置するアイテム")]
-    [SerializeField] private GameObject itemObjectPrefab;
+    [SerializeField] private NetworkObject itemObjectPrefab;
 
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
@@ -29,43 +28,38 @@ public class ItemObjectPlace: MonoBehaviour
     [Header("アイテムを配置するz軸範囲（最大値）")]
     [SerializeField] private float maxZ = 0.0f;
 
-    private Vector3 randomPosition;
+    private NetworkRunner networkRunner;
 
-    [SerializeField] private List<RegenerationCallOut> items = new List<RegenerationCallOut>();
-
-    private void Start()
+    public override void Spawned()
     {
+        networkRunner = Runner;
+
+        if (!Object.HasStateAuthority)
+        {
+            // サーバーのみがアイテムを生成する
+            // クライアントがこの処理をしないことでアイテムの重複生成を防ぐ
+            Debug.Log("クライアントはアイテム生成処理をスキップ");
+            return;
+        }
+
         for (int i = 0; i < maxItemObjectCount; i++)
         {
-            //randomPosition = GetRandomPosition();
-            //GameObject obj = Instantiate(itemObjectPrefab, randomPosition, Quaternion.identity);
-
-            //RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
-            //if (regenerationCallOut != null)
-            //    items.Add(regenerationCallOut);
+            // アイテムを生成して配置する
             SpawnItem();
         }
     }
 
-    private void Update()
-    {
-        for(int i = 0; i < items.Count; i++)
-        {
-             if (items[i].isGenerateRequest)
-             {
-                 Vector3 randomPosition = GetRandomPosition();
-                 GameObject obj = Instantiate(itemObjectPrefab, randomPosition, Quaternion.identity);
-                 Debug.Log("再配置完了");
-                RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
-                if (regenerationCallOut != null)
-                    items.Add(regenerationCallOut);
+    //private void Start()
+    //{
+    //    networkRunner = FindAnyObjectByType<NetworkRunner>();
 
-                items[i].isGenerateRequest = false; // 再配置後にフラグをリセット
-             }
-        }
-    }
+    //    for (int i = 0; i < maxItemObjectCount; i++)
+    //    {
+    //        // アイテムを生成して配置する
+    //        SpawnItem();
+    //    }
+    //}
 
-    
 
     /// <summary>
     /// 座標をランダムに決めるメソッド
@@ -83,25 +77,36 @@ public class ItemObjectPlace: MonoBehaviour
         return new Vector3(randomX, randomY, randomZ);
     }
 
+    /// <summary>
+    /// イベント呼び出し時アイテムを生成するメソッド
+    /// </summary>
     private void SpawnItem()
     {
-        GameObject obj = Instantiate(itemObjectPrefab, GetRandomPosition(), Quaternion.identity);
+        // アイテムを生成してランダムに決めた座標に配置
+        //GameObject obj = Instantiate(itemObjectPrefab, GetRandomPosition(), Quaternion.identity);
+        NetworkObject obj= networkRunner.Spawn(itemObjectPrefab,GetRandomPosition(), Quaternion.identity);
 
         RegenerationCallOut callOut = obj.GetComponent<RegenerationCallOut>();
 
         if (callOut != null)
         {
             // イベント登録
+            //イベントが呼び出されたときにHandleRegenerateメソッドが呼び出されるようにする
             callOut.OnNeedRegenerate += HandleRegenerate;
         }
     }
 
+    /// <summary>
+    /// 生成時にマップ上に生成されないアイテムを削除して
+    /// 新しいアイテムを生成するメソッド
+    /// </summary>
     void HandleRegenerate(RegenerationCallOut item)
     {
         Debug.Log("再生成開始");
 
         // 古いアイテム削除
-        Destroy(item.gameObject);
+        //Destroy(item.gameObject);
+        networkRunner.Despawn(item.GetComponent<NetworkObject>());
 
         // 新しく生成
         SpawnItem();
