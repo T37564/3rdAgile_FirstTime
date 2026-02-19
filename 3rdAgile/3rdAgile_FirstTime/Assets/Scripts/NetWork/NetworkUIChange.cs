@@ -1,46 +1,23 @@
-// -----------------------------------------------------------------------------------
-// NetworkRunner が発行するプレイヤー参加・退出などのコールバックを受け取るスクリプト。
-// プレイヤー生成や接続時の初期処理をここで行う。
-// BasicSpawner.cs
-// Create.by TakahashiSaya
-//-----------------------------------------------------------------------------------
 using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkPrefabRef playerPrefab;
-
-
-    /// <summary>
-    /// 全クライアントのシーンロード完了時に呼ばれる。
-    /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
-    /// </summary>
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        if (runner.IsServer)
-        {
-            // 参加済みプレイヤー全員分スポーン
-            foreach (var player in runner.ActivePlayers)
-            {
-                runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
-            }
-
-            Debug.Log("ll");
-        }
-    }
 
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
     /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-
-
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log("JOIN");
+        UpdateCount(runner);
+    }
 
 
     /// <summary>
@@ -48,8 +25,21 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log("OUT");
+        UpdateCount(runner);
+    }
 
+
+    /// <summary>
+    /// ルームに参加しているプレイヤーテキストの人数を更新する処理
+    /// </summary>
+    private void UpdateCount(NetworkRunner runner)
+    {
+        int count = runner.ActivePlayers.Count();
+        TitleCanvasDisplaySettings.Instance.playerCountDisplayText.text = $"Player : {count} / 4 ";
+    }
 
     /// <summary>
     /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
@@ -57,12 +47,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-
-
-
-
-
-
 
 
 
@@ -155,6 +139,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
 
 
+    /// <summary>
+    /// 全クライアントのシーンロード完了時に呼ばれる。
+    /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
+    /// </summary>
+    public void OnSceneLoadDone(NetworkRunner runner) { }
 
 
 

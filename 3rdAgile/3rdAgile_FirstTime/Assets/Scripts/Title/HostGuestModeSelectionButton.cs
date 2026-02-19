@@ -3,7 +3,7 @@
 // BasicSpawner.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using TMPro;
+using System.Linq;
 using UnityEngine;
 
 public class HostGuestModeSelectionButton : MonoBehaviour
@@ -40,9 +40,9 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     /// </summary>
     public void NameInputDisplay()
     {
-        TitleUIManager.Instance.roomNameInput.transform.parent.gameObject.SetActive(true);
+        TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(true);
 
-        var input = TitleUIManager.Instance.roomNameInput;
+        var input = TitleCanvasDisplaySettings.Instance.roomNameInput;
         input.onSubmit.RemoveAllListeners(); // 以前のリスナーを削除
 
         input.onSubmit.AddListener(OnEnterPressed);
@@ -75,13 +75,10 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     /// </summary>
     private void HostModeStartButton(string roomName)
     {
-
-        Debug.Log("lll");
-
         // ホストとしてルーム作成
         networkGameStarter.CreateHostRoom(roomName);
 
-        TitleUIManager.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
+        TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -89,12 +86,34 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     /// </summary>
     private void GuestModeStartButton(string roomName)
     {
-
-        Debug.Log("mmm");
         // ゲストとしてルームに入る
         networkGameStarter.JoinHostRoom(roomName);
 
-        TitleUIManager.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
+        TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// スタートボタンが押されたときの処理
+    /// ゲームシーンに移動する
+    /// </summary>
+    public void ClickStartButton()
+    {
+        Debug.Log(1);
+        // runnerがちゃんと存在するか確認
+        if (networkGameStarter == null || networkGameStarter.networkRunner == null) return;
+        Debug.Log(2);
+        // ルーム内の人数を取得
+        int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
+        Debug.Log(3);
+        // 人数チェック（例：4人揃うまで開始しない）
+        if (playerCount != 4)
+        {
+            Debug.Log(5);
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false,"We don't have enough people.",2));
+            return;
+        }
+        Debug.Log(4);
+        // シーン遷移
+        networkGameStarter.networkRunner.LoadScene("SpawnTestScenes");
+    }
 }
