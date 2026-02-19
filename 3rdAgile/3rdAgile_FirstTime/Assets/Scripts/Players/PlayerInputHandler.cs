@@ -1,51 +1,63 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Fusion;
 
-public class PlayerInputHandler : MonoBehaviour
+namespace Network.Player
 {
-    private PlayerInput playerInput;
-
-    private PlayerInputData currentInput;
-    public PlayerInputData CurrentInput => currentInput;
-
-    private void Awake()
+    [RequireComponent(typeof(PlayerInput))]
+    public class PlayerInputHandler : MonoBehaviour
     {
-        playerInput = GetComponent<PlayerInput>();
-    }
+        private PlayerInput playerInput;
 
-    private void OnEnable()
-    {
-        if (playerInput == null) return;
+        private Vector2 move;
 
-        playerInput.onActionTriggered += OnMove;
-        playerInput.onActionTriggered += OnJump;
-    }
+        private void Awake()
+        {
+            playerInput = GetComponent<PlayerInput>();
+        }
 
-    private void OnDisable()
-    {
-        if (playerInput == null) return;
+        private void OnEnable()
+        {
+            if (playerInput == null) return;
 
-        playerInput.onActionTriggered -= OnMove;
-        playerInput.onActionTriggered -= OnJump;
-    }
+            playerInput.actions["Move"].performed += OnMove;
+            playerInput.actions["Move"].canceled += OnMove;
+        }
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (context.action.name != "Move") return;
+        private void OnDisable()
+        {
+            if (playerInput == null) return;
 
-        currentInput.move = context.ReadValue<Vector2>();
-    }
+            playerInput.onActionTriggered -= OnMove;
+        }
 
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.action.name != "Jump") return;
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            if (context.action.name != "Move") return;
 
-        if (context.started)
-            currentInput.jump = true;
-    }
+            move = context.ReadValue<Vector2>();
+        }
 
-    public void ClearOneShotInput()
-    {
-        currentInput.jump = false;
+        public PlayerInputData GetInput()
+        {
+            PlayerInputData data = new PlayerInputData()
+            {
+                move = move,
+            };
+            return data;
+        }
+
+        //public void OnJump(InputAction.CallbackContext context)
+        //{
+        //    if (context.action.name != "Jump") return;
+
+        //    if (context.started)
+        //        currentInput.jump = true;
+        //}
+
+        //public void ClearOneShotInput()
+        //{
+        //    currentInput.jump = false;
+        //}
     }
 }
