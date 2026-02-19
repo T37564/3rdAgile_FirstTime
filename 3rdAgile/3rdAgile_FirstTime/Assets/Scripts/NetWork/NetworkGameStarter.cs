@@ -29,6 +29,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = GameMode.Host,
             SessionName = sessionName,
+            PlayerCount = 4,
             SceneManager = _runnerObject.AddComponent<NetworkSceneManagerDefault>()
         });
 
