@@ -2,12 +2,14 @@
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 {
     private NetworkRunner _runner = null;
+
+    private GameObject _runnerObject = null;
+
 
     /// <summary>
     /// マッチする処理　ホストバージョン
@@ -17,25 +19,17 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     {
         TitleUIManager.Instance.nowLoadingImage.SetActive(true);
 
-        // NetworkRunnerコンポーネントを作って、ゲームオブジェクトに追加
-        // NetworkRunnerはFusionのネットワークセッションを管理する役割
-        _runner = gameObject.AddComponent<NetworkRunner>();
+        // Runner専用オブジェクトを作成
+        _runnerObject = new GameObject("NetworkRunnerHost");
+        _runner = _runnerObject.AddComponent<NetworkRunner>();
 
-        // プレイヤーからの入力をFusionに渡す設定
-        // trueにすると、自分の入力をネットワークに送れるようになる
         _runner.ProvideInput = true;
 
-        // Fusionでゲームセッションに参加する
-        // await をつけることで「開始処理が終わるまで待つ」けど、ゲーム自体は止まらない
         await _runner.StartGame(new StartGameArgs()
         {
-            // ゲームモードを指定（例えば、HostやClientなど）
             GameMode = GameMode.Host,
-
-            // セッション名を指定（同じ名前だと参加できる）
             SessionName = sessionName,
-
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = _runnerObject.AddComponent<NetworkSceneManagerDefault>()
         });
 
         TitleUIManager.Instance.titleCanvas.SetActive(false);
@@ -52,22 +46,46 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     {
         TitleUIManager.Instance.nowLoadingImage.SetActive(true);
 
-        _runner = gameObject.AddComponent<NetworkRunner>();
-        _runner.ProvideInput = true;
-
-        // クライアントとしてゲーム開始
-        await _runner.StartGame(new StartGameArgs()
+        try
         {
-            GameMode = GameMode.Client,
-            SessionName = sessionName,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-        });
+            // Runner専用オブジェクトを作成
+            _runnerObject = new GameObject("NetworkRunnerClient");
+            _runner = _runnerObject.AddComponent<NetworkRunner>();
 
-        // ここまで来れば接続成功
-        TitleUIManager.Instance.titleCanvas.SetActive(false);
-        TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+            _runner.ProvideInput = true;
 
-        Debug.Log("ゲスト側接続完了");
+            var result = await _runner.StartGame(new StartGameArgs()
+            {
+                GameMode = GameMode.Client,
+                SessionName = sessionName,
+                EnableClientSessionCreation = false,
+                SceneManager = _runnerObject.AddComponent<NetworkSceneManagerDefault>()
+            });
+
+            if (result.Ok)
+            {
+                TitleUIManager.Instance.titleCanvas.SetActive(false);
+                TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+
+                Debug.Log("ゲスト側接続完了");
+            }
+            else
+            {
+                CoroutineRunner.Instance.StartCoroutine(
+                    TitleUIManager.Instance.ErrorTextDisplay("The room does not exist")
+                );
+            }
+        }
+        catch
+        {
+            CoroutineRunner.Instance.StartCoroutine(
+                TitleUIManager.Instance.ErrorTextDisplay("An unexpected error has occurred. Please try again.")
+            );
+        }
+        finally
+        {
+            TitleUIManager.Instance.nowLoadingImage.SetActive(false);
+        }
     }
 
 
