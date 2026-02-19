@@ -34,10 +34,11 @@ public class ItemObjectPlace : NetworkBehaviour
     {
         networkRunner = Runner;
 
-        if (!networkRunner.IsServer)
+        if (!Object.HasStateAuthority)
         {
             // サーバーのみがアイテムを生成する
             // クライアントがこの処理をしないことでアイテムの重複生成を防ぐ
+            Debug.Log("クライアントはアイテム生成処理をスキップ");
             return;
         }
 
@@ -81,13 +82,6 @@ public class ItemObjectPlace : NetworkBehaviour
     /// </summary>
     private void SpawnItem()
     {
-        //if (!networkRunner.IsServer)
-        //{
-        //    // サーバーのみがアイテムを生成する
-        //    // クライアントがこの処理をしないことでアイテムの重複生成を防ぐ
-        //    return;
-        //}
-
         // アイテムを生成してランダムに決めた座標に配置
         //GameObject obj = Instantiate(itemObjectPrefab, GetRandomPosition(), Quaternion.identity);
         NetworkObject obj= networkRunner.Spawn(itemObjectPrefab,GetRandomPosition(), Quaternion.identity);
