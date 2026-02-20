@@ -1,7 +1,11 @@
 using UnityEngine;
+using Fusion;
 
-public struct PlayerInputData
+namespace Network.Player
 {
-    public Vector2 move;
-    public bool jump;
+    public struct PlayerInputData : INetworkInput
+    {
+        public Vector2 move;
+        public NetworkBool picked;
+    }
 }

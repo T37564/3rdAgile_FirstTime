@@ -1,51 +1,123 @@
+//======================================================================
+// 担当者：鈴木
+//======================================================================
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerInputHandler : MonoBehaviour
+namespace Network.Player
 {
-    private PlayerInput playerInput;
-
-    private PlayerInputData currentInput;
-    public PlayerInputData CurrentInput => currentInput;
-
-    private void Awake()
+    /// <summary>
+    /// ローカルのプレイヤー入力情報を受け取るクラス
+    /// </summary>
+    [RequireComponent(typeof(PlayerInput))]
+    public class PlayerInputHandler : MonoBehaviour
     {
-        playerInput = GetComponent<PlayerInput>();
-    }
+        private PlayerInput playerInput;
 
-    private void OnEnable()
-    {
-        if (playerInput == null) return;
+        private Vector2 move;
+        private bool picked = false;
 
-        playerInput.onActionTriggered += OnMove;
-        playerInput.onActionTriggered += OnJump;
-    }
+        private bool holdCompleted = false;
 
-    private void OnDisable()
-    {
-        if (playerInput == null) return;
+        private void Awake()
+        {
+            playerInput = GetComponent<PlayerInput>();
+        }
 
-        playerInput.onActionTriggered -= OnMove;
-        playerInput.onActionTriggered -= OnJump;
-    }
+        /// <summary>
+        /// イベント登録
+        /// </summary>
+        private void OnEnable()
+        {
+            if (playerInput == null) return;
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (context.action.name != "Move") return;
+            playerInput.actions["Move"].performed += OnMove;
+            playerInput.actions["Move"].canceled += OnMove;
 
-        currentInput.move = context.ReadValue<Vector2>();
-    }
+            playerInput.actions["ItemPicked"].performed += OnItemPickedPerformed;
+            playerInput.actions["ItemPicked"].canceled += OnItemPickedCanceled;
+        }
 
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.action.name != "Jump") return;
+        /// <summary>
+        /// イベント登録解除
+        /// </summary>
+        private void OnDisable()
+        {
+            if (playerInput == null) return;
 
-        if (context.started)
-            currentInput.jump = true;
-    }
+            playerInput.onActionTriggered -= OnMove;
+        }
 
-    public void ClearOneShotInput()
-    {
-        currentInput.jump = false;
+        /// <summary>
+        /// InputSystem経由で入ってきた移動入力情報を保存
+        /// </summary>
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            if (context.action.name != "Move") return;
+
+            move = context.ReadValue<Vector2>();
+        }
+
+        #region アイテムを拾う等Aボタン長押し処理
+        /// <summary>
+        /// ボタンの長押し入力が成立したタイミングで発火
+        /// </summary>
+        public void OnItemPickedPerformed(InputAction.CallbackContext context)
+        {
+            // 長押し成立フラグを立てる
+            holdCompleted = true;
+        }
+
+        /// <summary>
+        /// 長押し入力がキャンセルされたら発火
+        /// </summary>
+        public void OnItemPickedCanceled(InputAction.CallbackContext context)
+        {
+            // 長押し入力が成立していなかったらメソッドから抜ける
+            if (!holdCompleted) return;
+
+            //成立したとホストに通知するためのbool値をtrueで保存
+            picked = true;
+
+            // ボタンが離されたので再度長押し判定をとれるようにfalseに
+            holdCompleted = false;
+        }
+        #endregion
+
+        #region アイテムを離す
+        /// <summary>
+        /// 長押しが成立したら発火
+        /// </summary>
+        public void OnItemDropedPerformed(InputAction.CallbackContext context)
+        {
+            holdCompleted = true;
+        }
+
+        /// <summary>
+        /// 長押し入力がキャンセルされたら発火
+        /// </summary>
+        public void OnItemDropedCanceled(InputAction.CallbackContext context)
+        {
+            if (!holdCompleted) return;
+            picked = false;
+            holdCompleted = false;
+        }
+        #endregion
+
+        /// <summary>
+        /// 保存した情報を入力構造体に渡す
+        /// </summary>
+        public PlayerInputData GetInput()
+        {
+            PlayerInputData data = new PlayerInputData()
+            {
+                move = move,
+                picked = picked
+            };
+            return data;
+        }
+
+        
     }
 }
