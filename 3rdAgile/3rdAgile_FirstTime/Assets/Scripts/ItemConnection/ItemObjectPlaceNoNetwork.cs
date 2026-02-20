@@ -21,10 +21,10 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     public class RoomSpawnPosition
     {
         [Header("部屋の最小X座標")]
-        public float minX; // 部屋の最小X座標
+        public float minX; 
 
         [Header("部屋の最大X座標")]
-        public float maxX; // 部屋の最大X座標
+        public float maxX; 
 
         [Header("部屋の最小Z座標")]
         public float minZ;
@@ -39,25 +39,8 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     [Header("部屋ごとのアイテム配置範囲のリスト")]
     [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
-
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
-
-    [Header("アイテムを配置するx軸範囲（最小値）")]
-    [SerializeField] private float minX = 0.0f;
-
-    [Header("アイテムを配置するx軸範囲（最大値）")]
-    [SerializeField] private float maxX = 0.0f;
-
-    //マップの構造的に高低差があるのでY軸の範囲も設定する
-    [Header("アイテムを配置するy軸の候補値")]
-    [SerializeField] private float[] yPositionCandidates;
-
-    [Header("アイテムを配置するz軸範囲（最小値）")]
-    [SerializeField] private float minZ = 0.0f;
-
-    [Header("アイテムを配置するz軸範囲（最大値）")]
-    [SerializeField] private float maxZ = 0.0f;
 
     private void Start()
     {
@@ -114,16 +97,22 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// 設定した部屋のアイテム配置範囲リストをランダムに選ぶメソッド
+    /// </summary>
     private RoomSpawnPosition GetRandomRoom()
     {
-        if(roomSpawnPositions==null|| roomSpawnPositions.Length == 0)
+        // roomSpawnPositionsがnullまたは配列に設定していない場合
+        if (roomSpawnPositions==null|| roomSpawnPositions.Length == 0)
         {
             Debug.LogError("部屋のスポーン位置が設定されていません");
             return null;
         }
 
+        //配列の中からランダムに1つ選ぶ
         int index=UnityEngine.Random.Range(0, roomSpawnPositions.Length);
 
+        //RoomSpawnPositionの配列で選ばれたものを返り値にする
         return roomSpawnPositions[index];
     }
 
@@ -133,21 +122,17 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     /// </summary>
     private Vector3 GetRandomPosition()
     {
-        //// X軸とZ軸は指定された範囲内でランダムに決める
-        //float randomX = UnityEngine.Random.Range(minX, maxX);
-        //float randomZ = UnityEngine.Random.Range(minZ, maxZ);
-
-        ////配列内の候補からY座標の値をランダムに選ぶ
-        //float randomY = yPositionCandidates[UnityEngine.Random.Range(0, yPositionCandidates.Length)];
-        //Debug.Log($"Random Y Position: {randomY}"); // デバッグ用ログ
-
+        
         RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
 
+        // 部屋の座標内のランダムな座標を代入
         float randomX = UnityEngine.Random.Range(roomSpawnPosition.minX, roomSpawnPosition.maxX);
         float randomZ = UnityEngine.Random.Range(roomSpawnPosition.minZ, roomSpawnPosition.maxZ);
 
+        //決められたY座標に配置する
         float randomY = roomSpawnPosition.positionY;
 
+        // 決められた座標を返り値にする
         return new Vector3(randomX, randomY, randomZ);
     }
 
