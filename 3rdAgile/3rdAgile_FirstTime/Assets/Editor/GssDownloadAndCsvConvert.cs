@@ -273,11 +273,19 @@ public class GssDownloadAndCsvConvert : EditorWindow
 
             try
             {
+                // IDをint型にパース
                 string rawId = columns[0].Trim().Trim('"').Trim('\uFEFF');
                 int id = int.Parse(rawId);
 
+                // 名前をトリミング
                 string rawName = columns[1].Trim().Trim('"');
                 string assetName = SanitizeFileName(rawName);
+
+                // 名前が空だったときのフォールバック
+                if (string.IsNullOrEmpty(assetName))
+                {
+                    assetName = rawId;
+                }
 
                 string assetPath = $"{SAVE_FOLDER}/{assetName}.asset";
 
@@ -331,7 +339,7 @@ public class GssDownloadAndCsvConvert : EditorWindow
 
     private string SanitizeFileName(string name)
     {
-        foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+        foreach (char c in Path.GetInvalidFileNameChars())
         {
             name = name.Replace(c.ToString(), "");
         }

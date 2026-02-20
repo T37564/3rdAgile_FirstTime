@@ -59,6 +59,7 @@ namespace Network.Player
             move = context.ReadValue<Vector2>();
         }
 
+        #region アイテムを拾う等Aボタン長押し処理
         /// <summary>
         /// ボタンの長押し入力が成立したタイミングで発火
         /// </summary>
@@ -82,6 +83,27 @@ namespace Network.Player
             // ボタンが離されたので再度長押し判定をとれるようにfalseに
             holdCompleted = false;
         }
+        #endregion
+
+        #region アイテムを離す
+        /// <summary>
+        /// 長押しが成立したら発火
+        /// </summary>
+        public void OnItemDropedPerformed(InputAction.CallbackContext context)
+        {
+            holdCompleted = true;
+        }
+
+        /// <summary>
+        /// 長押し入力がキャンセルされたら発火
+        /// </summary>
+        public void OnItemDropedCanceled(InputAction.CallbackContext context)
+        {
+            if (!holdCompleted) return;
+            picked = false;
+            holdCompleted = false;
+        }
+        #endregion
 
         /// <summary>
         /// 保存した情報を入力構造体に渡す
