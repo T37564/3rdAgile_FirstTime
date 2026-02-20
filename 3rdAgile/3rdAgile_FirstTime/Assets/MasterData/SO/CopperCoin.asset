@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45443360a7d554f4da2f5fc7670392ed, type: 3}
+  m_Name: CopperCoin
+  m_EditorClassIdentifier: Assembly-CSharp::SampleMasterData
+  id: 1
+  intValues:
+  - key: ID
+    value: 1
+  - key: Amount
+    value: 300
+  - key: RequiredPeople
+    value: 1
+  floatValues:
+  - key: EarlyTime
+    value: 0.3
+  - key: MiddleTime
+    value: 0.15
+  - key: FinalTime
+    value: 0
+  boolValues:
+  - key: SpeedReduction
+    value: 0
+  - key: CursedFlag
+    value: 0
+  - key: GuardianAwakeFlag
+    value: 0
+  stringValues:
+  - key: Name
+    value: CopperCoin
