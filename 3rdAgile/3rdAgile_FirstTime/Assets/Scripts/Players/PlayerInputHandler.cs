@@ -1,29 +1,47 @@
+//======================================================================
+// 担当者：鈴木
+//======================================================================
+
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Fusion;
 
 namespace Network.Player
 {
+    /// <summary>
+    /// ローカルのプレイヤー入力情報を受け取るクラス
+    /// </summary>
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerInputHandler : MonoBehaviour
     {
         private PlayerInput playerInput;
 
         private Vector2 move;
+        private bool picked = false;
+
+        private bool holdCompleted = false;
 
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
         }
 
+        /// <summary>
+        /// イベント登録
+        /// </summary>
         private void OnEnable()
         {
             if (playerInput == null) return;
 
             playerInput.actions["Move"].performed += OnMove;
             playerInput.actions["Move"].canceled += OnMove;
+
+            playerInput.actions["ItemPicked"].performed += OnItemPickedPerformed;
+            playerInput.actions["ItemPicked"].canceled += OnItemPickedCanceled;
         }
 
+        /// <summary>
+        /// イベント登録解除
+        /// </summary>
         private void OnDisable()
         {
             if (playerInput == null) return;
@@ -31,6 +49,9 @@ namespace Network.Player
             playerInput.onActionTriggered -= OnMove;
         }
 
+        /// <summary>
+        /// InputSystem経由で入ってきた移動入力情報を保存
+        /// </summary>
         public void OnMove(InputAction.CallbackContext context)
         {
             if (context.action.name != "Move") return;
@@ -38,26 +59,43 @@ namespace Network.Player
             move = context.ReadValue<Vector2>();
         }
 
+        /// <summary>
+        /// ボタンの長押し入力が成立したタイミングで発火
+        /// </summary>
+        public void OnItemPickedPerformed(InputAction.CallbackContext context)
+        {
+            // 長押し成立フラグを立てる
+            holdCompleted = true;
+        }
+
+        /// <summary>
+        /// 長押し入力がキャンセルされたら発火
+        /// </summary>
+        public void OnItemPickedCanceled(InputAction.CallbackContext context)
+        {
+            // 長押し入力が成立していなかったらメソッドから抜ける
+            if (!holdCompleted) return;
+
+            //成立したとホストに通知するためのbool値をtrueで保存
+            picked = true;
+
+            // ボタンが離されたので再度長押し判定をとれるようにfalseに
+            holdCompleted = false;
+        }
+
+        /// <summary>
+        /// 保存した情報を入力構造体に渡す
+        /// </summary>
         public PlayerInputData GetInput()
         {
             PlayerInputData data = new PlayerInputData()
             {
                 move = move,
+                picked = picked
             };
             return data;
         }
 
-        //public void OnJump(InputAction.CallbackContext context)
-        //{
-        //    if (context.action.name != "Jump") return;
-
-        //    if (context.started)
-        //        currentInput.jump = true;
-        //}
-
-        //public void ClearOneShotInput()
-        //{
-        //    currentInput.jump = false;
-        //}
+        
     }
 }

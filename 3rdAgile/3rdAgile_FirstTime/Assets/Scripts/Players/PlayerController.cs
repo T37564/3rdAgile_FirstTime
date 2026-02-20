@@ -9,7 +9,7 @@ namespace Network.Player
         [SerializeField] private PlayerInputHandler inputHandler;
 
         [SerializeField] private float moveSpeed = 1.0f;
-        [SerializeField] private float jumpForce = 50.0f;
+        //[SerializeField] private float jumpForce = 50.0f;
 
         private Rigidbody rb;
 
@@ -22,7 +22,7 @@ namespace Network.Player
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerInputData input))
+            if (GetInput<PlayerInputData>(out var input))
             {
                 Vector3 move = new Vector3(input.move.x, 0.0f, input.move.y);
                 rb.MovePosition(rb.position + move * moveSpeed * Runner.DeltaTime);
