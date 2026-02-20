@@ -3,67 +3,47 @@ using UnityEngine;
 
 public class ItemObjectPlaceNoNetwork : MonoBehaviour
 {
-    [Header("配置するアイテム")]
-    [Header("銅貨オブジェクト")]
-    [SerializeField] private GameObject copperCoinPrefab;
+    [System.Serializable]
+    public class ItemProbability
+    {
+        [Header("アイテムのプレハブオブジェクト")]
+        public GameObject itemPrefab; // アイテムのプレハブ
 
-    [Header("銀貨オブジェクト")]
-    [SerializeField] private GameObject silverCoinPrefab;
+        [Header("アイテムの出現確率")]
+        public float probability; // アイテムの出現確率
+    }
 
-    [Header("金貨オブジェクト")]
-    [SerializeField] private GameObject goldCoinPrefab;
+    // アイテムとその確率の配列
+    [Header("出現するアイテムのリスト")]
+    [SerializeField] private ItemProbability[] itemProbabilities;
 
-    [Header("謎のコインオブジェクト")]
-    [SerializeField] private GameObject mysteriousCoinPrefab;
+    [System.Serializable]
+    public class RoomSpawnPosition
+    {
+        [Header("部屋の最小X座標")]
+        public float minX; 
 
-    [Header("高価な壺オブジェクト")]
-    [SerializeField] private GameObject expensivePotPrefab;
+        [Header("部屋の最大X座標")]
+        public float maxX; 
 
-    [Header("古代の壺オブジェクト")]
-    [SerializeField] private GameObject ancientVasePrefab;
+        [Header("部屋の最小Z座標")]
+        public float minZ;
 
-    [Header("銅貨の出現確立")]
-    [SerializeField] private float copperCoinProbability = 0.0f;
+        [Header("部屋の最大Z座標")]
+        public float maxZ;
 
-    [Header("銀貨の出現確立")]
-    [SerializeField] private float silverCoinProbability = 0.0f;
+        [Header("部屋のY座標")]
+        public float positionY; // 部屋のY座標
+    }
 
-    [Header("金貨の出現確立")]
-    [SerializeField] private float goldCoinProbability = 0.0f;
-
-    [Header("謎のコインの出現確立")]
-    [SerializeField] private float mysteriousCoinProbability = 0.0f;
-
-    [Header("高価な壺の出現確立")]
-    [SerializeField] private float expensivePotProbability = 0.0f;
-
-    //確率の合計値
-    private float totalProbability = 0.0f;
+    [Header("部屋ごとのアイテム配置範囲のリスト")]
+    [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
 
-    [Header("アイテムを配置するx軸範囲（最小値）")]
-    [SerializeField] private float minX = 0.0f;
-
-    [Header("アイテムを配置するx軸範囲（最大値）")]
-    [SerializeField] private float maxX = 0.0f;
-
-    //マップの構造的に高低差があるのでY軸の範囲も設定する
-    [Header("アイテムを配置するy軸の候補値")]
-    [SerializeField] private float[] yPositionCandidates;
-
-    [Header("アイテムを配置するz軸範囲（最小値）")]
-    [SerializeField] private float minZ = 0.0f;
-
-    [Header("アイテムを配置するz軸範囲（最大値）")]
-    [SerializeField] private float maxZ = 0.0f;
-
     private void Start()
     {
-        //確率の合計値を設定
-        totalProbability = 100.0f;
-
         for (int i = 0; i < maxItemObjectCount; i++)
         {
             // アイテムを生成して配置する
@@ -72,18 +52,87 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     }
 
     /// <summary>
+    /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
+    /// </summary>
+    /// <returns></returns>
+    private GameObject GetRandomPrefabObject()
+    {
+        //合計確率の初期値
+        float total = 0.0f;
+
+        // ItemProbabilityごとのprobabilityの合計を計算
+        //全部の確立を計算している
+        foreach (var item in itemProbabilities)
+        {
+            total += item.probability;
+        }
+
+        //totalが0以下の場合確率に基づく計算ができないのでエラーを出力してnullを返す
+        if (total <= 0)
+        {
+            Debug.LogError("確率の合計が0です");
+            return null;
+        }
+
+        // 0.0から合計確率の範囲でランダムな数値を生成
+        float randomProbability = UnityEngine.Random.Range(0f, total);
+
+        // ランダムな数値がどのアイテムに属するかを決定
+        float current = 0.0f;
+
+        // アイテムの確率を順番に足していき、ランダムな数値がどのアイテムの範囲に入るかを確認
+        foreach (var item in itemProbabilities)
+        {
+            //現在のアイテムの確率を足していく
+            current += item.probability;
+
+            //取得したランダムな数値が現在のアイテムの出現確立の数値内にある場合
+            //そのアイテムをGameObjectとして返す
+            if (randomProbability < current)
+            {
+                return item.itemPrefab;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 設定した部屋のアイテム配置範囲リストをランダムに選ぶメソッド
+    /// </summary>
+    private RoomSpawnPosition GetRandomRoom()
+    {
+        // roomSpawnPositionsがnullまたは配列に設定していない場合
+        if (roomSpawnPositions==null|| roomSpawnPositions.Length == 0)
+        {
+            Debug.LogError("部屋のスポーン位置が設定されていません");
+            return null;
+        }
+
+        //配列の中からランダムに1つ選ぶ
+        int index=UnityEngine.Random.Range(0, roomSpawnPositions.Length);
+
+        //RoomSpawnPositionの配列で選ばれたものを返り値にする
+        return roomSpawnPositions[index];
+    }
+
+    /// <summary>
     /// 座標をランダムに決めるメソッド
     /// Y座標は候補値からランダムに選ぶようにする
     /// </summary>
     private Vector3 GetRandomPosition()
     {
-        // X軸とZ軸は指定された範囲内でランダムに決める
-        float randomX = UnityEngine.Random.Range(minX, maxX);
-        float randomZ = UnityEngine.Random.Range(minZ, maxZ);
+        
+        RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
 
-        float randomY = yPositionCandidates[UnityEngine.Random.Range(0, yPositionCandidates.Length)];
-        Debug.Log($"Random Y Position: {randomY}"); // デバッグ用ログ
+        // 部屋の座標内のランダムな座標を代入
+        float randomX = UnityEngine.Random.Range(roomSpawnPosition.minX, roomSpawnPosition.maxX);
+        float randomZ = UnityEngine.Random.Range(roomSpawnPosition.minZ, roomSpawnPosition.maxZ);
 
+        //決められたY座標に配置する
+        float randomY = roomSpawnPosition.positionY;
+
+        // 決められた座標を返り値にする
         return new Vector3(randomX, randomY, randomZ);
     }
 
@@ -92,42 +141,8 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     /// </summary>
     private void SpawnItem()
     {
-        // 0.0から100.0の範囲でランダムな数値を生成
-        float number = UnityEngine.Random.Range(0.0f, 100.0f);
-
-        GameObject spawnPrefab = null;
-
-        // ランダムに取得した値に基づいて生成するアイテムを決める
-        if (number <= 30.0f)
-        {
-            Debug.Log("生成するアイテム: 銅貨");
-            spawnPrefab = copperCoinPrefab;
-        }
-        else if (number <= 55.0f)
-        {
-            Debug.Log("生成するアイテム: 銀貨");
-            spawnPrefab = silverCoinPrefab;
-        }
-        else if (number <= 75.0f)
-        {
-            Debug.Log("生成するアイテム: 金貨");
-            spawnPrefab = goldCoinPrefab;
-        }
-        else if(number <= 90.0f)
-        {
-            Debug.Log("生成するアイテム: 謎のコイン");
-            spawnPrefab = mysteriousCoinPrefab;
-        }
-        else if (number <= 95.0f)
-        {
-            Debug.Log("生成するアイテム: 高価な壺");
-            spawnPrefab = expensivePotPrefab;
-        }
-        else
-        {
-            Debug.Log("生成するアイテム: 古代の壺");
-            spawnPrefab = ancientVasePrefab;
-        }
+        // 確率に基づいてランダムにアイテムのプレハブを選択
+        GameObject spawnPrefab = GetRandomPrefabObject();
 
         if (spawnPrefab == null)
         {
