@@ -286,7 +286,6 @@ public class GssDownloadAndCsvConvert : EditorWindow
                 {
                     assetName = rawId;
                 }
-
                 string assetPath = $"{SAVE_FOLDER}/{assetName}.asset";
 
                 SampleMasterData data =
