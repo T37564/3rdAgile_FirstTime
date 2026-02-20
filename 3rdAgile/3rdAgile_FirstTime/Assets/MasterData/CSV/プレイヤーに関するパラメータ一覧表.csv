@@ -1,0 +1,5 @@
+"ID","Player_Name","Player_HP","Player_Speed","Player_AttackForObject","Player_AttackForGuardian","isSpeed_Reduction","isCursed","isStan","isAlive","isDied","isRevival","","","","","","","","","","","","","","","","","","","",""
+"1","TreasureHunter_1","100","5.5","25","0","FALSE","FALSE","FALSE","TRUE","FALSE","FALSE","","","","","","","","","","","","","","","","","","","",""
+"2","TreasureHunter_2","100","5.5","25","0","FALSE","FALSE","FALSE","TRUE","FALSE","FALSE","","","","","","","","","","","","","","","","","","","",""
+"3","TreasureHunter_3","100","5.5","25","0","FALSE","FALSE","FALSE","TRUE","FALSE","FALSE","","","","","","","","","","","","","","","","","","","",""
+"4","TreasureHunter_4","100","5.5","25","0","FALSE","FALSE","FALSE","TRUE","FALSE","FALSE","","","","","","","","","","","","","","","","","","","",""
