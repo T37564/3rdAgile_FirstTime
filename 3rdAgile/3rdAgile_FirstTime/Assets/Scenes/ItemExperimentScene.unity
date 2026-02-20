@@ -480,9 +480,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b4e520f4da078143bb0ee5efa9d0b98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlaceNoNetwork
-  CopperCoinPrefab: {fileID: 5854831717035632874, guid: e01e9da6ab7b89442a8e498126e32601, type: 3}
-  SilverCoinPrefab: {fileID: 5854831717035632874, guid: b5d1c291f91675b46adeda77c4e951ac, type: 3}
-  maxItemObjectCount: 10
+  copperCoinPrefab: {fileID: 5854831717035632874, guid: e01e9da6ab7b89442a8e498126e32601, type: 3}
+  silverCoinPrefab: {fileID: 5854831717035632874, guid: b5d1c291f91675b46adeda77c4e951ac, type: 3}
+  goldCoinPrefab: {fileID: 5854831717035632874, guid: d94d8a2db004e534391fb5e3d3e265ed, type: 3}
+  mysteriousCoinPrefab: {fileID: 5854831717035632874, guid: 2161ad540d11bad4abb5f1a9bdc42779, type: 3}
+  expensivePotPrefab: {fileID: 5854831717035632874, guid: b59339f91ee87fd4db055ddc985b628d, type: 3}
+  ancientVasePrefab: {fileID: 5854831717035632874, guid: 98e2e333c47fa5949964730442df48fa, type: 3}
+  copperCoinProbability: 30
+  silverCoinProbability: 25
+  goldCoinProbability: 20
+  mysteriousCoinProbability: 15
+  expensivePotProbability: 5
+  maxItemObjectCount: 30
   minX: -15
   maxX: 15
   yPositionCandidates:
@@ -686,7 +695,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}

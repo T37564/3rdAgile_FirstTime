@@ -1,17 +1,44 @@
 using System;
 using UnityEngine;
 
-public enum ItemKind : int
-{
-    CopperCoin=0,
-    SilverCoin,
-}
 public class ItemObjectPlaceNoNetwork : MonoBehaviour
 {
     [Header("配置するアイテム")]
-    [SerializeField] private GameObject CopperCoinPrefab;
+    [Header("銅貨オブジェクト")]
+    [SerializeField] private GameObject copperCoinPrefab;
 
-    [SerializeField] private GameObject SilverCoinPrefab;
+    [Header("銀貨オブジェクト")]
+    [SerializeField] private GameObject silverCoinPrefab;
+
+    [Header("金貨オブジェクト")]
+    [SerializeField] private GameObject goldCoinPrefab;
+
+    [Header("謎のコインオブジェクト")]
+    [SerializeField] private GameObject mysteriousCoinPrefab;
+
+    [Header("高価な壺オブジェクト")]
+    [SerializeField] private GameObject expensivePotPrefab;
+
+    [Header("古代の壺オブジェクト")]
+    [SerializeField] private GameObject ancientVasePrefab;
+
+    [Header("銅貨の出現確立")]
+    [SerializeField] private float copperCoinProbability = 0.0f;
+
+    [Header("銀貨の出現確立")]
+    [SerializeField] private float silverCoinProbability = 0.0f;
+
+    [Header("金貨の出現確立")]
+    [SerializeField] private float goldCoinProbability = 0.0f;
+
+    [Header("謎のコインの出現確立")]
+    [SerializeField] private float mysteriousCoinProbability = 0.0f;
+
+    [Header("高価な壺の出現確立")]
+    [SerializeField] private float expensivePotProbability = 0.0f;
+
+    //確率の合計値
+    private float totalProbability = 0.0f;
 
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
@@ -32,18 +59,17 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     [Header("アイテムを配置するz軸範囲（最大値）")]
     [SerializeField] private float maxZ = 0.0f;
 
-    //列挙型（enum）の変数の宣言
-    private ItemKind itemKind;
-
     private void Start()
     {
+        //確率の合計値を設定
+        totalProbability = 100.0f;
+
         for (int i = 0; i < maxItemObjectCount; i++)
         {
             // アイテムを生成して配置する
             SpawnItem();
         }
     }
-
 
     /// <summary>
     /// 座標をランダムに決めるメソッド
@@ -66,24 +92,41 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     /// </summary>
     private void SpawnItem()
     {
-        // 列挙型の値の要素数を取得
-        int maxCount = Enum.GetNames(typeof(ItemKind)).Length;
-
-        //列挙型の値をランダムに取得
-        itemKind = (ItemKind)UnityEngine.Random.Range(0, maxCount);
-        Debug.Log($"Generated ItemKind: {itemKind}"); // デバッグ用ログ
+        // 0.0から100.0の範囲でランダムな数値を生成
+        float number = UnityEngine.Random.Range(0.0f, 100.0f);
 
         GameObject spawnPrefab = null;
 
-        //取得した値に応じて生成するアイテムを変える
-        switch (itemKind)
+        // ランダムに取得した値に基づいて生成するアイテムを決める
+        if (number <= 30.0f)
         {
-            case ItemKind.CopperCoin:
-                spawnPrefab = CopperCoinPrefab;
-                break;
-            case ItemKind.SilverCoin:
-                spawnPrefab = SilverCoinPrefab;
-                break;
+            Debug.Log("生成するアイテム: 銅貨");
+            spawnPrefab = copperCoinPrefab;
+        }
+        else if (number <= 55.0f)
+        {
+            Debug.Log("生成するアイテム: 銀貨");
+            spawnPrefab = silverCoinPrefab;
+        }
+        else if (number <= 75.0f)
+        {
+            Debug.Log("生成するアイテム: 金貨");
+            spawnPrefab = goldCoinPrefab;
+        }
+        else if(number <= 90.0f)
+        {
+            Debug.Log("生成するアイテム: 謎のコイン");
+            spawnPrefab = mysteriousCoinPrefab;
+        }
+        else if (number <= 95.0f)
+        {
+            Debug.Log("生成するアイテム: 高価な壺");
+            spawnPrefab = expensivePotPrefab;
+        }
+        else
+        {
+            Debug.Log("生成するアイテム: 古代の壺");
+            spawnPrefab = ancientVasePrefab;
         }
 
         if (spawnPrefab == null)
