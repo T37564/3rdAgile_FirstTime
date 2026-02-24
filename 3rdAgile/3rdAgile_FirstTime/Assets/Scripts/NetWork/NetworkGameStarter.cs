@@ -1,4 +1,10 @@
-﻿using Fusion;
+﻿// -----------------------------------------------------------------------------------
+// ルーム作成、参加、シーン管理、ゲーム開始の司令塔。
+// NetworkGameStarter.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
+
+using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
@@ -6,9 +12,12 @@ using UnityEngine;
 
 public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private NetworkRunner _runner = null;
+    // ルーム情報などを入れるNetworkRunner
+    public NetworkRunner networkRunner = null;
 
-    private GameObject _runnerObject = null;
+
+    // NetworkRunner をアタッチするためのオブジェクト
+    private GameObject networkRunnerObject = null;
 
 
     /// <summary>
@@ -17,24 +26,38 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public async void CreateHostRoom(string sessionName)
     {
-        TitleUIManager.Instance.nowLoadingImage.SetActive(true);
+        TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(true);
 
         // Runner専用オブジェクトを作成
-        _runnerObject = new GameObject("NetworkRunnerHost");
-        _runner = _runnerObject.AddComponent<NetworkRunner>();
+        networkRunnerObject = new GameObject("NetworkRunnerHost");
+        DontDestroyOnLoad(networkRunnerObject);
 
-        _runner.ProvideInput = true;
+        networkRunner = networkRunnerObject.AddComponent<NetworkRunner>();
 
-        await _runner.StartGame(new StartGameArgs()
+        networkRunner.ProvideInput = true;
+
+        // UIイベント管理スクリプトを Runner オブジェクトに付ける
+        var uiChange = networkRunnerObject.AddComponent<NetworkUIChange>();
+        // コールバック登録（StartGame 前に行う）
+        networkRunner.AddCallbacks(uiChange);
+
+        // PlayerSpawner 登録
+        var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
+        networkRunner.AddCallbacks(playerSpawner);
+
+        networkRunner.AddCallbacks(this);
+
+        await networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Host,
             SessionName = sessionName,
             PlayerCount = 4,
-            SceneManager = _runnerObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
         });
 
-        TitleUIManager.Instance.titleCanvas.SetActive(false);
-        TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+        TitleCanvasDisplaySettings.Instance.titleCanvas.SetActive(false);
+        TitleCanvasDisplaySettings.Instance.lobbyCanvas.SetActive(true);
+        TitleCanvasDisplaySettings.Instance.gameStartButton.SetActive(true);
 
         Debug.Log("ホスト側接続完了");
     }
@@ -45,47 +68,62 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public async void JoinHostRoom(string sessionName)
     {
-        TitleUIManager.Instance.nowLoadingImage.SetActive(true);
+        TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(true);
 
         try
         {
-            // Runner専用オブジェクトを作成
-            _runnerObject = new GameObject("NetworkRunnerClient");
-            _runner = _runnerObject.AddComponent<NetworkRunner>();
+            networkRunnerObject = new GameObject("NetworkRunnerClient");
+            DontDestroyOnLoad(networkRunnerObject);
 
-            _runner.ProvideInput = true;
+            networkRunner = networkRunnerObject.AddComponent<NetworkRunner>();
 
-            var result = await _runner.StartGame(new StartGameArgs()
+            networkRunner.ProvideInput = true;
+
+            // UIイベント管理スクリプトを Runner オブジェクトに付ける
+            var uiChange = networkRunnerObject.AddComponent<NetworkUIChange>();
+            // コールバック登録（StartGame 前に行う）
+            networkRunner.AddCallbacks(uiChange);
+
+            // PlayerSpawner 登録
+            var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
+            networkRunner.AddCallbacks(playerSpawner);
+
+            networkRunner.AddCallbacks(this);
+
+
+            var result = await networkRunner.StartGame(new StartGameArgs()
             {
                 GameMode = GameMode.Client,
                 SessionName = sessionName,
                 EnableClientSessionCreation = false,
-                SceneManager = _runnerObject.AddComponent<NetworkSceneManagerDefault>()
+                SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
             });
 
             if (result.Ok)
             {
-                TitleUIManager.Instance.titleCanvas.SetActive(false);
-                TitleUIManager.Instance.lobbyCanvas.SetActive(true);
+                TitleCanvasDisplaySettings.Instance.titleCanvas.SetActive(false);
+                TitleCanvasDisplaySettings.Instance.lobbyCanvas.SetActive(true);
 
                 Debug.Log("ゲスト側接続完了");
             }
             else
             {
-                CoroutineRunner.Instance.StartCoroutine(
-                    TitleUIManager.Instance.ErrorTextDisplay("The room does not exist")
-                );
+                CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true,"The room does not exist", 1));
+
+                TitleCanvasDisplaySettings.Instance.ResetTitleUI();
+                TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
             }
         }
         catch
         {
-            CoroutineRunner.Instance.StartCoroutine(
-                TitleUIManager.Instance.ErrorTextDisplay("An unexpected error has occurred. Please try again.")
-            );
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true,"An unexpected error has occurred. Please try again.", 1));
+
+            TitleCanvasDisplaySettings.Instance.ResetTitleUI();
+            TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
         }
         finally
         {
-            TitleUIManager.Instance.nowLoadingImage.SetActive(false);
+            TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(false);
         }
     }
 
@@ -107,18 +145,13 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
 
+
     /// <summary>
     /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
     /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-
-
-
-
-
-
 
 
 
@@ -188,21 +221,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 現在参加可能なセッション（ゲーム部屋）の一覧が更新された時に呼ばれる。
     /// ロビー画面のリスト更新や、「部屋が増えた・消えた」をUIに反映するのに使う。
     /// </summary>
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-    {
-        //string targetSessionName = "MyRoom";
-
-        //bool exists = sessionList.Any(s => s.Name == targetSessionName);
-
-        //if (exists)
-        //{
-        //    Debug.Log($"✅ セッション '{targetSessionName}' は存在します。");
-        //}
-        //else
-        //{
-        //    Debug.Log($"❌ セッション '{targetSessionName}' は存在しません。");
-        //}
-    }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
 
 
 

@@ -1,19 +1,13 @@
-// -----------------------------------------------------------------------------------
-// NetworkRunner が発行するプレイヤー参加・退出などのコールバックを受け取るスクリプト。
-// プレイヤー生成や接続時の初期処理をここで行う。
-// BasicSpawner.cs
-// Create.by TakahashiSaya
-//-----------------------------------------------------------------------------------
 using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // 複数人のIDを取得するためList型
-    private List<PlayerRef> players = new List<PlayerRef>();
+
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -21,58 +15,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        players.Add(player);
-        Debug.Log($"Player joined: {player}");
-    }
-
-
-
-    /// <summary>
-    /// 全クライアントのシーンロード完了時に呼ばれる。
-    /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
-    /// </summary>
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        if (!runner.IsServer) return;
-
-        // スポーンする位置をいれたオブジェクトを取得
-        Transform spawnPoint = GameObject.Find("SpawnPoint").transform;
-
-        // 子オブジェクト分配列を作成
-        Transform[] spawnPosition = new Transform[spawnPoint.childCount];
-
-        // 配列に子オブジェクトの位置情報を入れる
-        for (int i = 0; i < spawnPoint.childCount; i++)
-        {
-            spawnPosition[i] = spawnPoint.GetChild(i);
-        }
-
-        // スポーンさせるPlayerのオブジェクトをさがす
-        GameObject prefabObj = Resources.Load<GameObject>("NetworkPlayer_Test");
-
-        // 見つからなかったとき
-        if (prefabObj == null)
-        {
-            Debug.LogError("PlayerPrefab が見つからないわよ！");
-            return;
-        }
-
-        // NetworkObjectがついているか確認する
-        NetworkObject networkPlayerObject = prefabObj.GetComponent<NetworkObject>();
-
-        // 見つからなかったとき
-        if (networkPlayerObject == null)
-        {
-            Debug.LogError("NetworkObject が付いてないわよ！");
-            return;
-        }
-
-        // 参加したすべてのプレイヤーを Spawn する
-        for (int i = 0; i < players.Count; i++)
-        {
-            runner.Spawn(networkPlayerObject, spawnPosition[i].position, Quaternion.identity, players[i]);
-            Debug.Log($"Spawned player for {players[i]}");
-        }
+        Debug.Log("JOIN");
+        UpdateCount(runner);
     }
 
 
@@ -81,8 +25,21 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log("OUT");
+        UpdateCount(runner);
+    }
 
+
+    /// <summary>
+    /// ルームに参加しているプレイヤーテキストの人数を更新する処理
+    /// </summary>
+    private void UpdateCount(NetworkRunner runner)
+    {
+        int count = runner.ActivePlayers.Count();
+        TitleCanvasDisplaySettings.Instance.playerCountDisplayText.text = $"Player : {count} / 4 ";
+    }
 
     /// <summary>
     /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
@@ -90,7 +47,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-
 
 
 
@@ -183,6 +139,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
 
 
+    /// <summary>
+    /// 全クライアントのシーンロード完了時に呼ばれる。
+    /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
+    /// </summary>
+    public void OnSceneLoadDone(NetworkRunner runner) { }
 
 
 
