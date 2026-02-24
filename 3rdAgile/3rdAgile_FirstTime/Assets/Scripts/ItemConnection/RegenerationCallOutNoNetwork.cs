@@ -29,6 +29,7 @@ public class RegenerationCallOutNoNetwork : MonoBehaviour
         }
     }
 
+    //アイテムが地面に配置されているかどうかを判定するメソッド
     private bool IsGround()
     {
         return Physics.Raycast(transform.position, Vector3.down, rayLength, layerMask);

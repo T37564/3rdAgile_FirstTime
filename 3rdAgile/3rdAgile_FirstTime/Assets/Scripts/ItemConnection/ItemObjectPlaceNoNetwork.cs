@@ -20,6 +20,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     [System.Serializable]
     public class RoomSpawnPosition
     {
+        [Header("アイテムを配置する部屋の座標範囲を設定する")]
         [Header("部屋の最小X座標")]
         public float minX; 
 
@@ -44,6 +45,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
 
     private void Start()
     {
+        //maxItemObjectCountで指定した数だけアイテムを生成する
         for (int i = 0; i < maxItemObjectCount; i++)
         {
             // アイテムを生成して配置する
