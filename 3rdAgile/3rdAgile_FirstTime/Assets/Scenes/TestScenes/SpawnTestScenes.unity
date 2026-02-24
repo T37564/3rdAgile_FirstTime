@@ -420,6 +420,80 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1009439673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1009439675}
+  - component: {fileID: 1009439674}
+  m_Layer: 0
+  m_Name: ItemObjectPlaceNoNetwork
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1009439674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009439673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4e520f4da078143bb0ee5efa9d0b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlaceNoNetwork
+  itemProbabilities:
+  - itemPrefab: {fileID: 5854831717035632874, guid: e01e9da6ab7b89442a8e498126e32601, type: 3}
+    probability: 30
+  - itemPrefab: {fileID: 5854831717035632874, guid: b5d1c291f91675b46adeda77c4e951ac, type: 3}
+    probability: 25
+  - itemPrefab: {fileID: 5854831717035632874, guid: d94d8a2db004e534391fb5e3d3e265ed, type: 3}
+    probability: 20
+  - itemPrefab: {fileID: 5854831717035632874, guid: 2161ad540d11bad4abb5f1a9bdc42779, type: 3}
+    probability: 15
+  - itemPrefab: {fileID: 5854831717035632874, guid: b59339f91ee87fd4db055ddc985b628d, type: 3}
+    probability: 7
+  - itemPrefab: {fileID: 5854831717035632874, guid: 98e2e333c47fa5949964730442df48fa, type: 3}
+    probability: 3
+  roomSpawnPositions:
+  - minX: -25
+    maxX: 25
+    minZ: -25
+    maxZ: 25
+    positionY: 0.5
+  - minX: -25
+    maxX: 25
+    minZ: -25
+    maxZ: 25
+    positionY: 10.5
+  - minX: -10
+    maxX: 10
+    minZ: 20
+    maxZ: 40
+    positionY: 5.5
+  maxItemObjectCount: 30
+--- !u!4 &1009439675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009439673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1219740488
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,3 +691,4 @@ SceneRoots:
   - {fileID: 173859064}
   - {fileID: 855676016}
   - {fileID: 1463889637}
+  - {fileID: 1009439675}
