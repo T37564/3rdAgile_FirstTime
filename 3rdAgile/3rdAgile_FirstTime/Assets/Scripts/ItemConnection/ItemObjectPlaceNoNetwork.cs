@@ -1,3 +1,4 @@
+using Fusion;
 using System;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     public class ItemProbability
     {
         [Header("アイテムのプレハブオブジェクト")]
-        public GameObject itemPrefab; // アイテムのプレハブ
+        public NetworkObject itemPrefab; // アイテムのプレハブ
 
         [Header("アイテムの出現確率")]
         public float probability; // アイテムの出現確率
@@ -15,7 +16,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
 
     // アイテムとその確率の配列
     [Header("出現するアイテムのリスト")]
-    [SerializeField] private ItemProbability[] itemProbabilities;
+    [SerializeField] public ItemProbability[] itemProbabilities;
 
     [System.Serializable]
     public class RoomSpawnPosition
@@ -48,7 +49,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
     /// </summary>
     /// <returns></returns>
-    private GameObject GetRandomPrefabObject()
+    private NetworkObject GetRandomPrefabObject()
     {
         //合計確率の初期値
         float total = 0.0f;
@@ -135,7 +136,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     private void SpawnItem()
     {
         // 確率に基づいてランダムにアイテムのプレハブを選択
-        GameObject spawnPrefab = GetRandomPrefabObject();
+        NetworkObject spawnPrefab = GetRandomPrefabObject();
 
         if (spawnPrefab == null)
         {
@@ -144,7 +145,7 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
         }
 
         // アイテムを生成してランダムに決めた座標に配置
-        GameObject obj = Instantiate(spawnPrefab, GetRandomPosition(), Quaternion.identity);
+        NetworkObject obj = Instantiate(spawnPrefab, GetRandomPosition(), Quaternion.identity);
 
         RegenerationCallOutNoNetwork callOut = obj.GetComponent<RegenerationCallOutNoNetwork>();
 
