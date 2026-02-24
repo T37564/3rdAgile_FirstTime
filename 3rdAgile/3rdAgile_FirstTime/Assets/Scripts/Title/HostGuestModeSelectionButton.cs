@@ -112,6 +112,6 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         }
         
         // ƒV[ƒ“‘JˆÚ
-        networkGameStarter.networkRunner.LoadScene("SpawnTestScenes");
+        networkGameStarter.networkRunner.LoadScene("PlayerSpawnTestScenes 1");
     }
 }

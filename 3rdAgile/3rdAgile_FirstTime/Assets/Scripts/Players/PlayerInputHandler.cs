@@ -56,6 +56,8 @@ namespace Network.Player
         {
             if (context.action.name != "Move") return;
 
+            Debug.Log("Move input received: " + context.ReadValue<Vector2>());
+
             move = context.ReadValue<Vector2>();
         }
 

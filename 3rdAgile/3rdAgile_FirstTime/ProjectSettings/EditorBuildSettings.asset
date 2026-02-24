@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/TestScenes/MatchingTestScenes.unity
     guid: 3a57a9dbb0ae0be44a4da2abc61266d9
   - enabled: 1
+    path: Assets/Scenes/TestScenes/PlayerSpawnTestScenes 1.unity
+    guid: 4be6f11016243164e9f71dd07242f494
+  - enabled: 0
     path: Assets/Scenes/TestScenes/SpawnTestScenes.unity
     guid: 1c53bc4c5e117d144a3b14f082148a26
   - enabled: 1
