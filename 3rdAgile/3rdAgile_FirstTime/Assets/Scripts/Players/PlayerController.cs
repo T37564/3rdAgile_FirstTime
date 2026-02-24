@@ -17,12 +17,17 @@ namespace Network.Player
         {
             rb = GetComponent<Rigidbody>();
             if (Object.HasInputAuthority)
-                inputHandler = GetComponent<PlayerInputHandler>();
+            {
+                var inputGetter = FindAnyObjectByType<PlayerInputGetter>();
+                inputGetter.RegisterLocalInput(GetComponent<PlayerInputHandler>());
+            }
         }
 
         public override void FixedUpdateNetwork()
         {
             if(!Object.HasInputAuthority) return;
+
+            Debug.Log("FixedUpdateNetwork called");
 
             if (GetInput<PlayerInputData>(out var input))
             {

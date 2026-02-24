@@ -117,6 +117,7 @@ namespace Network.Player
                 move = move,
                 picked = picked
             };
+            Debug.Log("InputData created: Move = " + data.move + ", Picked = " + data.picked);
             return data;
         }
 

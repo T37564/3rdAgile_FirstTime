@@ -5,23 +5,26 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInputHandler))]
 public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private PlayerInputHandler inputHandler = null;
+    [SerializeField] private PlayerInputHandler inputHandler = null;
 
-    private void Awake()
+    public void RegisterLocalInput(PlayerInputHandler handler)
     {
-        inputHandler = GetComponent<PlayerInputHandler>();
+        inputHandler = handler;
     }
 
     /// <summary>
     /// 各Tickごとに入力データをRunnerへ渡すために呼ばれる。
     /// InputSystemの値をNetworkInputへセットする場所。
     /// </summary>
-    public void OnInput(NetworkRunner runner, NetworkInput input)   
+    public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if (inputHandler != null) return;
+        Debug.LogWarning("nullかも～");
+
+        if (inputHandler == null) return;
+
+        Debug.Log("nullじゃないかったよ～");
 
         PlayerInputData data = inputHandler.GetInput();
 
@@ -31,6 +34,15 @@ public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     #region このクラスでは使わないコールバック（空実装）
+    /// <summary>
+    /// シーンロードが完了したときに呼ばれる。
+    /// ロード後の初期化処理を書く。
+    /// </summary>
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+
+    }
+
     /// <summary>
     /// プレイヤーがセッションに参加したときに呼ばれる。
     /// ホストでスポーン処理を書くことが多い。
@@ -94,17 +106,11 @@ public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// シーンロードが完了したときに呼ばれる。
-    /// ロード後の初期化処理を書く。
-    /// </summary>
-    public void OnSceneLoadDone(NetworkRunner runner) { }
-
-    /// <summary>
     /// シーンロードが開始されたときに呼ばれる。
     /// ロード前の準備処理を書く。
     /// </summary>
     public void OnSceneLoadStart(NetworkRunner runner) { }
-   
+
     /// <summary>
     /// カスタム認証のレスポンスを受け取ったときに呼ばれる。
     /// 外部認証を使用している場合に利用。
