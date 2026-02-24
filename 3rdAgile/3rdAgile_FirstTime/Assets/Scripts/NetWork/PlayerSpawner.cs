@@ -21,15 +21,26 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        if (runner.IsServer)
-        {
-            // 参加済みプレイヤー全員分スポーン
-            foreach (var player in runner.ActivePlayers)
-            {
-                runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
-            }
+        if (!runner.IsServer) return;
 
-            Debug.Log("ll");
+        // playerPrefab がセットされていなかったら Resources から探す
+        if (playerPrefab == null)
+        {
+            var prefab = Resources.Load<GameObject>("PlayerPrefab"); // Resources/PlayerPrefab.prefab を想定
+            if (prefab != null)
+            {
+                Debug.Log("PlayerPrefab を Resources から自動でセットしました");
+            }
+            else
+            {
+                Debug.LogError("PlayerPrefab が見つかりません！Resources フォルダに PlayerPrefab を入れてください");
+                return;
+            }
+        }
+
+        foreach (var player in runner.ActivePlayers)
+        {
+            runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
         }
     }
 

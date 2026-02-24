@@ -98,21 +98,19 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     /// </summary>
     public void ClickStartButton()
     {
-        Debug.Log(1);
         // runnerがちゃんと存在するか確認
         if (networkGameStarter == null || networkGameStarter.networkRunner == null) return;
-        Debug.Log(2);
+        
         // ルーム内の人数を取得
         int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
-        Debug.Log(3);
+        
         // 人数チェック（例：4人揃うまで開始しない）
-        if (playerCount != 4)
+        if (playerCount != 2)
         {
-            Debug.Log(5);
             CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false,"We don't have enough people.",2));
             return;
         }
-        Debug.Log(4);
+        
         // シーン遷移
         networkGameStarter.networkRunner.LoadScene("SpawnTestScenes");
     }

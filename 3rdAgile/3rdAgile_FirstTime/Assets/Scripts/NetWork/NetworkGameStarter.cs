@@ -38,9 +38,13 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
         // UIイベント管理スクリプトを Runner オブジェクトに付ける
         var uiChange = networkRunnerObject.AddComponent<NetworkUIChange>();
-
         // コールバック登録（StartGame 前に行う）
         networkRunner.AddCallbacks(uiChange);
+
+        // PlayerSpawner 登録
+        var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
+        networkRunner.AddCallbacks(playerSpawner);
+
         networkRunner.AddCallbacks(this);
 
         await networkRunner.StartGame(new StartGameArgs()
@@ -77,9 +81,13 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
             // UIイベント管理スクリプトを Runner オブジェクトに付ける
             var uiChange = networkRunnerObject.AddComponent<NetworkUIChange>();
-
             // コールバック登録（StartGame 前に行う）
             networkRunner.AddCallbacks(uiChange);
+
+            // PlayerSpawner 登録
+            var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
+            networkRunner.AddCallbacks(playerSpawner);
+
             networkRunner.AddCallbacks(this);
 
 
