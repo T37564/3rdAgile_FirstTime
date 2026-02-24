@@ -12,7 +12,19 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkPrefabRef playerPrefab;
+    // 複数人のIDを取得するためList型
+    private List<PlayerRef> players = new List<PlayerRef>();
+
+    /// <summary>
+    /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
+    /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
+    /// </summary>
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        players.Add(player);
+        Debug.Log($"Player joined: {player}");
+    }
+
 
 
     /// <summary>
@@ -23,35 +35,45 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!runner.IsServer) return;
 
-        // playerPrefab がセットされていなかったら Resources から探す
-        if (playerPrefab == null)
+        // スポーンする位置をいれたオブジェクトを取得
+        Transform spawnPoint = GameObject.Find("SpawnPoint").transform;
+
+        // 子オブジェクト分配列を作成
+        Transform[] spawnPosition = new Transform[spawnPoint.childCount];
+
+        // 配列に子オブジェクトの位置情報を入れる
+        for (int i = 0; i < spawnPoint.childCount; i++)
         {
-            var prefab = Resources.Load<GameObject>("PlayerPrefab"); // Resources/PlayerPrefab.prefab を想定
-            if (prefab != null)
-            {
-                Debug.Log("PlayerPrefab を Resources から自動でセットしました");
-            }
-            else
-            {
-                Debug.LogError("PlayerPrefab が見つかりません！Resources フォルダに PlayerPrefab を入れてください");
-                return;
-            }
+            spawnPosition[i] = spawnPoint.GetChild(i);
         }
 
-        foreach (var player in runner.ActivePlayers)
+        // スポーンさせるPlayerのオブジェクトをさがす
+        GameObject prefabObj = Resources.Load<GameObject>("NetworkPlayer_Test");
+
+        // 見つからなかったとき
+        if (prefabObj == null)
         {
-            runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
+            Debug.LogError("PlayerPrefab が見つからないわよ！");
+            return;
+        }
+
+        // NetworkObjectがついているか確認する
+        NetworkObject networkPlayerObject = prefabObj.GetComponent<NetworkObject>();
+
+        // 見つからなかったとき
+        if (networkPlayerObject == null)
+        {
+            Debug.LogError("NetworkObject が付いてないわよ！");
+            return;
+        }
+
+        // 参加したすべてのプレイヤーを Spawn する
+        for (int i = 0; i < players.Count; i++)
+        {
+            runner.Spawn(networkPlayerObject, spawnPosition[i].position, Quaternion.identity, players[i]);
+            Debug.Log($"Spawned player for {players[i]}");
         }
     }
-
-
-    /// <summary>
-    /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
-    /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
-    /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-
-
 
 
     /// <summary>
@@ -68,11 +90,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-
-
-
-
-
 
 
 
