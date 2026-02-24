@@ -22,8 +22,11 @@ namespace Network.Player
 
         public override void FixedUpdateNetwork()
         {
+            if(!Object.HasInputAuthority) return;
+
             if (GetInput<PlayerInputData>(out var input))
             {
+                Debug.Log($"Input: {input.move}");
                 Vector3 move = new Vector3(input.move.x, 0.0f, input.move.y);
                 rb.MovePosition(rb.position + move * moveSpeed * Runner.DeltaTime);
             }
