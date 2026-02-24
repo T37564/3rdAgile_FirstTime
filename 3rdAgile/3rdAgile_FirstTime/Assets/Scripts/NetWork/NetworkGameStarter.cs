@@ -45,6 +45,11 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
         networkRunner.AddCallbacks(playerSpawner);
 
+        // PlayerSpawner 登録
+        var itemSpawner = networkRunnerObject.AddComponent<ItemSpawner>();
+        networkRunner.AddCallbacks(itemSpawner);
+
+
         networkRunner.AddCallbacks(this);
 
         await networkRunner.StartGame(new StartGameArgs()
@@ -88,6 +93,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
             networkRunner.AddCallbacks(playerSpawner);
 
+            // PlayerSpawner 登録
+            var itemSpawner = networkRunnerObject.AddComponent<ItemSpawner>();
+            networkRunner.AddCallbacks(itemSpawner);
+
             networkRunner.AddCallbacks(this);
 
 
@@ -108,7 +117,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             }
             else
             {
-                CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true,"The room does not exist", 1));
+                CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true, "The room does not exist", 1));
 
                 TitleCanvasDisplaySettings.Instance.ResetTitleUI();
                 TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
@@ -116,7 +125,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         }
         catch
         {
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true,"An unexpected error has occurred. Please try again.", 1));
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true, "An unexpected error has occurred. Please try again.", 1));
 
             TitleCanvasDisplaySettings.Instance.ResetTitleUI();
             TitleCanvasDisplaySettings.Instance.ResetLobbyUI();

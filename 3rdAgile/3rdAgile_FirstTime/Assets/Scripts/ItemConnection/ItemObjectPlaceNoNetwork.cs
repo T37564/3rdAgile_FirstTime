@@ -22,10 +22,10 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     {
         [Header("アイテムを配置する部屋の座標範囲を設定する")]
         [Header("部屋の最小X座標")]
-        public float minX; 
+        public float minX;
 
         [Header("部屋の最大X座標")]
-        public float maxX; 
+        public float maxX;
 
         [Header("部屋の最小Z座標")]
         public float minZ;
@@ -43,15 +43,6 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
 
-    private void Start()
-    {
-        //maxItemObjectCountで指定した数だけアイテムを生成する
-        for (int i = 0; i < maxItemObjectCount; i++)
-        {
-            // アイテムを生成して配置する
-            SpawnItem();
-        }
-    }
 
     /// <summary>
     /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
@@ -105,14 +96,14 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     private RoomSpawnPosition GetRandomRoom()
     {
         // roomSpawnPositionsがnullまたは配列に設定していない場合
-        if (roomSpawnPositions==null|| roomSpawnPositions.Length == 0)
+        if (roomSpawnPositions == null || roomSpawnPositions.Length == 0)
         {
             Debug.LogError("部屋のスポーン位置が設定されていません");
             return null;
         }
 
         //配列の中からランダムに1つ選ぶ
-        int index=UnityEngine.Random.Range(0, roomSpawnPositions.Length);
+        int index = UnityEngine.Random.Range(0, roomSpawnPositions.Length);
 
         //RoomSpawnPositionの配列で選ばれたものを返り値にする
         return roomSpawnPositions[index];
@@ -122,9 +113,9 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     /// 座標をランダムに決めるメソッド
     /// Y座標は候補値からランダムに選ぶようにする
     /// </summary>
-    private Vector3 GetRandomPosition()
+    public Vector3 GetRandomPosition()
     {
-        
+
         RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
 
         // 部屋の座標内のランダムな座標を代入
@@ -164,6 +155,8 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
             callOut.OnNeedRegenerate += HandleRegenerate;
         }
     }
+
+
 
     /// <summary>
     /// 生成時にマップ上に生成されないアイテムを削除して
