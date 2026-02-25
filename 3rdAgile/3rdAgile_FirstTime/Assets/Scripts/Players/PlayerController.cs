@@ -32,6 +32,7 @@ namespace Network.Player
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            Debug.Log(isHolding);
             if(!Object.HasStateAuthority) return;
 
             if (GetInput<PlayerInputData>(out var input))
@@ -41,7 +42,8 @@ namespace Network.Player
 
                 if (input.tryPick)
                 {
-
+                    isHolding = input.tryPick;
+                    Debug.Log($"Try Pick : {isHolding}");
                 }
             }
         }
