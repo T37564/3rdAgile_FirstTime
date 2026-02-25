@@ -9,6 +9,7 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Network.Player;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -70,7 +71,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 参加したすべてのプレイヤーを Spawn する
         for (int i = 0; i < players.Count; i++)
         {
-            runner.Spawn(networkPlayerObject, spawnPosition[i].position, Quaternion.identity, players[i]);
+            runner.Spawn(networkPlayerObject, 
+                         spawnPosition[i].position, 
+                         Quaternion.identity, 
+                         players[i]
+                         );
             Debug.Log($"Spawned player for {players[i]}");
         }
     }

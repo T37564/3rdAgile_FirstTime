@@ -56,8 +56,6 @@ namespace Network.Player
         {
             if (context.action.name != "Move") return;
 
-            Debug.Log("Move input received: " + context.ReadValue<Vector2>());
-
             move = context.ReadValue<Vector2>();
         }
 
@@ -117,7 +115,6 @@ namespace Network.Player
                 move = move,
                 picked = picked
             };
-            Debug.Log("InputData created: Move = " + data.move + ", Picked = " + data.picked);
             return data;
         }
 

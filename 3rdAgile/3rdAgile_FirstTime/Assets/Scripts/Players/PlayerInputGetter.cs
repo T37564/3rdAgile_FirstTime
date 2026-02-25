@@ -28,8 +28,6 @@ public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
 
         PlayerInputData data = inputHandler.GetInput();
 
-        // ここでInputSystemから値を取得してdataにセットする
-
         input.Set(data);
     }
 
