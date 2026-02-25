@@ -13,6 +13,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     // スクリプトを取得
     private ItemObjectPlaceNoNetwork itemObjectPlaceNoNetwork = null;
 
+    //アイテムがスポーンした数
     private int itemCount = 0;
 
     /// <summary>
@@ -44,7 +45,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 生成位置を入れるためList型
         List<Vector3> itemPositionList = new List<Vector3>();
 
-        //30箇所positionを作ってください
+        //生成する数だけpositionを作ってください
         for (int i = 0; i < ITEM_FIRST_SPAWNED_COUNT; i++)
         {
             //positionを作る
@@ -54,11 +55,13 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         /////////////////////////////////////////////////////////////////
         // スポーンさせるオブジェクトの設定
         /////////////////////////////////////////////////////////////////
-        // スポーンさせるPlayerのオブジェクトをさがす
+        // スポーンさせるアイテムのオブジェクトをさがす
         List<NetworkObject> itemObjectList = new List<NetworkObject>();
 
+        // itemObjectPlaceNoNetworkの配列の数だけループする
         for (int i = 0; i < itemObjectPlaceNoNetwork.itemProbabilities.Length; i++)
         {
+            // i番目のitemProbabilitiesのアイテムをitemObjectListに登録する
             itemObjectList.Add(itemObjectPlaceNoNetwork.itemProbabilities[i].itemPrefab);
 
             // 見つからなかったとき
@@ -95,6 +98,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 参加したすべてのプレイヤーを Spawn する
         for (int i = 0; i < ITEM_FIRST_SPAWNED_COUNT; i++)
         {
+            // スポーンしたアイテムの数をカウントする数値を増やす
             itemCount++;
             runner.Spawn(itemObjectList, itemPositionList[i], Quaternion.identity, null);
 
