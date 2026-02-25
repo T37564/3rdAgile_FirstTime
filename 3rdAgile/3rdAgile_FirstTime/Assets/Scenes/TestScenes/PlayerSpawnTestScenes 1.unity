@@ -450,17 +450,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlaceNoNetwork
   itemProbabilities:
-  - itemPrefab: {fileID: 5854831717035632874, guid: e01e9da6ab7b89442a8e498126e32601, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
     probability: 30
-  - itemPrefab: {fileID: 5854831717035632874, guid: b5d1c291f91675b46adeda77c4e951ac, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
     probability: 25
-  - itemPrefab: {fileID: 5854831717035632874, guid: d94d8a2db004e534391fb5e3d3e265ed, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
     probability: 20
-  - itemPrefab: {fileID: 5854831717035632874, guid: 2161ad540d11bad4abb5f1a9bdc42779, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
     probability: 15
-  - itemPrefab: {fileID: 5854831717035632874, guid: b59339f91ee87fd4db055ddc985b628d, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
     probability: 7
-  - itemPrefab: {fileID: 5854831717035632874, guid: 98e2e333c47fa5949964730442df48fa, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
     probability: 3
   roomSpawnPositions:
   - minX: -25
@@ -479,6 +479,13 @@ MonoBehaviour:
     maxZ: 40
     positionY: 5.5
   maxItemObjectCount: 30
+  itemDataArrays:
+  - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
+  - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
+  - {fileID: 11400000, guid: d37aa02c477a5c2478cb43fb852e3a6b, type: 2}
+  - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
+  - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
+  - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
 --- !u!4 &873366681
 Transform:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3917181395533769747}
   - component: {fileID: 6089126295371903787}
   - component: {fileID: 1397100366237517205}
+  - component: {fileID: 1938197116313789723}
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
   m_Layer: 0
@@ -132,6 +133,19 @@ MonoBehaviour:
     m_Bits: 8
   rayLength: 1
   isGenerateRequest: 0
+--- !u!114 &1938197116313789723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d422f6410bf24ff458a20ec1f4084ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDataStorage
+  sampleMasterData: {fileID: 11400000, guid: 5428945430e3b0a45b15a46a675cb730, type: 2}
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
