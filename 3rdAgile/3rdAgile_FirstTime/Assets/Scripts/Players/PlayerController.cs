@@ -7,10 +7,16 @@ namespace Network.Player
     public class PlayerController : NetworkBehaviour
     {
         [SerializeField] private float moveSpeed = 1.0f;
-        //[SerializeField] private float jumpForce = 50.0f;
+
+        [Networked] private NetworkBool isHolding { get; set; }
 
         private Rigidbody rb;
 
+        /// <summary>
+        /// ネットワーク上でオブジェクトが確定したときに呼び出されるコールバック関数
+        /// UnityのStart()のようなものだが、ネットワーク上でオブジェクトが確定したときに呼び出されるため、
+        /// ネットワークオブジェクトの初期化に適している
+        /// </summary>
         public override void Spawned()
         {
             rb = GetComponent<Rigidbody>();
@@ -21,6 +27,9 @@ namespace Network.Player
             }
         }
 
+        /// <summary>
+        /// ネットワーク上でオブジェクトが確定した後、毎Tick呼び出されるコールバック関数
+        /// </summary>
         public override void FixedUpdateNetwork()
         {
             if(!Object.HasStateAuthority) return;
@@ -28,8 +37,12 @@ namespace Network.Player
             if (GetInput<PlayerInputData>(out var input))
             {
                 Vector3 move = new Vector3(input.move.x, 0.0f, input.move.y);
-                //rb.linearVelocity = move * moveSpeed;
                 transform.position += move * moveSpeed * Runner.DeltaTime;
+
+                if (input.tryPick)
+                {
+
+                }
             }
         }
     }

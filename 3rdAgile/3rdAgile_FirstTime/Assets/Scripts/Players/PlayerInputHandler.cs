@@ -74,7 +74,7 @@ namespace Network.Player
         /// </summary>
         public void OnItemPickedCanceled(InputAction.CallbackContext context)
         {
-            // 長押し入力が成立していなかったらメソッドから抜ける
+            // 長押し入力が成立していなかったら何もせずメソッドから抜ける
             if (!holdCompleted) return;
 
             //成立したとホストに通知するためのbool値をtrueで保存
@@ -113,7 +113,7 @@ namespace Network.Player
             PlayerInputData data = new PlayerInputData()
             {
                 move = move,
-                picked = picked
+                tryPick = picked
             };
             return data;
         }

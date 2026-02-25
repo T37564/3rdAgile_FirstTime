@@ -20,11 +20,7 @@ public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        Debug.LogWarning("nullÇ©Ç‡Å`");
-
         if (inputHandler == null) return;
-
-        Debug.Log("nullÇ∂Ç·Ç»Ç¢Ç©Ç¡ÇΩÇÊÅ`");
 
         PlayerInputData data = inputHandler.GetInput();
 
