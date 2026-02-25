@@ -89,6 +89,19 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    private void SetupItem(NetworkObject obj)
+    {
+        ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
+
+        if (storage != null && storage.useRandomData)
+        {
+            SampleMasterData data =
+                itemObjectPlaceNoNetwork.GetRomdomItemData();
+
+            storage.SetData(data);
+        }
+    }
+
 
     private void ItemSpawned(NetworkRunner runner, NetworkObject itemObjectList, List<Vector3> itemPositionList)
     {
@@ -100,7 +113,10 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             // スポーンしたアイテムの数をカウントする数値を増やす
             itemCount++;
-            runner.Spawn(itemObjectList, itemPositionList[i], Quaternion.identity, null);
+            runner.Spawn(itemObjectList, itemPositionList[i], Quaternion.identity, null,(runner, obj) =>  // ← ここで初期化
+            {
+                SetupItem(obj);
+            });
 
             Debug.Log(itemCount);
         }

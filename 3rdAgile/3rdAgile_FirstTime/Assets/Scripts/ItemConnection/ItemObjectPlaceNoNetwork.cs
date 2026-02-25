@@ -2,47 +2,50 @@ using Fusion;
 using System;
 using UnityEngine;
 
+[System.Serializable]
+public class ItemProbability
+{
+    [Header("アイテムのプレハブオブジェクト")]
+    public NetworkObject itemPrefab; // アイテムのプレハブ
+
+    [Header("アイテムの出現確率")]
+    public float probability; // アイテムの出現確率
+}
+
+[System.Serializable]
+public class RoomSpawnPosition
+{
+    [Header("アイテムを配置する部屋の座標範囲を設定する")]
+    [Header("部屋の最小X座標")]
+    public float minX;
+
+    [Header("部屋の最大X座標")]
+    public float maxX;
+
+    [Header("部屋の最小Z座標")]
+    public float minZ;
+
+    [Header("部屋の最大Z座標")]
+    public float maxZ;
+
+    [Header("部屋のY座標")]
+    public float positionY; // 部屋のY座標
+}
+
 public class ItemObjectPlaceNoNetwork : MonoBehaviour
 {
-    [System.Serializable]
-    public class ItemProbability
-    {
-        [Header("アイテムのプレハブオブジェクト")]
-        public NetworkObject itemPrefab; // アイテムのプレハブ
-
-        [Header("アイテムの出現確率")]
-        public float probability; // アイテムの出現確率
-    }
-
     // アイテムとその確率の配列
     [Header("出現するアイテムのリスト")]
     [SerializeField] public ItemProbability[] itemProbabilities;
-
-    [System.Serializable]
-    public class RoomSpawnPosition
-    {
-        [Header("アイテムを配置する部屋の座標範囲を設定する")]
-        [Header("部屋の最小X座標")]
-        public float minX;
-
-        [Header("部屋の最大X座標")]
-        public float maxX;
-
-        [Header("部屋の最小Z座標")]
-        public float minZ;
-
-        [Header("部屋の最大Z座標")]
-        public float maxZ;
-
-        [Header("部屋のY座標")]
-        public float positionY; // 部屋のY座標
-    }
 
     [Header("部屋ごとのアイテム配置範囲のリスト")]
     [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
     [Header("配置するアイテムの最大値")]
     [SerializeField] private int maxItemObjectCount;
+
+    [Header("アイテムのデータが入っている配列")]
+    [SerializeField] private SampleMasterData[] itemDataArrays;
 
 
     /// <summary>
@@ -131,6 +134,21 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
     }
 
     /// <summary>
+    /// アイテムの情報をランダムに決めるメソッド
+    /// </summary>
+    public SampleMasterData GetRomdomItemData()
+    {
+        if (itemDataArrays == null || itemDataArrays.Length == 0)
+        {
+            Debug.LogError("アイテムデータ候補が設定されていません");
+            return null;
+        }
+
+        int itemDataIndex = UnityEngine.Random.Range(0, itemDataArrays.Length);
+        return itemDataArrays[itemDataIndex];
+    }
+
+    /// <summary>
     /// イベント呼び出し時アイテムを生成するメソッド
     /// </summary>
     private void SpawnItem()
@@ -146,6 +164,16 @@ public class ItemObjectPlaceNoNetwork : MonoBehaviour
 
         // アイテムを生成してランダムに決めた座標に配置
         NetworkObject obj = Instantiate(spawnPrefab, GetRandomPosition(), Quaternion.identity);
+        Debug.Log(obj.name + "を生成しました");
+
+        ItemDataStorage itemDataStorage = obj.GetComponent<ItemDataStorage>();
+
+        if (itemDataStorage != null && itemDataStorage.useRandomData)
+        {
+            SampleMasterData getRandomItemData = GetRomdomItemData();
+            itemDataStorage.SetData(getRandomItemData);
+            Debug.Log(obj.name + "にアイテムデータを設定しました",getRandomItemData);
+        }
 
         RegenerationCallOutNoNetwork callOut = obj.GetComponent<RegenerationCallOutNoNetwork>();
 

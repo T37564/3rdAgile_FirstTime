@@ -479,6 +479,13 @@ MonoBehaviour:
     maxZ: 20
     positionY: 5.5
   maxItemObjectCount: 30
+  itemDataArrays:
+  - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
+  - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
+  - {fileID: 11400000, guid: d37aa02c477a5c2478cb43fb852e3a6b, type: 2}
+  - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
+  - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
+  - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
 --- !u!4 &1009439675
 Transform:
   m_ObjectHideFlags: 0
