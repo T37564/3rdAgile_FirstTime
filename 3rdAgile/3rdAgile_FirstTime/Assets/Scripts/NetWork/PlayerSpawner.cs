@@ -9,12 +9,15 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Network.Player;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     // 複数人のIDを取得するためList型
     private List<PlayerRef> players = new List<PlayerRef>();
+
+    // どのプレイヤーがどのオブジェクトを操作しているか
+    private Dictionary<PlayerRef, NetworkObject> playerObjects = new Dictionary<PlayerRef, NetworkObject>();
+
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -71,14 +74,19 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 参加したすべてのプレイヤーを Spawn する
         for (int i = 0; i < players.Count; i++)
         {
-            runner.Spawn(networkPlayerObject, 
-                         spawnPosition[i].position, 
-                         Quaternion.identity, 
+            NetworkObject spawnedPlayerObject = runner.Spawn(networkPlayerObject,
+                         spawnPosition[i].position,
+                         Quaternion.identity,
                          players[i]
                          );
+
+            // PlayerRef と NetworkObject を紐づける
+            playerObjects[players[i]] = spawnedPlayerObject;
+
             Debug.Log($"Spawned player for {players[i]}");
         }
     }
+
 
 
     /// <summary>
@@ -86,7 +94,34 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log("抜けた？");
+
+        // 自分のオブジェクトがあれば消すだけ
+        if (playerObjects.TryGetValue(player, out var obj))
+        {
+            runner.Despawn(obj);
+            playerObjects.Remove(player);
+            players.Remove(player);
+        }
+
+        // ホストが抜けた場合
+        if (player.RawEncoded == 0)
+        {
+            Debug.Log("Host left → 全員タイトルへ戻るわよ！！");
+
+            // 全端末（ホストもゲストも）タイトルへ
+            FindAnyObjectByType<NetworkGameStarter>().ReturnToTitle();
+            return;
+        }
+
+        // クライアントが抜けた場合：ゲーム続行
+        Debug.Log($"Client {player} left, game continues");
+    }
+
+
+
 
 
     /// <summary>

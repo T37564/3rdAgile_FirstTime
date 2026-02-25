@@ -9,6 +9,7 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -151,6 +152,52 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         networkRunner.AddCallbacks(inputGetter);
     }
 
+
+    /// <summary>
+    /// NetworkRunner がシャットダウンした時
+    /// タイトルに戻るための処理
+    /// </summary>
+    public void ReturnToTitle()
+    {
+        if (networkRunner != null)
+        {
+            networkRunner.Shutdown();
+            Destroy(networkRunner.gameObject);
+        }
+
+        SceneManager.LoadScene("MatchingTestScenes");
+    }
+
+
+    /// <summary>
+    /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
+    /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
+    /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
+    /// </summary>
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    {
+
+        // ① ReturnToTitle を安全に呼ぶ
+        var starter = FindAnyObjectByType<NetworkGameStarter>();
+
+        if (starter != null)
+        {
+            starter.ReturnToTitle();
+        }
+        else
+        {
+            SceneManager.LoadScene("MatchingTestScenes");
+        }
+
+        // ② Runner を破壊して DontDestroyOnLoad を解除
+        if (runner != null)
+        {
+            Destroy(runner.gameObject);
+        }
+    }
+
+
+
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
@@ -166,15 +213,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
-
-
-
-    /// <summary>
-    /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
-    /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
-    /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
-    /// </summary>
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
 
 
 
