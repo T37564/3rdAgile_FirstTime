@@ -49,6 +49,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         var itemSpawner = networkRunnerObject.AddComponent<ItemSpawner>();
         networkRunner.AddCallbacks(itemSpawner);
 
+        var playerInputGetter = networkRunnerObject.AddComponent<PlayerInputGetter>();
+        networkRunner.AddCallbacks(playerInputGetter);
 
         networkRunner.AddCallbacks(this);
 
@@ -97,6 +99,9 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             var itemSpawner = networkRunnerObject.AddComponent<ItemSpawner>();
             networkRunner.AddCallbacks(itemSpawner);
 
+            var inputGetter = networkRunnerObject.AddComponent<PlayerInputGetter>();
+            networkRunner.AddCallbacks(inputGetter);
+
             networkRunner.AddCallbacks(this);
 
 
@@ -136,6 +141,15 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+
+    /// <summary>
+    /// touroku suru callback wo kettei suru basho
+    /// </summary>
+    /// <param name="inputGetter"></param>
+    public void RegisterCallbacks(PlayerInputGetter inputGetter)
+    {
+        networkRunner.AddCallbacks(inputGetter);
+    }
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
