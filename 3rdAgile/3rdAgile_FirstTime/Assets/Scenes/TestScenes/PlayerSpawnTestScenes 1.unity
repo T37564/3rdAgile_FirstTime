@@ -429,7 +429,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 873366681}
-  - component: {fileID: 873366680}
+  - component: {fileID: 873366682}
   m_Layer: 0
   m_Name: ItemObjectPlaceNoNetwork
   m_TagString: Untagged
@@ -437,55 +437,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &873366680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873366679}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b4e520f4da078143bb0ee5efa9d0b98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlaceNoNetwork
-  itemProbabilities:
-  - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
-    probability: 30
-  - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
-    probability: 25
-  - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
-    probability: 20
-  - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
-    probability: 15
-  - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
-    probability: 7
-  - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
-    probability: 3
-  roomSpawnPositions:
-  - minX: -25
-    maxX: 25
-    minZ: -25
-    maxZ: 25
-    positionY: 0.5
-  - minX: -25
-    maxX: 25
-    minZ: -25
-    maxZ: 25
-    positionY: 10.5
-  - minX: -10
-    maxX: 10
-    minZ: 20
-    maxZ: 40
-    positionY: 5.5
-  maxItemObjectCount: 30
-  itemDataArrays:
-  - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
-  - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
-  - {fileID: 11400000, guid: d37aa02c477a5c2478cb43fb852e3a6b, type: 2}
-  - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
-  - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
-  - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
 --- !u!4 &873366681
 Transform:
   m_ObjectHideFlags: 0
@@ -501,6 +452,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &873366682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873366679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4e520f4da078143bb0ee5efa9d0b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlace
+  itemProbabilities:
+  - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
+    probability: 30
+  - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
+    probability: 25
+  - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
+    probability: 20
+  - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
+    probability: 15
+  - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
+    probability: 7
+  - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
+    probability: 3
+  roomSpawnPositions:
+  - minX: -5
+    maxX: 5
+    minZ: -5
+    maxZ: 5
+    positionY: 0
+  - minX: -20
+    maxX: 20
+    minZ: -20
+    maxZ: 20
+    positionY: 5
+  - minX: -40
+    maxX: 40
+    minZ: -40
+    maxZ: 40
+    positionY: 10
+  maxItemObjectCount: 20
+  itemDataArrays:
+  - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
+  - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
+  - {fileID: 11400000, guid: d37aa02c477a5c2478cb43fb852e3a6b, type: 2}
+  - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
+  - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
+  - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
 --- !u!1 &1219740488
 GameObject:
   m_ObjectHideFlags: 0

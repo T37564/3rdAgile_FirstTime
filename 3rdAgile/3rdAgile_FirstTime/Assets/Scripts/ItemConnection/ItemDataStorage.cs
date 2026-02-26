@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// アイテムの情報が入っているscriptableobjectを格納するクラス
+/// </summary>
 public class ItemDataStorage : MonoBehaviour
 {
     [SerializeField] private SampleMasterData sampleMasterData;
@@ -9,6 +12,9 @@ public class ItemDataStorage : MonoBehaviour
 
     public SampleMasterData itemData => sampleMasterData;
 
+    /// <summary>
+    /// このメソッドが呼び出されたときアイテムの情報を格納しているscriptableobjectを変更するメソッド
+    /// </summary>
     public void SetData(SampleMasterData newData)
     {
         sampleMasterData = newData;

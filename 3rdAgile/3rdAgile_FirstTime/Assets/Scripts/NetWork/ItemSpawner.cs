@@ -11,7 +11,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private readonly int ITEM_FIRST_SPAWNED_COUNT = 3;
 
     // スクリプトを取得
-    private ItemObjectPlaceNoNetwork itemObjectPlaceNoNetwork = null;
+    private ItemObjectPlace itemObjectPlace = null;
 
     //アイテムがスポーンした数
     private int itemCount = 0;
@@ -32,9 +32,9 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         GameObject spawnPoint = GameObject.Find("ItemObjectPlaceNoNetwork");
 
         // スクリプトを取得
-        itemObjectPlaceNoNetwork = spawnPoint.GetComponent<ItemObjectPlaceNoNetwork>();
+        itemObjectPlace = spawnPoint.GetComponent<ItemObjectPlace>();
 
-        if (itemObjectPlaceNoNetwork == null)
+        if (itemObjectPlace == null)
         {
             Debug.LogError("ItemObjectPlaceNoNetwork script が付いてない！");
             return;
@@ -49,7 +49,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         for (int i = 0; i < ITEM_FIRST_SPAWNED_COUNT; i++)
         {
             //positionを作る
-            itemPositionList.Add(itemObjectPlaceNoNetwork.GetRandomPosition());
+            itemPositionList.Add(itemObjectPlace.GetRandomPosition());
         }
 
         /////////////////////////////////////////////////////////////////
@@ -59,10 +59,10 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         List<NetworkObject> itemObjectList = new List<NetworkObject>();
 
         // itemObjectPlaceNoNetworkの配列の数だけループする
-        for (int i = 0; i < itemObjectPlaceNoNetwork.itemProbabilities.Length; i++)
+        for (int i = 0; i < itemObjectPlace.itemProbabilities.Length; i++)
         {
             // i番目のitemProbabilitiesのアイテムをitemObjectListに登録する
-            itemObjectList.Add(itemObjectPlaceNoNetwork.itemProbabilities[i].itemPrefab);
+            itemObjectList.Add(itemObjectPlace.itemProbabilities[i].itemPrefab);
 
             // 見つからなかったとき
             if (itemObjectList == null)
@@ -70,16 +70,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 Debug.LogError("PlayerPrefab が見つからないわよ！");
                 return;
             }
-
-            //// NetworkObjectがついているか確認する
-            //NetworkObject networkPlayerObject = itemObjectList;
-
-            //// 見つからなかったとき
-            //if (networkPlayerObject == null)
-            //{
-            //    Debug.LogError("NetworkObject が付いてないわよ！");
-            //    return;
-            //}
         }
 
         //ほかのオブジェクトを生成したいときはメソッドにすればいいんじゃね？
@@ -93,10 +83,12 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
 
+        // アイテムの情報をランダムに決めてほしいアイテムの場合
         if (storage != null && storage.useRandomData)
         {
+            //ランダムに決めたアイテムの情報を生成したアイテムに代入する
             SampleMasterData data =
-                itemObjectPlaceNoNetwork.GetRomdomItemData();
+                itemObjectPlace.GetRomdomItemData();
 
             storage.SetData(data);
         }

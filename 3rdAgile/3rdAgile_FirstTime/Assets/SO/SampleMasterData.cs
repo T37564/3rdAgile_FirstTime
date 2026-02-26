@@ -11,6 +11,7 @@ using UnityEngine;
 [Serializable]
 public class IntEntry
 {
+    [Header("整数型の値を設定するための名前と値")]
     public string key;
     public int value;
 }
@@ -18,6 +19,7 @@ public class IntEntry
 [Serializable]
 public class FloatEntry
 {
+    [Header("小数の値を設定するための名前と値")]
     public string key;
     public float value;
 }
@@ -25,6 +27,7 @@ public class FloatEntry
 [Serializable]
 public class BoolEntry
 {
+    [Header("bool型の判定や状態を設定するための名前とフラグ")]
     public string key;
     public bool value;
 }
@@ -32,6 +35,7 @@ public class BoolEntry
 [Serializable]
 public class StringEntry
 {
+    [Header("文字列の名前を設定するための名前")]
     public string key;
     public string value;
 }
