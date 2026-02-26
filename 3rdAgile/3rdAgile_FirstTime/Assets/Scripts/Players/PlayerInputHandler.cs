@@ -67,7 +67,6 @@ namespace Network.Player
         {
             // 長押し成立フラグを立てる
             holdCompleted = true;
-            Debug.Log("Hold Completed");
         }
 
         /// <summary>
@@ -75,7 +74,6 @@ namespace Network.Player
         /// </summary>
         public void OnItemPickedCanceled(InputAction.CallbackContext context)
         {
-            Debug.Log("Hold Canceled");
             // 長押し入力が成立していなかったら何もせずメソッドから抜ける
             if (!holdCompleted) return;
 
