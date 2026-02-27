@@ -1,114 +1,154 @@
 using Fusion;
+using System;
 using UnityEngine;
 
-/// <summary>
-/// 生成したアイテムをランダム配置するクラス
-/// </summary>
-public class ItemObjectPlace : NetworkBehaviour
+[System.Serializable]
+public class ItemProbability
 {
-    [Header("配置するアイテム")]
-    [SerializeField] private NetworkObject itemObjectPrefab;
+    [Header("アイテムのプレハブオブジェクト")]
+    public NetworkObject itemPrefab; // アイテムのプレハブ
+
+    [Header("アイテムの出現確率")]
+    public float probability; // アイテムの出現確率
+}
+
+[System.Serializable]
+public class RoomSpawnPosition
+{
+    [Header("アイテムを配置する部屋の座標範囲を設定する")]
+    [Header("部屋の最小X座標")]
+    public float minX;
+
+    [Header("部屋の最大X座標")]
+    public float maxX;
+
+    [Header("部屋の最小Z座標")]
+    public float minZ;
+
+    [Header("部屋の最大Z座標")]
+    public float maxZ;
+
+    [Header("部屋のY座標")]
+    public float positionY; // 部屋のY座標
+}
+
+public class ItemObjectPlace : MonoBehaviour
+{
+    // アイテムとその確率の配列
+    [Header("出現するアイテムのリスト")]
+    [SerializeField] public ItemProbability[] itemProbabilities;
+
+    [Header("部屋ごとのアイテム配置範囲のリスト")]
+    [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
     [Header("配置するアイテムの最大値")]
-    [SerializeField] private int maxItemObjectCount;
+    [SerializeField] public int maxItemObjectCount;
 
-    [Header("アイテムを配置するx軸範囲（最小値）")]
-    [SerializeField] private float minX = 0.0f;
+    [Header("アイテムのデータが入っている配列")]
+    [SerializeField] private SampleMasterData[] itemDataArrays;
 
-    [Header("アイテムを配置するx軸範囲（最大値）")]
-    [SerializeField] private float maxX = 0.0f;
 
-    //マップの構造的に高低差があるのでY軸の範囲も設定する
-    [Header("アイテムを配置するy軸の候補値")]
-    [SerializeField] private float[] yPositionCandidates;
-
-    [Header("アイテムを配置するz軸範囲（最小値）")]
-    [SerializeField] private float minZ = 0.0f;
-
-    [Header("アイテムを配置するz軸範囲（最大値）")]
-    [SerializeField] private float maxZ = 0.0f;
-
-    private NetworkRunner networkRunner;
-
-    public override void Spawned()
+    /// <summary>
+    /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
+    /// </summary>
+    /// <returns></returns>
+    public NetworkObject GetRandomPrefabObject()
     {
-        networkRunner = Runner;
+        //合計確率の初期値
+        float total = 0.0f;
 
-        if (!Object.HasStateAuthority)
+        // ItemProbabilityごとのprobabilityの合計を計算
+        //全部の確立を計算している
+        foreach (var item in itemProbabilities)
         {
-            // サーバーのみがアイテムを生成する
-            // クライアントがこの処理をしないことでアイテムの重複生成を防ぐ
-            Debug.Log("クライアントはアイテム生成処理をスキップ");
-            return;
+            total += item.probability;
         }
 
-        for (int i = 0; i < maxItemObjectCount; i++)
+        //totalが0以下の場合確率に基づく計算ができないのでエラーを出力してnullを返す
+        if (total <= 0)
         {
-            // アイテムを生成して配置する
-            SpawnItem();
+            Debug.LogError("確率の合計が0です");
+            return null;
         }
+
+        // 0.0から合計確率の範囲でランダムな数値を生成
+        float randomProbability = UnityEngine.Random.Range(0f, total);
+
+        // ランダムな数値がどのアイテムに属するかを決定
+        float current = 0.0f;
+
+        // アイテムの確率を順番に足していき、ランダムな数値がどのアイテムの範囲に入るかを確認
+        foreach (var item in itemProbabilities)
+        {
+            //現在のアイテムの確率を足していく
+            current += item.probability;
+
+            //取得したランダムな数値が現在のアイテムの出現確立の数値内にある場合
+            //そのアイテムをGameObjectとして返す
+            if (randomProbability < current)
+            {
+                return item.itemPrefab;
+            }
+        }
+
+        return null;
     }
 
-    //private void Start()
-    //{
-    //    networkRunner = FindAnyObjectByType<NetworkRunner>();
+    /// <summary>
+    /// 設定した部屋のアイテム配置範囲リストをランダムに選ぶメソッド
+    /// </summary>
+    private RoomSpawnPosition GetRandomRoom()
+    {
+        // roomSpawnPositionsがnullまたは配列に設定していない場合
+        if (roomSpawnPositions == null || roomSpawnPositions.Length == 0)
+        {
+            Debug.LogError("部屋のスポーン位置が設定されていません");
+            return null;
+        }
 
-    //    for (int i = 0; i < maxItemObjectCount; i++)
-    //    {
-    //        // アイテムを生成して配置する
-    //        SpawnItem();
-    //    }
-    //}
+        //配列の中からランダムに1つ選ぶ
+        int index = UnityEngine.Random.Range(0, roomSpawnPositions.Length);
 
+        //RoomSpawnPositionの配列で選ばれたものを返り値にする
+        return roomSpawnPositions[index];
+    }
 
     /// <summary>
     /// 座標をランダムに決めるメソッド
     /// Y座標は候補値からランダムに選ぶようにする
     /// </summary>
-    private Vector3 GetRandomPosition()
+    public Vector3 GetRandomPosition()
     {
-        // X軸とZ軸は指定された範囲内でランダムに決める
-        float randomX = Random.Range(minX, maxX);
-        float randomZ = Random.Range(minZ, maxZ);
 
-        float randomY = yPositionCandidates[Random.Range(0, yPositionCandidates.Length)];
-        Debug.Log($"Random Y Position: {randomY}"); // デバッグ用ログ
+        RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
 
+        // 部屋の座標内のランダムな座標を代入
+        float randomX = UnityEngine.Random.Range(roomSpawnPosition.minX, roomSpawnPosition.maxX);
+        float randomZ = UnityEngine.Random.Range(roomSpawnPosition.minZ, roomSpawnPosition.maxZ);
+
+        //決められたY座標に配置する
+        float randomY = roomSpawnPosition.positionY;
+
+        // 決められた座標を返り値にする
         return new Vector3(randomX, randomY, randomZ);
     }
 
     /// <summary>
-    /// イベント呼び出し時アイテムを生成するメソッド
+    /// アイテムの情報をランダムに決めるメソッド
     /// </summary>
-    private void SpawnItem()
+    public SampleMasterData GetRomdomItemData()
     {
-        // アイテムを生成してランダムに決めた座標に配置
-        //GameObject obj = Instantiate(itemObjectPrefab, GetRandomPosition(), Quaternion.identity);
-        NetworkObject obj= networkRunner.Spawn(itemObjectPrefab,GetRandomPosition(), Quaternion.identity);
-
-        RegenerationCallOut callOut = obj.GetComponent<RegenerationCallOut>();
-
-        if (callOut != null)
+        if (itemDataArrays == null || itemDataArrays.Length == 0)
         {
-            // イベント登録
-            //イベントが呼び出されたときにHandleRegenerateメソッドが呼び出されるようにする
-            callOut.OnNeedRegenerate += HandleRegenerate;
+            Debug.LogError("アイテムデータ候補が設定されていません");
+            return null;
         }
+
+        // itemDataArraysの配列の数からランダムに1つ選ぶ
+        int itemDataIndex = UnityEngine.Random.Range(0, itemDataArrays.Length);
+
+        // itemDataArraysの配列で選ばれたものを返り値にする
+        return itemDataArrays[itemDataIndex];
     }
 
-    /// <summary>
-    /// 生成時にマップ上に生成されないアイテムを削除して
-    /// 新しいアイテムを生成するメソッド
-    /// </summary>
-    void HandleRegenerate(RegenerationCallOut item)
-    {
-        Debug.Log("再生成開始");
-
-        // 古いアイテム削除
-        //Destroy(item.gameObject);
-        networkRunner.Despawn(item.GetComponent<NetworkObject>());
-
-        // 新しく生成
-        SpawnItem();
-    }
 }

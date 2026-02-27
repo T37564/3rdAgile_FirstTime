@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 3917181395533769747}
   - component: {fileID: 6089126295371903787}
   - component: {fileID: 1397100366237517205}
-  - component: {fileID: 2680584046864985895}
+  - component: {fileID: 1938197116313789723}
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
   m_Layer: 0
-  m_Name: Cube 1
+  m_Name: LegendaryChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98332912785b2b84abbf740fb68b30d0, type: 2}
+  - {fileID: 2100000, guid: 34db9bf18915b654a9fcc0764305ce8b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,7 +133,7 @@ MonoBehaviour:
     m_Bits: 8
   rayLength: 1
   isGenerateRequest: 0
---- !u!114 &2680584046864985895
+--- !u!114 &1938197116313789723
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,7 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d422f6410bf24ff458a20ec1f4084ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataStorage
-  sampleMasterData: {fileID: 11400000, guid: d45ce8882907791439e9de49068484ae, type: 2}
+  sampleMasterData: {fileID: 11400000, guid: f3966eaea876f70459dcbc469fc004f2, type: 2}
+  useRandomData: 0
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -185,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 1835667897
+  SortKey: 1458942135
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

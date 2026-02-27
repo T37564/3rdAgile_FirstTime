@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 3917181395533769747}
   - component: {fileID: 6089126295371903787}
   - component: {fileID: 1397100366237517205}
-  - component: {fileID: 8599090137824959149}
+  - component: {fileID: 9045057846944883647}
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
   m_Layer: 0
-  m_Name: Cube 4
+  m_Name: CopperCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3ff76c6222333b34cbbb235d517e3a56, type: 2}
+  - {fileID: 2100000, guid: be60cf662de883241b6ffc398fe71bb8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,7 +133,7 @@ MonoBehaviour:
     m_Bits: 8
   rayLength: 1
   isGenerateRequest: 0
---- !u!114 &8599090137824959149
+--- !u!114 &9045057846944883647
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d422f6410bf24ff458a20ec1f4084ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataStorage
-  sampleMasterData: {fileID: 11400000, guid: 2771f5f63f0f0ac4bb769288608558be, type: 2}
+  sampleMasterData: {fileID: 11400000, guid: 00948fd63e10db04db2cde37d1dc4cfc, type: 2}
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 690222400
+  SortKey: 1837318055
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
