@@ -8,7 +8,7 @@ public class Guardian : NetworkBehaviour
 
     [SerializeField] private LayerMask playerLayer;
 
-    private Collider[] hitCollider = new Collider[4];
+    private Collider[] hitCollider = new Collider[] { };
 
     public override void Spawned()
     {
