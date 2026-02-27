@@ -1,9 +1,12 @@
-//======================================================================
+//==========================================================================
+// プレイヤーの入力をローカルで受け取り、構造体にまとめてホストに送るクラス
 // 担当者：鈴木
-//======================================================================
+//==========================================================================
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using Fusion;
 
 namespace Network.Player
 {
@@ -13,18 +16,35 @@ namespace Network.Player
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerInputHandler : MonoBehaviour
     {
+        // プレイヤーがインタラクト可能なオブジェクトを保存するリスト
+        private List<IInteractable> interactables = new List<IInteractable>();
+
+        public IInteractable interactObject = null;
+
+        public Transform Transform => transform;
+
+        public string tagName = "";
+
+        //プレイヤーの入力情報を保存するためのコンポーネント
         private PlayerInput playerInput;
 
-        private Vector2 move;
+        // プレイヤーの移動入力を保存するための変数
+        private Vector2 move = Vector2.zero;
+        // アイテムを拾う等の長押し入力が成立したかどうかを保存するための変数
         private bool picked = false;
 
+        // 長押し入力が成立したかどうかを保存するための変数
         private bool holdCompleted = false;
 
+        /// <summary>
+        /// 初期化
+        /// </summary>
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
         }
 
+        #region イベント登録と解除
         /// <summary>
         /// イベント登録
         /// </summary>
@@ -48,7 +68,9 @@ namespace Network.Player
 
             playerInput.onActionTriggered -= OnMove;
         }
+        #endregion
 
+        #region プレイヤーの移動入力
         /// <summary>
         /// InputSystem経由で入ってきた移動入力情報を保存
         /// </summary>
@@ -57,7 +79,9 @@ namespace Network.Player
             if (context.action.name != "Move") return;
 
             move = context.ReadValue<Vector2>();
+            Debug.Log("入力受け取ったよー");
         }
+        #endregion
 
         #region アイテムを拾う等Aボタン長押し処理
         /// <summary>
@@ -67,6 +91,7 @@ namespace Network.Player
         {
             // 長押し成立フラグを立てる
             holdCompleted = true;
+
         }
 
         /// <summary>
@@ -74,7 +99,7 @@ namespace Network.Player
         /// </summary>
         public void OnItemPickedCanceled(InputAction.CallbackContext context)
         {
-            // 長押し入力が成立していなかったらメソッドから抜ける
+            // 長押し入力が成立していなかったら何もせずメソッドから抜ける
             if (!holdCompleted) return;
 
             //成立したとホストに通知するためのbool値をtrueで保存
@@ -113,11 +138,46 @@ namespace Network.Player
             PlayerInputData data = new PlayerInputData()
             {
                 move = move,
-                picked = picked
+                tryPick = picked
             };
             return data;
         }
 
-        
+        /// <summary>
+        /// プレイヤーの一定距離内入ったオブジェクトを保存するためのメソッド
+        /// </summary>
+        private void OnTriggerEnter(Collider other)
+        {
+            var interactable = other.GetComponent<IInteractable>();
+            if(interactable != null)
+                interactables.Add(interactable);
+
+
+            // プレイヤーの周囲にあるインタラクト可能なオブジェクトの中で一番近いものを探す
+            float minDistance = float.MaxValue;
+
+            foreach (var interactableObj in interactables)
+            {
+                // 距離の計算
+                float distance = (interactableObj.Transform.position - Transform.position).sqrMagnitude;
+                // 最も近いオブジェクトを保存
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    interactObject = interactableObj;
+                    tagName = interactObject.Transform.tag;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 登録していたオブジェクトからプレイヤーが一定距離外に出たときにリストから削除するためのメソッド
+        /// </summary>
+        private void OnTriggerExit(Collider other)
+        {
+            var interactable = other.GetComponent<IInteractable>();
+            if(interactable != null)
+                interactables.Remove(interactable);
+        }
     }
 }
