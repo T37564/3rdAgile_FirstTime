@@ -42,7 +42,7 @@ public class ItemObjectPlace : MonoBehaviour
     [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
     [Header("配置するアイテムの最大値")]
-    [SerializeField] private int maxItemObjectCount;
+    [SerializeField] public int maxItemObjectCount;
 
     [Header("アイテムのデータが入っている配列")]
     [SerializeField] private SampleMasterData[] itemDataArrays;
@@ -52,7 +52,7 @@ public class ItemObjectPlace : MonoBehaviour
     /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
     /// </summary>
     /// <returns></returns>
-    private NetworkObject GetRandomPrefabObject()
+    public NetworkObject GetRandomPrefabObject()
     {
         //合計確率の初期値
         float total = 0.0f;
@@ -151,58 +151,4 @@ public class ItemObjectPlace : MonoBehaviour
         return itemDataArrays[itemDataIndex];
     }
 
-    /// <summary>
-    /// イベント呼び出し時アイテムを生成するメソッド
-    /// </summary>
-    private void SpawnItem()
-    {
-        // 確率に基づいてランダムにアイテムのプレハブを選択
-        NetworkObject spawnPrefab = GetRandomPrefabObject();
-
-        if (spawnPrefab == null)
-        {
-            Debug.Log("生成Prefabが設定されていません");
-            return;
-        }
-
-        // アイテムを生成してランダムに決めた座標に配置
-        NetworkObject obj = Instantiate(spawnPrefab, GetRandomPosition(), Quaternion.identity);
-        Debug.Log(obj.name + "を生成しました");
-
-        // アイテムの情報が入っているクラスを生成したアイテムに代入する
-        ItemDataStorage itemDataStorage = obj.GetComponent<ItemDataStorage>();
-
-        // アイテムの情報をランダムに決めてほしいアイテムの場合
-        if (itemDataStorage != null && itemDataStorage.useRandomData)
-        {
-            //ランダムに決めたアイテムの情報を生成したアイテムに代入する
-            SampleMasterData getRandomItemData = GetRomdomItemData();
-            itemDataStorage.SetData(getRandomItemData);
-            Debug.Log(obj.name + "にアイテムデータを設定しました",getRandomItemData);
-        }
-
-        RegenerationCallOutNoNetwork callOut = obj.GetComponent<RegenerationCallOutNoNetwork>();
-
-        if (callOut != null)
-        {
-            // イベント登録
-            //イベントが呼び出されたときにHandleRegenerateメソッドが呼び出されるようにする
-            callOut.OnNeedRegenerate += HandleRegenerate;
-        }
-    }
-
-    /// <summary>
-    /// 生成時にマップ上に生成されないアイテムを削除して
-    /// 新しいアイテムを生成するメソッド
-    /// </summary>
-    private void HandleRegenerate(RegenerationCallOutNoNetwork item)
-    {
-        Debug.Log("再生成開始");
-
-        // 古いアイテム削除
-        Destroy(item.gameObject);
-
-        // 新しく生成
-        SpawnItem();
-    }
 }

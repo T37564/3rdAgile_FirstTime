@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static Unity.Collections.Unicode;
+using static UnityEditor.PlayerSettings;
 
 public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -29,56 +30,42 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // スポーン位置の設定
         /////////////////////////////////////////////////////////////////
         // スポーンする位置をいれたオブジェクトを取得
-        GameObject spawnPoint = GameObject.Find("ItemObjectPlaceNoNetwork");
+        GameObject spawnPoint = GameObject.Find("ItemObjectPlace");
 
         // スクリプトを取得
         itemObjectPlace = spawnPoint.GetComponent<ItemObjectPlace>();
 
         if (itemObjectPlace == null)
         {
-            Debug.LogError("ItemObjectPlaceNoNetwork script が付いてない！");
+            Debug.LogError("ItemObjectPlace script が付いてない！");
             return;
         }
 
-        //itemProbability = itemObjectPlaceNoNetwork.GetComponent<ItemObjectPlaceNoNetwork.ItemProbability>();
-
-        // 生成位置を入れるためList型
-        List<Vector3> itemPositionList = new List<Vector3>();
-
         //生成する数だけpositionを作ってください
-        for (int i = 0; i < ITEM_FIRST_SPAWNED_COUNT; i++)
+        for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
         {
-            //positionを作る
-            itemPositionList.Add(itemObjectPlace.GetRandomPosition());
-        }
+            itemCount++;
 
-        /////////////////////////////////////////////////////////////////
-        // スポーンさせるオブジェクトの設定
-        /////////////////////////////////////////////////////////////////
-        // スポーンさせるアイテムのオブジェクトをさがす
-        List<NetworkObject> itemObjectList = new List<NetworkObject>();
+            // 生成する際のランダムな位置を取得
+            Vector3 generatePosition =itemObjectPlace.GetRandomPosition();
+            
+            // 生成するオブジェクトを取得
+            NetworkObject prefab = itemObjectPlace.GetRandomPrefabObject();
 
-        // itemObjectPlaceNoNetworkの配列の数だけループする
-        for (int i = 0; i < itemObjectPlace.itemProbabilities.Length; i++)
-        {
-            // i番目のitemProbabilitiesのアイテムをitemObjectListに登録する
-            itemObjectList.Add(itemObjectPlace.itemProbabilities[i].itemPrefab);
+            if (prefab == null) continue;
 
-            // 見つからなかったとき
-            if (itemObjectList == null)
+            // ネットワークを使ったアイテム生成
+            runner.Spawn(prefab, generatePosition, Quaternion.identity, null, (runner, obj) =>
             {
-                Debug.LogError("PlayerPrefab が見つからないわよ！");
-                return;
-            }
-        }
-
-        //ほかのオブジェクトを生成したいときはメソッドにすればいいんじゃね？
-        foreach (var item in itemObjectList)
-        {
-            ItemSpawned(runner, item, itemPositionList);
+                SetupItem(obj);
+            });
+            Debug.Log(itemCount);
         }
     }
 
+    /// <summary>
+    /// アイテムの情報をランダムに決めるメソッド
+    /// </summary>
     private void SetupItem(NetworkObject obj)
     {
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
@@ -94,25 +81,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-
-    private void ItemSpawned(NetworkRunner runner, NetworkObject itemObjectList, List<Vector3> itemPositionList)
-    {
-        /////////////////////////////////////////////////////////////////
-        // スポーンさせる処理
-        /////////////////////////////////////////////////////////////////
-        // 参加したすべてのプレイヤーを Spawn する
-        for (int i = 0; i < ITEM_FIRST_SPAWNED_COUNT; i++)
-        {
-            // スポーンしたアイテムの数をカウントする数値を増やす
-            itemCount++;
-            runner.Spawn(itemObjectList, itemPositionList[i], Quaternion.identity, null,(runner, obj) =>  // ← ここで初期化
-            {
-                SetupItem(obj);
-            });
-
-            Debug.Log(itemCount);
-        }
-    }
+    
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。

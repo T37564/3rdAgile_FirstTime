@@ -431,7 +431,7 @@ GameObject:
   - component: {fileID: 873366681}
   - component: {fileID: 873366682}
   m_Layer: 0
-  m_Name: ItemObjectPlaceNoNetwork
+  m_Name: ItemObjectPlace
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -482,7 +482,7 @@ MonoBehaviour:
     maxX: 5
     minZ: -5
     maxZ: 5
-    positionY: 0
+    positionY: 0.5
   - minX: -20
     maxX: 20
     minZ: -20
@@ -493,7 +493,7 @@ MonoBehaviour:
     minZ: -40
     maxZ: 40
     positionY: 10
-  maxItemObjectCount: 20
+  maxItemObjectCount: 30
   itemDataArrays:
   - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
   - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
