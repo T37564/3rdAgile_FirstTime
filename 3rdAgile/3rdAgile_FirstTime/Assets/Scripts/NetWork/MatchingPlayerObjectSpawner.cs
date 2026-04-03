@@ -58,7 +58,7 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
             int index = player.AsIndex;
 
             runner.Spawn(
-                // 先に入ったホスト分マイナスする
+                 // 先に入ったホスト分マイナスする
                 playerPrefab[index - hostCount],
                 // 先に入ったホスト分マイナスする
                 playerSpawnPosition[index - hostCount],
