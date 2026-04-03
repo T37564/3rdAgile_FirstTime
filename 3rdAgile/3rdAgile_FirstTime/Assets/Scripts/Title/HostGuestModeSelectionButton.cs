@@ -78,6 +78,7 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         // ホストとしてルーム作成
         networkGameStarter.CreateHostRoom(roomName);
 
+        // ルーム名入力テキスト非表示
         TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 
@@ -89,6 +90,7 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         // ゲストとしてルームに入る
         networkGameStarter.JoinHostRoom(roomName);
 
+        // ルーム名入力テキスト非表示
         TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 

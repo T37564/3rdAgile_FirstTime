@@ -1,7 +1,6 @@
 // -----------------------------------------------------------------------------------
-// NetworkRunner が発行するプレイヤー参加・退出などのコールバックを受け取るスクリプト。
-// プレイヤー生成や接続時の初期処理をここで行う。
-// BasicSpawner.cs
+// ロビーに入った時のオブジェクト表示。
+// MatchingPlayerObjectSpawner.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using Fusion;
@@ -10,14 +9,32 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // 複数人のIDを取得するためList型
-    private List<PlayerRef> players = new List<PlayerRef>();
+    private readonly int hostCount = 1;
 
-    // どのプレイヤーがどのオブジェクトを操作しているか
-    private Dictionary<PlayerRef, NetworkObject> playerObjects = new Dictionary<PlayerRef, NetworkObject>();
+    // プレイヤーがスポーンしたときの生成位置
+    private Vector3[] playerSpawnPosition = null;
 
+    // ゲストのゲームオブジェクト
+    private NetworkObject[] playerPrefab = null;
+
+    // プレイヤーのPrefabの情報が入ったScriptableObject
+    private PlayerPrefabData playerPrefabData = null;
+
+    private void Awake()
+    {
+        playerPrefabData = Resources.Load<PlayerPrefabData>("PlayerPrefabData/PrefabData");
+
+        if (playerPrefabData == null)
+        {
+            Debug.LogError("PlayerPrefabDataが見つからないわよ！");
+            return;
+        }
+
+        playerPrefab = playerPrefabData.playerPrefab;
+        playerSpawnPosition = playerPrefabData.prefabSpawnPosition;
+    }
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -25,8 +42,29 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        players.Add(player);
-        Debug.Log($"Player joined: {player}");
+        if (!runner.IsServer) return;
+
+        // ホストの処理
+        if (player == runner.LocalPlayer && runner.IsServer)
+        {
+            Debug.Log("接続完了");
+            runner.Spawn(playerPrefab[0],
+                playerSpawnPosition[0],
+                Quaternion.identity,
+                player);
+        }
+        else// ゲストの処理
+        {
+            int index = player.AsIndex;
+
+            runner.Spawn(
+                // 先に入ったホスト分マイナスする
+                playerPrefab[index - hostCount],
+                // 先に入ったホスト分マイナスする
+                playerSpawnPosition[index - hostCount],
+                Quaternion.identity,
+                player);
+        }
     }
 
 
@@ -35,57 +73,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// 全クライアントのシーンロード完了時に呼ばれる。
     /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
     /// </summary>
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        if (!runner.IsServer) return;
-
-        // スポーンする位置をいれたオブジェクトを取得
-        Transform spawnPoint = GameObject.Find("SpawnPoint").transform;
-
-        // 子オブジェクト分配列を作成
-        Transform[] spawnPosition = new Transform[spawnPoint.childCount];
-
-        // 配列に子オブジェクトの位置情報を入れる
-        for (int i = 0; i < spawnPoint.childCount; i++)
-        {
-            spawnPosition[i] = spawnPoint.GetChild(i);
-        }
-
-        // スポーンさせるPlayerのオブジェクトをさがす
-        GameObject prefabObj = Resources.Load<GameObject>("Cube (1)");
-
-        // 見つからなかったとき
-        if (prefabObj == null)
-        {
-            Debug.LogError("PlayerPrefab が見つからないわよ！");
-            return;
-        }
-
-        // NetworkObjectがついているか確認する
-        NetworkObject networkPlayerObject = prefabObj.GetComponent<NetworkObject>();
-
-        // 見つからなかったとき
-        if (networkPlayerObject == null)
-        {
-            Debug.LogError("NetworkObject が付いてないわよ！");
-            return;
-        }
-
-        // 参加したすべてのプレイヤーを Spawn する
-        for (int i = 0; i < players.Count; i++)
-        {
-            NetworkObject spawnedPlayerObject = runner.Spawn(networkPlayerObject,
-                         spawnPosition[i].position,
-                         Quaternion.identity,
-                         players[i]
-                         );
-
-            // PlayerRef と NetworkObject を紐づける
-            playerObjects[players[i]] = spawnedPlayerObject;
-
-            Debug.Log($"Spawned player for {players[i]}");
-        }
-    }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
 
 
 
@@ -94,31 +82,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-        Debug.Log("抜けた？");
-
-        // 自分のオブジェクトがあれば消すだけ
-        if (playerObjects.TryGetValue(player, out var obj))
-        {
-            runner.Despawn(obj);
-            playerObjects.Remove(player);
-            players.Remove(player);
-        }
-
-        // ホストが抜けた場合
-        if (player.RawEncoded == -1)
-        {
-            Debug.Log("Host left → 全員タイトルへ戻るわよ！！");
-
-            // 全端末（ホストもゲストも）タイトルへ
-            FindAnyObjectByType<NetworkGameStarter>().ReturnToTitle();
-            return;
-        }
-
-        // クライアントが抜けた場合：ゲーム続行
-        Debug.Log($"Client {player} left, game continues");
-    }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
 
 
