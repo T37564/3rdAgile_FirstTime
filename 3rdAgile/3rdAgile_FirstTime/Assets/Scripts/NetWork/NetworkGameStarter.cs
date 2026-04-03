@@ -8,6 +8,7 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -42,16 +43,20 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // コールバック登録（StartGame 前に行う）
         networkRunner.AddCallbacks(uiChange);
 
-        // PlayerSpawner 登録
+        // playerSpawner 登録
         var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
         networkRunner.AddCallbacks(playerSpawner);
 
-        // PlayerSpawner 登録
+        // itemSpawner 登録
         var itemSpawner = networkRunnerObject.AddComponent<ItemSpawner>();
         networkRunner.AddCallbacks(itemSpawner);
 
+        // playerInputGetter 登録
         var playerInputGetter = networkRunnerObject.AddComponent<PlayerInputGetter>();
         networkRunner.AddCallbacks(playerInputGetter);
+
+        var matchingPlayerObjectSpawner = networkRunner.AddComponent<MatchingPlayerObjectSpawner>();
+        networkRunner.AddCallbacks(matchingPlayerObjectSpawner);
 
         networkRunner.AddCallbacks(this);
 
