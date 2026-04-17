@@ -1,0 +1,8 @@
+.key {
+    transition: background-color 0.15s ease-in-out, 
+                scale 0.15s ease-in-out;
+}
+
+.key.selected {
+    background-color: #5C5C5C;   /* ‘I‘ğ’†‚ÌF */
+}
