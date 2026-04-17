@@ -18,14 +18,28 @@ namespace Network.Player
         // プレイヤーの生死に関するイベント
         public event Action OnPlayerDied;
 
+        public event Action OnPlayerRevived;
+
+        [Header("-- Player Settings --")]
+        [Header("プレイヤーの移動速度")]
         [SerializeField] private float moveSpeed = 1.0f;
 
-        [Networked] private NetworkBool isHolding { get; set; }
+        [Header("インタラクト判定半径")]
+        [SerializeField] private float interactRadius = 2.0f;
 
-        [Networked] private NetworkBool isAlive { get; set; }
+        [Header("インタラクト対象レイヤー")]
+        [SerializeField] private LayerMask interactLayerMask;
+
+        [Networked] private NetworkBool IsHoldingItem { get; set; }
+
+        [Networked] private NetworkBool IsAlive { get; set; }
 
         private PlayerInputHandler inputHandler;
-        private IInteractable interactable;
+
+        private bool prevAlive;
+
+        private bool prevHoldingItem;
+
         public Transform Transform => transform;
 
 
@@ -36,13 +50,25 @@ namespace Network.Player
         /// </summary>
         public override void Spawned()
         {
-            isAlive = true;
+            inputHandler = GetComponent<PlayerInputHandler>();
+
             if (Object.HasInputAuthority)
             {
-                inputHandler = GetComponent<PlayerInputHandler>();
-                var inputGetter = FindAnyObjectByType<PlayerInputGetter>();
-                inputGetter.RegisterLocalInput(inputHandler);
+                PlayerInputGetter inputGetter = FindAnyObjectByType<PlayerInputGetter>();
+                if (inputGetter != null)
+                {
+                    inputGetter.RegisterLocalInput(inputHandler);
+                }
             }
+
+            if (Object.HasStateAuthority)
+            {
+                IsAlive = true;
+                IsHoldingItem = false;
+            }
+
+            prevAlive = IsAlive;
+            prevHoldingItem = IsHoldingItem;
         }
 
         /// <summary>
@@ -50,59 +76,65 @@ namespace Network.Player
         /// </summary>
         public override void FixedUpdateNetwork()
         {
-            Debug.Log("FixedUpdateNetwork");
-            if (!isAlive) return;
+            if (!Object.HasStateAuthority) return;
+            if (!GetInput<PlayerInputData>(out var input)) return;
 
-            Debug.Log("生きてるよ");
-            if (GetInput<PlayerInputData>(out var input))
+            if (IsAlive)
             {
-                if (!Object.HasStateAuthority) return;
+                Move(input.move);
+            }
 
-                Vector3 move = new Vector3(input.move.x, 0.0f, input.move.y);
-                transform.position += move * moveSpeed * Runner.DeltaTime;
+            if (input.tryInteract)
+            {
+                TryInteract();
+            }
+        }
 
-                if (input.tryPick)
+        private void Move(Vector2 moveInput)
+        {
+            Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
+
+            if (move.sqrMagnitude > 1f)
+            {
+                move.Normalize();
+            }
+
+            transform.position += move * moveSpeed * Runner.DeltaTime;
+        }
+
+        private void TryInteract()
+        {
+            IInteractable target = FindNearestInteractable();
+
+            if (target == null) return;
+            if (!target.CanInteract(this)) return;
+
+            target.Interact(this);
+        }
+
+        private IInteractable FindNearestInteractable()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, interactRadius, interactLayerMask);
+
+            IInteractable nearest = null;
+            float minSqrDistance = float.MaxValue;
+
+            foreach (Collider hit in hits)
+            {
+                if (hit.transform == transform) continue;
+
+                IInteractable interactable = hit.GetComponent<IInteractable>();
+                if (interactable == null) continue;
+
+                float sqrDistance = (interactable.Transform.position - transform.position).sqrMagnitude;
+                if (sqrDistance < minSqrDistance)
                 {
-                    //isHolding = input.tryPick;
-
-                    // tryPickは長押しが成立したときにtrueになるため以下でアイテムを拾う処理、プレイヤーを復活させる処理に分岐
-                    // PlayerInputHandlerで保存した一番近い位置にあるIInteractableを取得する
-                    interactable = inputHandler.interactObject;
-
-                    // タグ名を取得して取得したIInteractableがアイテムなのかプレイヤーなのかを判別し処理を分岐
-                    string interactableObjectTagName = inputHandler.tagName;
-                    switch (interactableObjectTagName)
-                    {
-                        case "Item":
-                            isHolding = true;
-                            // アイテムのIInteractableを継承しているクラスにinteractableをキャストして、Interact()を呼び出す
-                            break;
-                        case "Player":
-                            // プレイヤーのIInteractableを継承しているクラスにinteractableをキャストしてisAliveをtrueにする
-                            PlayerController playerController = interactable as PlayerController;
-                            playerController.isAlive = true;
-                            break;
-                        default:
-                            break;
-                    }
+                    minSqrDistance = sqrDistance;
+                    nearest = interactable;
                 }
             }
 
-            //if (isHolding)
-            //{
-            //    // PlayerInputHandlerで保存した一番近い位置にあるIInteractableを取得する
-            //    interactable = inputHandler.interactObject;
-
-            //    string interactableObjectTagName = inputHandler.tagName;
-            //    switch (interactableObjectTagName)
-            //    {
-            //        case "Item":
-            //            // アイテムのIInteractableを継承しているクラスにinteractableをキャストして、Interact()を呼び出す
-            //            break;
-            //        default:
-            //            break;
-            //    }
-            //}
+            return nearest;
         }
 
         /// <summary>
@@ -110,11 +142,23 @@ namespace Network.Player
         /// </summary>
         public override void Render()
         {
-            if (isHolding)
-                OnPickUpItem?.Invoke();
-
-            if (!isAlive)
+            if (prevAlive && !IsAlive)
+            {
                 OnPlayerDied?.Invoke();
+            }
+
+            if (!prevAlive && IsAlive)
+            {
+                OnPlayerRevived?.Invoke();
+            }
+
+            if (!prevHoldingItem && IsHoldingItem)
+            {
+                OnPickUpItem?.Invoke();
+            }
+
+            prevAlive = IsAlive;
+            prevHoldingItem = IsHoldingItem;
         }
 
         /// <summary>
@@ -122,12 +166,49 @@ namespace Network.Player
         /// </summary>
         public void TakeDamage()
         {
-            if (!isAlive) return;
-            isAlive = false;
+            if(!Object.HasStateAuthority) return;
+            if (!IsAlive) return;
+
+            IsAlive = false;
         }
 
-        public void Interact()
+        public void Revive()
         {
+            if (!Object.HasStateAuthority) return;
+            if (IsAlive) return;
+
+            IsAlive = true;
+        }
+
+
+        // =========================
+        // IInteractable 実装
+        // 「死亡中プレイヤーは蘇生対象になる」
+        // =========================
+
+        public bool CanInteract(PlayerController player)
+        {
+            if (player == null) return false;
+
+            // 自分自身にはインタラクトしない
+            if (player == this) return false;
+
+            // 死亡中のプレイヤーだけ蘇生対象
+            return !IsAlive;
+        }
+
+        public void Interact(PlayerController player)
+        {
+            if (!Object.HasStateAuthority) return;
+            if (IsAlive) return;
+
+            Revive();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, interactRadius);
         }
     }
 }

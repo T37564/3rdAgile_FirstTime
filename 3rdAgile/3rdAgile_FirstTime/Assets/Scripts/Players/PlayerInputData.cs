@@ -6,6 +6,8 @@ namespace Network.Player
     public struct PlayerInputData : INetworkInput
     {
         public Vector2 move;
-        public NetworkBool tryPick;
+        //public NetworkBool tryPick;
+
+        public NetworkBool tryInteract;
     }
 }

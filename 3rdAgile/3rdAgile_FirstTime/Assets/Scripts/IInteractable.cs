@@ -1,3 +1,4 @@
+using Network.Player;
 using UnityEngine;
 
 public interface IInteractable
@@ -8,7 +9,12 @@ public interface IInteractable
     Transform Transform { get; }
 
     /// <summary>
+    /// このオブジェクトに対してインタラクト可能か
+    /// </summary>
+    bool CanInteract(PlayerController player);
+
+    /// <summary>
     /// アイテムとプレイヤーそれぞれで処理が違うため空実装
     /// </summary>
-    void Interact();
+    void Interact(PlayerController player);
 }
