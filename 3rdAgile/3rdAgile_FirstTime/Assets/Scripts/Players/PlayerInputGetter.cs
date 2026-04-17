@@ -7,11 +7,11 @@ using UnityEngine;
 
 public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private PlayerInputHandler inputHandler = null;
+    [SerializeField] private PlayerInputHandler localInputHandler = null;
 
     public void RegisterLocalInput(PlayerInputHandler handler)
     {
-        inputHandler = handler;
+        localInputHandler = handler;
     }
 
     /// <summary>
@@ -20,9 +20,9 @@ public class PlayerInputGetter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if (inputHandler == null) return;
+        if (localInputHandler == null) return;
 
-        PlayerInputData data = inputHandler.GetInput();
+        PlayerInputData data = localInputHandler.GetInput();
 
         input.Set(data);
     }

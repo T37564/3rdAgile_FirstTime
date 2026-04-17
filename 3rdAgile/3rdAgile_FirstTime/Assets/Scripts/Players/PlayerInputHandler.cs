@@ -16,6 +16,17 @@ namespace Network.Player
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerInputHandler : MonoBehaviour
     {
+        //プレイヤーの入力情報を保存するためのコンポーネント
+        private PlayerInput playerInput;
+
+        // プレイヤーの移動入力を保存するための変数
+        private Vector2 moveInput = Vector2.zero;
+
+        // 長押し入力が成立したかどうかを保存するための変数
+        private bool holdCompleted = false;
+
+        private bool interactTriggered = false;
+
         // プレイヤーがインタラクト可能なオブジェクトを保存するリスト
         private List<IInteractable> interactables = new List<IInteractable>();
 
@@ -25,16 +36,8 @@ namespace Network.Player
 
         public string tagName = "";
 
-        //プレイヤーの入力情報を保存するためのコンポーネント
-        private PlayerInput playerInput;
-
-        // プレイヤーの移動入力を保存するための変数
-        private Vector2 move = Vector2.zero;
         // アイテムを拾う等の長押し入力が成立したかどうかを保存するための変数
         private bool picked = false;
-
-        // 長押し入力が成立したかどうかを保存するための変数
-        private bool holdCompleted = false;
 
         /// <summary>
         /// 初期化
@@ -55,8 +58,8 @@ namespace Network.Player
             playerInput.actions["Move"].performed += OnMove;
             playerInput.actions["Move"].canceled += OnMove;
 
-            playerInput.actions["ItemPicked"].performed += OnItemPickedPerformed;
-            playerInput.actions["ItemPicked"].canceled += OnItemPickedCanceled;
+            playerInput.actions["ItemPicked"].performed += OnInteractPerformed;
+            playerInput.actions["ItemPicked"].canceled += OnInteractCanceled;
         }
 
         /// <summary>
@@ -66,7 +69,11 @@ namespace Network.Player
         {
             if (playerInput == null) return;
 
-            playerInput.onActionTriggered -= OnMove;
+            playerInput.actions["Move"].performed -= OnMove;
+            playerInput.actions["Move"].canceled -= OnMove;
+
+            playerInput.actions["ItemPicked"].performed -= OnInteractPerformed;
+            playerInput.actions["ItemPicked"].canceled -= OnInteractCanceled;
         }
         #endregion
 
@@ -76,10 +83,8 @@ namespace Network.Player
         /// </summary>
         public void OnMove(InputAction.CallbackContext context)
         {
-            if (context.action.name != "Move") return;
 
-            move = context.ReadValue<Vector2>();
-            Debug.Log("入力受け取ったよー");
+            moveInput = context.ReadValue<Vector2>();
         }
         #endregion
 
@@ -87,7 +92,7 @@ namespace Network.Player
         /// <summary>
         /// ボタンの長押し入力が成立したタイミングで発火
         /// </summary>
-        public void OnItemPickedPerformed(InputAction.CallbackContext context)
+        public void OnInteractPerformed(InputAction.CallbackContext context)
         {
             // 長押し成立フラグを立てる
             holdCompleted = true;
@@ -97,13 +102,13 @@ namespace Network.Player
         /// <summary>
         /// 長押し入力がキャンセルされたら発火
         /// </summary>
-        public void OnItemPickedCanceled(InputAction.CallbackContext context)
+        public void OnInteractCanceled(InputAction.CallbackContext context)
         {
             // 長押し入力が成立していなかったら何もせずメソッドから抜ける
             if (!holdCompleted) return;
 
             //成立したとホストに通知するためのbool値をtrueで保存
-            picked = true;
+            interactTriggered = true;
 
             // ボタンが離されたので再度長押し判定をとれるようにfalseに
             holdCompleted = false;
@@ -135,11 +140,13 @@ namespace Network.Player
         /// </summary>
         public PlayerInputData GetInput()
         {
-            PlayerInputData data = new PlayerInputData()
+            PlayerInputData data = new PlayerInputData
             {
-                move = move,
-                tryPick = picked
+                move = moveInput,
+                tryInteract = interactTriggered
             };
+
+            interactTriggered = false;
             return data;
         }
 
