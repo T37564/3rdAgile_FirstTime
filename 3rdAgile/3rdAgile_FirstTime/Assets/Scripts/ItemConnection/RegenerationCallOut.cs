@@ -17,6 +17,10 @@ public class RegenerationCallOut : NetworkBehaviour
     //アイテムが地面に配置されていない場合、再配置するためのフラグ
     public bool isGenerateRequest = false;
 
+    [Networked] public PlayerRef Carrier { get; set; }
+
+    [Networked] public bool isCarried { get; set; }
+
     //誰かに知らせるためのイベント
     public Action<RegenerationCallOut> OnNeedRegenerate;
 

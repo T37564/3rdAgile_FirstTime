@@ -41,6 +41,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
+        int currentWave = 1;
+
         //生成する数だけpositionを作ってください
         for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
         {
@@ -50,14 +52,15 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             Vector3 generatePosition =itemObjectPlace.GetRandomPosition();
             
             // 生成するオブジェクトを取得
-            NetworkObject prefab = itemObjectPlace.GetRandomPrefabObject();
+            //NetworkObject prefab = itemObjectPlace.GetRandomPrefabObject();
+            NetworkObject prefab =GetRandomItemByWave(currentWave);
 
             if (prefab == null) continue;
 
             // ネットワークを使ったアイテム生成
             runner.Spawn(prefab, generatePosition, Quaternion.identity, null, (runner, obj) =>
             {
-                SetupItem(obj);
+                SetupItem(obj,prefab);
             });
             Debug.Log(itemCount);
         }
@@ -66,19 +69,65 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary>
     /// アイテムの情報をランダムに決めるメソッド
     /// </summary>
-    private void SetupItem(NetworkObject obj)
+    private void SetupItem(NetworkObject obj, NetworkObject prefab)
     {
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
+        ItemDataStorage prefabStorage = prefab.GetComponent<ItemDataStorage>();
 
         // アイテムの情報をランダムに決めてほしいアイテムの場合
         if (storage != null && storage.useRandomData)
         {
             //ランダムに決めたアイテムの情報を生成したアイテムに代入する
-            SampleMasterData data =
-                itemObjectPlace.GetRomdomItemData();
+            //SampleMasterData data = itemObjectPlace.GetRomdomItemData();
 
-            storage.SetData(data);
+            //storage.SetData(data);
+            storage.SetData(prefabStorage.itemData);
         }
+    }
+
+    float GetWaveProbability(SampleMasterData sampleMasterData,int wave)
+    {
+        return wave switch
+        {
+            1 => sampleMasterData.GetFloat("EarlyTime"),
+            2 => sampleMasterData.GetFloat("MiddleTime"),
+            3 => sampleMasterData.GetFloat("FinalTime"),
+            _ => 0f
+        };
+    }
+
+    public NetworkObject GetRandomItemByWave(int wave)
+    {
+        //// スポーンする位置をいれたオブジェクトを取得
+        //GameObject spawnPoint = GameObject.Find("ItemObjectPlace");
+
+        //// スクリプトを取得
+        //itemObjectPlace = spawnPoint.GetComponent<ItemObjectPlace>();
+
+        float totalProbability = 0f;
+
+        // 全アイテムの Wave 出現確率を合計
+        foreach (var item in itemObjectPlace.itemProbabilities)
+        {
+            SampleMasterData data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
+            totalProbability += GetWaveProbability(data, wave);
+        }
+
+        float randamProbability=UnityEngine.Random.Range(0.0f, totalProbability);
+        float currentProbability = 0.0f;
+
+        // 個々のアイテムの確率で抽選
+        foreach (var item in itemObjectPlace.itemProbabilities)
+        {
+            SampleMasterData data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
+            currentProbability += GetWaveProbability(data, wave);
+            if (randamProbability < currentProbability)
+            {
+                return item.itemPrefab;
+            }
+        }
+
+        return null;
     }
 
     

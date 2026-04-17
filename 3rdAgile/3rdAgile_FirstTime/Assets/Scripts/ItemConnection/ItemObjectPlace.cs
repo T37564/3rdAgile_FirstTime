@@ -1,5 +1,7 @@
 using Fusion;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -10,6 +12,9 @@ public class ItemProbability
 
     [Header("アイテムの出現確率")]
     public float probability; // アイテムの出現確率
+
+    [Header("アイテムを運ぶ際に必要な人数")]
+    public int transportNumberPeople;
 }
 
 [System.Serializable]
@@ -31,6 +36,7 @@ public class RoomSpawnPosition
     [Header("部屋のY座標")]
     public float positionY; // 部屋のY座標
 }
+
 
 public class ItemObjectPlace : MonoBehaviour
 {
