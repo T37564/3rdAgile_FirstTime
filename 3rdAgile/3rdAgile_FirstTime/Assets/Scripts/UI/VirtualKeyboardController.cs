@@ -3,6 +3,7 @@
 // VirtualKeyboardController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,30 +18,24 @@ public class VirtualKeyboardController : MonoBehaviour
     // class="key" を持つ全てのキー（UI 要素）をまとめて格納
     private Button[] keys = null;
 
+    private Label matchingNumbersText = null;
+
     // 現在選択中のキーのインデックス
     private int currentIndex = 0;
 
+    private string matchingNumbers = "";
 
     // UI Document が有効になった瞬間に呼ばれる
     private void OnEnable()
     {
+        // 仮想キーボードのVisualElementを探す
         root = uiDocument.rootVisualElement;
 
         // UXML 内で class="key" が付いた要素を全部取得して配列に変換
         keys = root.Query<Button>(className: "key").ToList().ToArray();
-
-        if (keys == null)
-        {
-            Debug.LogWarning("ボタンなし");
-        }
-
-        // 初期状態として最初のキーをハイライトする
+        matchingNumbersText = root.Query<Label>();
+        // 初期キー　色変更
         Highlight(currentIndex);
-
-       
-
-        string key = keys[currentIndex].text;
-        Debug.Log(key);
     }
 
 
@@ -50,57 +45,101 @@ public class VirtualKeyboardController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Move(-1);
-            SelectKey(currentIndex);   // 見た目の更新
         }
 
         // 右移動（→）
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             Move(+1);
-            SelectKey(currentIndex);   // 見た目の更新
+        }
+
+        // 上移動
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            Move(-3);
+        }
+
+        // 下移動
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Move(+3);
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ClickCalculatorButton(currentIndex);
         }
     }
 
 
-    // -------------------------------
-    // キーの選択移動処理
-    // -------------------------------
+    /// <summary>
+    /// 選択しているキーの変更処理
+    /// </summary>
     private void Move(int dir)
     {
-        // 今のキーから selected を外す
         keys[currentIndex].RemoveFromClassList("selected");
 
-        // インデックスを進める
-        currentIndex += dir;
+        currentIndex = (currentIndex + dir + keys.Length) % keys.Length;
 
-        // 範囲を超えないようにクランプ
-        currentIndex = Mathf.Clamp(currentIndex, 0, keys.Length - 1);
-
-        // 新しいキーを強調表示
         Highlight(currentIndex);
 
-        string key=keys[currentIndex].text;
-
-        Debug.Log(key);
+        string st = keys[currentIndex].text;
+        Debug.Log(st);
     }
 
 
-    // 選択中のキーをハイライトする（selected を付与）
+    /// <summary>
+    /// 選択中のキー　強調させるため色を変更する処理
+    /// </summary>
     private void Highlight(int index)
     {
+        // USSの色に変更（グレー）
         keys[index].AddToClassList("selected");
     }
 
-
-
-    // 配列内のキーの見た目を一括で更新する
-    void SelectKey(int index)
+    /// <summary>
+    /// 電卓のボタンが押されたときの処理
+    /// </summary>
+    private void ClickCalculatorButton(int index)
     {
-        // 全キーから selected を外す
-        foreach (var key in keys)
-            key.RemoveFromClassList("selected");
+        if (keys[index].text == "消")
+        {
+            if (0 < matchingNumbers.Length)
+                DeleteButton();
+        }
+        else if (keys[index].text == "決")
+        {
+            if (0 < matchingNumbers.Length)
+                DecisionButton();
+        }
+        else
+        {
+            if (matchingNumbers.Length < 6)
+                matchingNumbers += keys[index].text;
+        }
 
-        // 指定されたキーに selected を付ける
-        keys[index].AddToClassList("selected");
+        MatchingNumbersTextChange();
+    }
+
+
+    /// <summary>
+    /// 決定ボタンが押されたときの処理
+    /// </summary>
+    private void DecisionButton()
+    {
+
+    }
+
+    /// <summary>
+    /// 削除ボタンが押されたときの処理
+    /// </summary>
+    private void DeleteButton()
+    {
+        matchingNumbers = matchingNumbers.Substring(0, matchingNumbers.Length - 1);
+    }
+
+    private void MatchingNumbersTextChange()
+    {
+        matchingNumbersText.text = matchingNumbers.ToString();
     }
 }
