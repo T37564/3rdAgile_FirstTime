@@ -1,0 +1,7 @@
+.key {
+    background-color: black;
+}
+
+.key.selected {
+    background-color: gray;
+}
