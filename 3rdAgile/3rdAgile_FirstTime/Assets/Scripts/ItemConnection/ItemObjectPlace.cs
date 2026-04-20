@@ -10,11 +10,19 @@ public class ItemProbability
     [Header("アイテムのプレハブオブジェクト")]
     public NetworkObject itemPrefab; // アイテムのプレハブ
 
+}
+
+[Serializable]
+public class PhaseItemTable
+{
+    [Header("Wave番号")]
+    public GamePhase phase;
+
+    [Header("このWaveで出現するアイテム")]
+    public ItemProbability[] items;
+
     [Header("アイテムの出現確率")]
     public float probability; // アイテムの出現確率
-
-    [Header("アイテムを運ぶ際に必要な人数")]
-    public int transportNumberPeople;
 }
 
 [System.Serializable]
@@ -37,12 +45,13 @@ public class RoomSpawnPosition
     public float positionY; // 部屋のY座標
 }
 
-
 public class ItemObjectPlace : MonoBehaviour
 {
     // アイテムとその確率の配列
     [Header("出現するアイテムのリスト")]
     [SerializeField] public ItemProbability[] itemProbabilities;
+
+    [SerializeField] public PhaseItemTable[] phaseItemTables;
 
     [Header("部屋ごとのアイテム配置範囲のリスト")]
     [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
@@ -53,21 +62,42 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("アイテムのデータが入っている配列")]
     [SerializeField] private SampleMasterData[] itemDataArrays;
 
+    [SerializeField] private GameTimer gameTimer;
+
+    private GamePhase currentPhase;
+
+    public List<FloatEntry> spawnProbabilities;
+
+    public NetworkObject GetRandomPrefabByPhase(GamePhase phase)
+    {
+        var table = Array.Find(phaseItemTables, t => t.phase == phase);
+        Debug.Log(phase);
+        if (table == null)
+        {
+            Debug.LogError($"Wave {phase} に対応するアイテムテーブルが見つかりません");
+            return null;
+        }
+
+        return GetRandomPrefabObject(table.items, phase);
+    }
+
 
     /// <summary>
     /// どのアイテムを生成するかを確率に基づいてランダムに決めるメソッド
     /// </summary>
     /// <returns></returns>
-    public NetworkObject GetRandomPrefabObject()
+    public NetworkObject GetRandomPrefabObject(ItemProbability[] items, GamePhase phase)
     {
         //合計確率の初期値
         float total = 0.0f;
-
+        
         // ItemProbabilityごとのprobabilityの合計を計算
         //全部の確立を計算している
-        foreach (var item in itemProbabilities)
+        foreach (var item in items)
         {
-            total += item.probability;
+            var data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
+
+            total += GetProbability(data, phase);
         }
 
         //totalが0以下の場合確率に基づく計算ができないのでエラーを出力してnullを返す
@@ -84,20 +114,34 @@ public class ItemObjectPlace : MonoBehaviour
         float current = 0.0f;
 
         // アイテムの確率を順番に足していき、ランダムな数値がどのアイテムの範囲に入るかを確認
-        foreach (var item in itemProbabilities)
+        foreach (var item in items)
         {
+            var data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
+
             //現在のアイテムの確率を足していく
-            current += item.probability;
+            current += GetProbability(data, phase);
 
             //取得したランダムな数値が現在のアイテムの出現確立の数値内にある場合
             //そのアイテムをGameObjectとして返す
             if (randomProbability < current)
             {
+                //int itemIndex = UnityEngine.Random.Range(0, item.items.Length);
                 return item.itemPrefab;
             }
         }
 
         return null;
+    }
+
+    private float GetProbability(SampleMasterData data, GamePhase phase)
+    {
+        return phase switch
+        {
+            GamePhase.Phase1 => data.GetFloat("Phase1Probability"),
+            GamePhase.Phase2 => data.GetFloat("Phase2Probability"),
+            GamePhase.Phase3 => data.GetFloat("Phase3Probability"),
+            _ => 0f
+        };
     }
 
     /// <summary>

@@ -543,7 +543,7 @@ GameObject:
   - component: {fileID: 1009439675}
   - component: {fileID: 1009439674}
   m_Layer: 0
-  m_Name: ItemObjectPlaceNoNetwork
+  m_Name: ItemObjectPlace
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -563,23 +563,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemObjectPlaceNoNetwork
   itemProbabilities:
   - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
-    probability: 30
-    transportNumberPeople: 0
   - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
-    probability: 25
-    transportNumberPeople: 0
   - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
-    probability: 20
-    transportNumberPeople: 0
   - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
-    probability: 15
-    transportNumberPeople: 0
   - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
-    probability: 7
-    transportNumberPeople: 0
   - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
-    probability: 3
-    transportNumberPeople: 0
+  - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
+  phaseItemTables: []
   roomSpawnPositions:
   - minX: -25
     maxX: 25
@@ -604,6 +597,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
   - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
   - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
+  gameTimer: {fileID: 3343831041543307287, guid: 975ca99ff76130540a1328e0103e3bdf, type: 3}
+  spawnProbabilities: []
 --- !u!4 &1009439675
 Transform:
   m_ObjectHideFlags: 0
@@ -909,8 +904,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1386069733}
   - component: {fileID: 1386069734}
+  - component: {fileID: 1386069735}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ItemSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -924,8 +920,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1386069732}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -943,6 +939,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c80c0a8ac5064ab479c5edab9022023b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  gameTimerPrefab: {fileID: 1212030418408890897, guid: 975ca99ff76130540a1328e0103e3bdf, type: 3}
+--- !u!114 &1386069735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386069732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 296360541
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1386069734}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &1463889636
 GameObject:
   m_ObjectHideFlags: 0
@@ -1132,5 +1148,5 @@ SceneRoots:
   - {fileID: 753483543}
   - {fileID: 1463889637}
   - {fileID: 1009439675}
-  - {fileID: 1386069733}
   - {fileID: 1161567046}
+  - {fileID: 1386069733}
