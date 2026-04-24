@@ -64,9 +64,6 @@ public class ItemObjectPlace : MonoBehaviour
 
     [SerializeField] private GameTimer gameTimer;
 
-    private GamePhase currentPhase;
-
-    public List<FloatEntry> spawnProbabilities;
 
     public NetworkObject GetRandomPrefabByPhase(GamePhase phase)
     {
@@ -116,9 +113,10 @@ public class ItemObjectPlace : MonoBehaviour
         // アイテムの確率を順番に足していき、ランダムな数値がどのアイテムの範囲に入るかを確認
         foreach (var item in items)
         {
+            // ItemDataStorageクラスを取得しitemDataも取得
             var data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
 
-            //現在のアイテムの確率を足していく
+            //現在フェーズのアイテムの確率を足していく
             current += GetProbability(data, phase);
 
             //取得したランダムな数値が現在のアイテムの出現確立の数値内にある場合
@@ -133,10 +131,15 @@ public class ItemObjectPlace : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// フェーズごとの出現確立を取得するメソッド
+    /// スクリプタブルオブジェクトに設定している出現確立数値を参照する
+    /// </summary>
     private float GetProbability(SampleMasterData data, GamePhase phase)
     {
         return phase switch
         {
+            // GetFloatの文字列型引数と同じ文字を参照
             GamePhase.Phase1 => data.GetFloat("Phase1Probability"),
             GamePhase.Phase2 => data.GetFloat("Phase2Probability"),
             GamePhase.Phase3 => data.GetFloat("Phase3Probability"),
