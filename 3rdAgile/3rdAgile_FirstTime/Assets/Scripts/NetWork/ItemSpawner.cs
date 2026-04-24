@@ -20,9 +20,12 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     //アイテムがスポーンした数
     private int itemCount = 0;
 
-    [SerializeField] private NetworkObject gameTimerPrefab;
+    [SerializeField] private GameTimer gameTimer = null;
 
-    private GameTimer gameTimer;
+    public void RegisterGameTimer(GameTimer timer)
+    {
+        gameTimer = timer;
+    }
 
     private void Start()
     {
@@ -36,6 +39,12 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         else
         {
             Debug.LogError("Runnerが見つからない");
+        }
+
+        if (gameTimer != null)
+        {
+            gameTimer = FindAnyObjectByType<GameTimer>();
+            gameTimer.GetComponent<GameTimer>();
         }
     }
 
@@ -68,16 +77,17 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 管理者だけ実行
         if (!runner.IsServer) return;
 
-       
-
+       GameTimer timer = FindAnyObjectByType<GameTimer>();
+        RegisterGameTimer(timer);
+        
         gameTimer.OnPhaseChanged += (phase) => OnPhaseChanged(phase, runner);
 
         //前回のやり方
         Debug.Log("GameTimer Spawned!!");
         // gameTimer.OnPhaseChanged += OnPhaseChanged(runner);
 
-        var obj = runner.Spawn(gameTimerPrefab, Vector3.zero, Quaternion.identity);
-        gameTimer = obj.GetComponent<GameTimer>();
+        //var obj = runner.Spawn(gameTimerPrefab, Vector3.zero, Quaternion.identity);
+        //gameTimer = obj.GetComponent<GameTimer>();
 
         Debug.Log("GameTimer Spawned");
 

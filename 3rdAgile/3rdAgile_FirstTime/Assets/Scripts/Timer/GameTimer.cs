@@ -64,6 +64,7 @@ public class GameTimer : NetworkBehaviour
     {
         if (CurrentPhase != previousPhase)
         {
+            Debug.Log($"Phase changed to {CurrentPhase}");
             OnPhaseChanged?.Invoke(CurrentPhase);
 
             if (CurrentPhase == GamePhase.Finished)
