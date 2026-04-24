@@ -3,10 +3,11 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Collections.Unicode;
-using static UnityEditor.PlayerSettings;
 
-public class ItemSpawner : NetworkBehaviour, INetworkRunnerCallbacks
+/// <summary>
+/// NetworkBehaviourÇ…Ç∑ÇÈÇ∆âÛÇÍÇƒÇµÇ‹Ç¢Ç‹Ç∑ÅB
+/// </summary>
+public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     private NetworkRunner networkRunner;
 
@@ -39,22 +40,12 @@ public class ItemSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     }
 
 
-    public override void Spawned()
+    private void OnPhaseChanged(GamePhase phase,NetworkRunner runner)
     {
-        Debug.Log("GameTimer Spawned!!");
-        if (networkRunner.IsServer)
-        {
-            gameTimer.OnPhaseChanged += OnPhaseChanged;
-        }
+        SpawnItems(phase,runner);
     }
 
-
-    private void OnPhaseChanged(GamePhase phase)
-    {
-        SpawnItems(phase);
-    }
-
-    private void SpawnItems(GamePhase phase)
+    private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
         for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
         {
@@ -64,7 +55,7 @@ public class ItemSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 
             Vector3 randomPosition = itemObjectPlace.GetRandomPosition();
 
-            Runner.Spawn(prefab, randomPosition, Quaternion.identity);
+            runner.Spawn(prefab, randomPosition, Quaternion.identity);
         }
     }
 
@@ -76,6 +67,14 @@ public class ItemSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     {
         // ä«óùé“ÇæÇØé¿çs
         if (!runner.IsServer) return;
+
+       
+
+        gameTimer.OnPhaseChanged += (phase) => OnPhaseChanged(phase, runner);
+
+        //ëOâÒÇÃÇ‚ÇËï˚
+        Debug.Log("GameTimer Spawned!!");
+        // gameTimer.OnPhaseChanged += OnPhaseChanged(runner);
 
         var obj = runner.Spawn(gameTimerPrefab, Vector3.zero, Quaternion.identity);
         gameTimer = obj.GetComponent<GameTimer>();
