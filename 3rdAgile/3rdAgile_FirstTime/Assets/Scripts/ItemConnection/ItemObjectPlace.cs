@@ -20,9 +20,6 @@ public class PhaseItemTable
 
     [Header("このWaveで出現するアイテム")]
     public ItemProbability[] items;
-
-    [Header("アイテムの出現確率")]
-    public float probability; // アイテムの出現確率
 }
 
 [System.Serializable]
@@ -51,6 +48,7 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("出現するアイテムのリスト")]
     [SerializeField] public ItemProbability[] itemProbabilities;
 
+    [Header("フェーズごとのアイテム")]
     [SerializeField] public PhaseItemTable[] phaseItemTables;
 
     [Header("部屋ごとのアイテム配置範囲のリスト")]
@@ -62,7 +60,36 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("アイテムのデータが入っている配列")]
     [SerializeField] private SampleMasterData[] itemDataArrays;
 
-    [SerializeField] private GameTimer gameTimer;
+    [SerializeField] private GameTimer gameTimer = null;
+
+    private static ItemObjectPlace instance;
+
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        if (gameTimer == null)
+        {
+            gameTimer = FindAnyObjectByType<GameTimer>();
+            gameTimer.GetComponent<GameTimer>();
+        }
+    }
+
+    //private void Start()
+    //{
+    //    if(gameTimer == null)
+    //    {
+    //        gameTimer = FindAnyObjectByType<GameTimer>();
+    //        gameTimer.GetComponent<GameTimer>();
+    //    }
+    //}
 
 
     public NetworkObject GetRandomPrefabByPhase(GamePhase phase)
