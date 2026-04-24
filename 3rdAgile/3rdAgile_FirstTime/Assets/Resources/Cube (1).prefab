@@ -71,6 +71,7 @@ GameObject:
   - component: {fileID: 6921466846602991058}
   - component: {fileID: 797298429775292460}
   - component: {fileID: 6543671954796799019}
+  - component: {fileID: -8692672578443632786}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Player
@@ -311,6 +312,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 1
+  interactRadius: 2
+  interactLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &797298429775292460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,6 +335,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6921466846602991058}
   - {fileID: 6543671954796799019}
+  - {fileID: -8692672578443632786}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &6543671954796799019
 MonoBehaviour:
@@ -348,3 +354,15 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &-8692672578443632786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9032917314817732529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254dc263fce0ecf498ee35776659af9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraBinder
