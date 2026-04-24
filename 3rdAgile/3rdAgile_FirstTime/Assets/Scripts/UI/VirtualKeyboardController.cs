@@ -1,145 +1,281 @@
-// -----------------------------------------------------------------------------------
-// ‰¼‘zƒL[ƒ{[ƒh‚Ì“ü—ÍA‘I‘ğ‚È‚Ç‚Ìˆ—
+ï»¿// -----------------------------------------------------------------------------------
+// ä»®æƒ³ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å…¥åŠ›ã€é¸æŠãªã©ã®å‡¦ç†
 // VirtualKeyboardController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using Unity.VisualScripting;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class VirtualKeyboardController : MonoBehaviour
 {
-    // UI Toolkit ‚Ìƒ‹[ƒg—v‘f‚ğQÆ‚·‚é‚½‚ß‚Ì UIDocument
+    private readonly int MAXIMUM_NUMBER_OF_DIGITS = 6;
+
+
+
+    [SerializeField] private PlayerInput playerInput = null;
+
+    // UI Toolkit ã®ãƒ«ãƒ¼ãƒˆè¦ç´ ã‚’å‚ç…§ã™ã‚‹ãŸã‚ã® UIDocument
     [SerializeField] private UIDocument uiDocument = null;
 
-    // UXML ‚Ì root
+
+
+    // UXML ã® root
     private VisualElement root = null;
 
-    // class="key" ‚ğ‚Â‘S‚Ä‚ÌƒL[iUI —v‘fj‚ğ‚Ü‚Æ‚ß‚ÄŠi”[
+    // class="key" ã‚’æŒã¤å…¨ã¦ã®ã‚­ãƒ¼ï¼ˆUI è¦ç´ ï¼‰ã‚’ã¾ã¨ã‚ã¦æ ¼ç´
     private Button[] keys = null;
 
+    // UIToolkitã®æš—è¨¼ç•ªå·ã‚’å…¥ã‚Œã‚‹ãƒ†ã‚­ã‚¹ãƒˆ
     private Label matchingNumbersText = null;
 
-    // Œ»İ‘I‘ğ’†‚ÌƒL[‚ÌƒCƒ“ƒfƒbƒNƒX
-    private int currentIndex = 0;
+    private System.Action[] clickActions;
 
+    // æš—è¨¼ç•ªå·ã‚’å…¥ã‚Œã‚‹å¤‰æ•°
     private string matchingNumbers = "";
 
-    // UI Document ‚ª—LŒø‚É‚È‚Á‚½uŠÔ‚ÉŒÄ‚Î‚ê‚é
+
+
+    // UI Document ãŒæœ‰åŠ¹ã«ãªã£ãŸç¬é–“ã«å‘¼ã°ã‚Œã‚‹
     private void OnEnable()
     {
-        // ‰¼‘zƒL[ƒ{[ƒh‚ÌVisualElement‚ğ’T‚·
+        // ä»®æƒ³ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®VisualElementã‚’æ¢ã™
         root = uiDocument.rootVisualElement;
 
-        // UXML “à‚Å class="key" ‚ª•t‚¢‚½—v‘f‚ğ‘S•”æ“¾‚µ‚Ä”z—ñ‚É•ÏŠ·
+        // UXML å†…ã§ class="key" ãŒä»˜ã„ãŸè¦ç´ ã‚’å…¨éƒ¨å–å¾—ã—ã¦é…åˆ—ã«å¤‰æ›
         keys = root.Query<Button>(className: "key").ToList().ToArray();
         matchingNumbersText = root.Query<Label>();
-        // ‰ŠúƒL[@F•ÏX
-        Highlight(currentIndex);
+
+        // ãƒœã‚¿ãƒ³ã®ç™»éŒ²
+        playerInput.actions["NumberUI"].performed += OnNumberUI;
+
+
+
+        clickActions = new System.Action[keys.Length];
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            int index = i;
+            clickActions[i] = () => OnKeyClicked(index);
+            keys[i].clicked += clickActions[i];
+        }
     }
 
 
-    private void Update()
+    private void OnDisable()
     {
-        // ¶ˆÚ“®i©j
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            Move(-1);
-        }
+        // ãƒœã‚¿ãƒ³ã®ç™»éŒ²è§£é™¤
+        playerInput.actions["NumberUI"].performed -= OnNumberUI;
 
-        // ‰EˆÚ“®i¨j
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        // ã‚¯ãƒªãƒƒã‚¯ã®ç™»éŒ²
+        for (int i = 0; i < keys.Length; i++)
         {
-            Move(+1);
-        }
-
-        // ãˆÚ“®
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            Move(-3);
-        }
-
-        // ‰ºˆÚ“®
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            Move(+3);
-        }
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            ClickCalculatorButton(currentIndex);
+            keys[i].clicked -= clickActions[i];
         }
     }
 
 
     /// <summary>
-    /// ‘I‘ğ‚µ‚Ä‚¢‚éƒL[‚Ì•ÏXˆ—
+    /// æ•°å­—ï¼ˆ0ï½9ï¼‰ã‚’UIä¸Šã®ãƒœã‚¿ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã«å¤‰æ›ã™ã‚‹
     /// </summary>
-    private void Move(int dir)
+    private int GetButtonIndex(int number)
     {
-        keys[currentIndex].RemoveFromClassList("selected");
-
-        currentIndex = (currentIndex + dir + keys.Length) % keys.Length;
-
-        Highlight(currentIndex);
-
-        string st = keys[currentIndex].text;
-        Debug.Log(st);
-    }
-
-
-    /// <summary>
-    /// ‘I‘ğ’†‚ÌƒL[@‹­’²‚³‚¹‚é‚½‚ßF‚ğ•ÏX‚·‚éˆ—
-    /// </summary>
-    private void Highlight(int index)
-    {
-        // USS‚ÌF‚É•ÏXiƒOƒŒ[j
-        keys[index].AddToClassList("selected");
-    }
-
-    /// <summary>
-    /// “d‘ì‚Ìƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Ìˆ—
-    /// </summary>
-    private void ClickCalculatorButton(int index)
-    {
-        if (keys[index].text == "Á")
+        switch (number)
         {
-            if (0 < matchingNumbers.Length)
-                DeleteButton();
+            case 7: return 0;
+            case 8: return 1;
+            case 9: return 2;
+
+            case 4: return 3;
+            case 5: return 4;
+            case 6: return 5;
+
+            case 1: return 6;
+            case 2: return 7;
+            case 3: return 8;
+
+            case 0: return 10;
+
+            default: return -1;
         }
-        else if (keys[index].text == "Œˆ")
+    }
+
+    /// <summary>
+    /// ãƒã‚¦ã‚¹ã§ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãã®å‡¦ç†
+    /// </summary>
+    private void OnKeyClicked(int index)
+    {
+        string text = keys[index].text;
+
+        if (text == "æ¶ˆ")
         {
-            if (0 < matchingNumbers.Length)
-                DecisionButton();
+            DeleteButton();
+        }
+        else if (text == "æ±º")
+        {
+            DecisionButton();
         }
         else
         {
-            if (matchingNumbers.Length < 6)
-                matchingNumbers += keys[index].text;
+            AddnNumericalInputFromKeyboard(int.Parse(text));
         }
+
+        StartCoroutine(Highlight(index));
+    }
+
+    /// <summary>
+    /// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ã‚’å—ã‘å–ã‚Šã€å¯¾å¿œã™ã‚‹å‡¦ç†ï¼ˆæ•°å­—å…¥åŠ›ãƒ»å‰Šé™¤ãƒ»æ±ºå®šï¼‰ã‚’å®Ÿè¡Œã™ã‚‹
+    /// </summary>
+    private void OnNumberUI(InputAction.CallbackContext callbackContext)
+    {
+        Debug.Log(callbackContext.control.path);
+
+        switch (callbackContext.control.path)
+        {
+            // 0
+            case "/Keyboard/numpad0":
+            case "/Keyboard/0":
+                AddnNumericalInputFromKeyboard(0);
+                break;
+
+            // 1
+            case "/Keyboard/numpad1":
+            case "/Keyboard/1":
+                AddnNumericalInputFromKeyboard(1);
+                break;
+
+            // 2
+            case "/Keyboard/numpad2":
+            case "/Keyboard/2":
+                AddnNumericalInputFromKeyboard(2);
+                break;
+
+            // 3
+            case "/Keyboard/numpad3":
+            case "/Keyboard/3":
+                AddnNumericalInputFromKeyboard(3);
+                break;
+
+            // 4
+            case "/Keyboard/numpad4":
+            case "/Keyboard/4":
+                AddnNumericalInputFromKeyboard(4);
+                break;
+
+            // 5
+            case "/Keyboard/numpad5":
+            case "/Keyboard/5":
+                AddnNumericalInputFromKeyboard(5);
+                break;
+
+            // 6
+            case "/Keyboard/numpad6":
+            case "/Keyboard/6":
+                AddnNumericalInputFromKeyboard(6);
+                break;
+
+            // 7
+            case "/Keyboard/numpad7":
+            case "/Keyboard/7":
+                AddnNumericalInputFromKeyboard(7);
+                break;
+
+            // 8
+            case "/Keyboard/numpad8":
+            case "/Keyboard/8":
+                AddnNumericalInputFromKeyboard(8);
+                break;
+
+            // 9
+            case "/Keyboard/numpad9":
+            case "/Keyboard/9":
+                AddnNumericalInputFromKeyboard(9);
+                break;
+
+            // Enter
+            case "/Keyboard/numpadEnter":
+            case "/Keyboard/Enter":
+                DecisionButton();
+                break;
+
+
+            //Del
+            case "/Keyboard/numpadPeriod":
+            case "/Keyboard/backspace":
+                DeleteButton();
+                break;
+
+            default:
+                Debug.Log("ä¾‹å¤–");
+                return;
+
+        }
+    }
+
+
+    /// <summary>
+    /// æ•°å­—ã‚’å…¥åŠ›ã—ã€UIè¡¨ç¤ºã‚’æ›´æ–°ã™ã‚‹ï¼ˆæœ€å¤§æ¡æ•°åˆ¶é™ã‚ã‚Šï¼‰
+    /// </summary>
+    private void AddnNumericalInputFromKeyboard(int index)
+    {
+        // é¸æŠã—ãŸUIã®è‰²ã‚’å¤‰ãˆã‚‹
+        int highlightIndex = GetButtonIndex(index);
+        if (highlightIndex >= 0)
+            StartCoroutine(Highlight(highlightIndex));
+
+        // æš—è¨¼ç•ªå·ã®æœ€å¤§æ¡æ•°ã‚ˆã‚Šå°ã•ã„ã¨ã
+        if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+            // å…¥åŠ›ã•ã‚ŒãŸç•ªå·ã‚’è¿½åŠ ã™ã‚‹
+            matchingNumbers += index.ToString();
+
+        // æš—è¨¼ç•ªå·ã®æ•°å€¤ãŒæ›¸ã‹ã‚ŒãŸUIã®æ›´æ–°
+        MatchingNumbersTextChange();
+    }
+
+
+    /// <summary>
+    /// æ±ºå®šãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã®å‡¦ç†
+    /// </summary>
+    private void DecisionButton()
+    {
+        StartCoroutine(Highlight(11));
+        Debug.Log("ç¢ºå®š");
+    }
+
+
+    /// <summary>
+    /// å‰Šé™¤ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã®å‡¦ç†
+    /// </summary>
+    private void DeleteButton()
+    {
+        StartCoroutine(Highlight(9));
+
+        if (matchingNumbers.Length > 0)
+            matchingNumbers = matchingNumbers.Substring(0, matchingNumbers.Length - 1);
 
         MatchingNumbersTextChange();
     }
 
 
     /// <summary>
-    /// Œˆ’èƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Ìˆ—
+    /// æš—è¨¼ç•ªå·ãŒæ›¸ã‹ã‚ŒãŸãƒ†ã‚­ã‚¹ãƒˆã®æ›´æ–°
     /// </summary>
-    private void DecisionButton()
-    {
-
-    }
-
-    /// <summary>
-    /// íœƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Ìˆ—
-    /// </summary>
-    private void DeleteButton()
-    {
-        matchingNumbers = matchingNumbers.Substring(0, matchingNumbers.Length - 1);
-    }
-
     private void MatchingNumbersTextChange()
     {
         matchingNumbersText.text = matchingNumbers.ToString();
+    }
+
+
+    /// <summary>
+    /// æŒ‡å®šã—ãŸãƒœã‚¿ãƒ³ã‚’ä¸€æ™‚çš„ã«ãƒã‚¤ãƒ©ã‚¤ãƒˆè¡¨ç¤ºã™ã‚‹ï¼ˆè¦–è¦šãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ç”¨ï¼‰
+    /// </summary>
+    private IEnumerator Highlight(int index)
+    {
+        keys[index].AddToClassList("selected");
+
+        yield return new WaitForSeconds(0.3f);
+
+        keys[index].RemoveFromClassList("selected");
     }
 }
