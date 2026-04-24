@@ -22,6 +22,20 @@ public class PhaseItemTable
     public ItemProbability[] items;
 }
 
+[Serializable]
+public class RandomItemData
+{
+    [Header("ランダム性のあるアイテムのデータ候補のリスト")]
+    SampleMasterData[] sampleMasterData;
+}
+
+[Serializable]
+public class ItemDataTable
+{
+    [Header("個別のアイテムにあるランダム性のあるデータ")]
+    public RandomItemData[] sampleMasterDatas;
+}
+
 [System.Serializable]
 public class RoomSpawnPosition
 {
@@ -58,9 +72,14 @@ public class ItemObjectPlace : MonoBehaviour
     [SerializeField] public int maxItemObjectCount;
 
     [Header("アイテムのデータが入っている配列")]
-    [SerializeField] private SampleMasterData[] itemDataArrays;
+    [SerializeField] private RandomItemData randomItemDatas;
+
+    [Header("ランダム性のあるアイテムのデータテーブル")]
+    [SerializeField] private ItemDataTable itemDataTable;
 
     [SerializeField] private GameTimer gameTimer = null;
+
+    [SerializeField] public SampleMasterData[] itemDataArrays;
 
     private static ItemObjectPlace instance;
 
@@ -81,15 +100,6 @@ public class ItemObjectPlace : MonoBehaviour
             gameTimer.GetComponent<GameTimer>();
         }
     }
-
-    //private void Start()
-    //{
-    //    if(gameTimer == null)
-    //    {
-    //        gameTimer = FindAnyObjectByType<GameTimer>();
-    //        gameTimer.GetComponent<GameTimer>();
-    //    }
-    //}
 
 
     public NetworkObject GetRandomPrefabByPhase(GamePhase phase)

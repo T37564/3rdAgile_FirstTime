@@ -696,6 +696,9 @@ MonoBehaviour:
     maxZ: 20
     positionY: 10
   maxItemObjectCount: 30
+  itemDataTable:
+    sampleMasterDatas: []
+  gameTimer: {fileID: 385890815}
   itemDataArrays:
   - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
   - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
@@ -703,7 +706,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
   - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
   - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
-  gameTimer: {fileID: 0}
+  - {fileID: 11400000, guid: ff9b8c51005aa3b4d8e96a7e97a21386, type: 2}
+  - {fileID: 11400000, guid: f08c23543ee3d3a42b51418ff714a5ee, type: 2}
 --- !u!1 &1219740488
 GameObject:
   m_ObjectHideFlags: 0
