@@ -21,11 +21,11 @@ MonoBehaviour:
   - key: RequiredPeople
     value: 2
   floatValues:
-  - key: EarlyTime
+  - key: Phase1Probability
     value: 0.03
-  - key: MiddleTime
+  - key: Phase2Probability
     value: 0.12
-  - key: FinalTime
+  - key: Phase3Probability
     value: 0.1
   boolValues:
   - key: SpeedReduction

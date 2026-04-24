@@ -48,7 +48,7 @@ public class GameTimer : NetworkBehaviour
 
         float elapsedTime = totalTime - RemainingTime;
         int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
-
+        Debug.Log(elapsedTime);
         GamePhase newPhase = phaseIndex switch
         {
             0 => GamePhase.Phase1,

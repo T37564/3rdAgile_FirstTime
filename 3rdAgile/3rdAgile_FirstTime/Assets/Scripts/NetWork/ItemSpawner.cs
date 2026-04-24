@@ -6,8 +6,10 @@ using UnityEngine;
 using static Unity.Collections.Unicode;
 using static UnityEditor.PlayerSettings;
 
-public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class ItemSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 {
+    private NetworkRunner networkRunner;
+
     // 最初にスポーンするアイテムの数
     private readonly int ITEM_FIRST_SPAWNED_COUNT = 3;
 
@@ -17,6 +19,55 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     //アイテムがスポーンした数
     private int itemCount = 0;
 
+    [SerializeField] private NetworkObject gameTimerPrefab;
+
+    private GameTimer gameTimer;
+
+    private void Start()
+    {
+        var runner = FindFirstObjectByType<NetworkRunner>();
+
+        if (runner != null)
+        {
+            runner.AddCallbacks(this);
+            Debug.Log("Callbacks登録した");
+        }
+        else
+        {
+            Debug.LogError("Runnerが見つからない");
+        }
+    }
+
+
+    public override void Spawned()
+    {
+        Debug.Log("GameTimer Spawned!!");
+        if (networkRunner.IsServer)
+        {
+            gameTimer.OnPhaseChanged += OnPhaseChanged;
+        }
+    }
+
+
+    private void OnPhaseChanged(GamePhase phase)
+    {
+        SpawnItems(phase);
+    }
+
+    private void SpawnItems(GamePhase phase)
+    {
+        for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
+        {
+            var prefab = itemObjectPlace.GetRandomPrefabByPhase(phase);
+
+            if (prefab == null) continue;
+
+            Vector3 randomPosition = itemObjectPlace.GetRandomPosition();
+
+            Runner.Spawn(prefab, randomPosition, Quaternion.identity);
+        }
+    }
+
     /// <summary>
     /// 全クライアントのシーンロード完了時に呼ばれる。
     /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
@@ -25,6 +76,11 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         // 管理者だけ実行
         if (!runner.IsServer) return;
+
+        var obj = runner.Spawn(gameTimerPrefab, Vector3.zero, Quaternion.identity);
+        gameTimer = obj.GetComponent<GameTimer>();
+
+        Debug.Log("GameTimer Spawned");
 
         /////////////////////////////////////////////////////////////////
         // スポーン位置の設定
@@ -41,16 +97,20 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
+        // 現在のフェーズ取得
+        GamePhase phase = gameTimer.CurrentPhase;
+
+
         //生成する数だけpositionを作ってください
         for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
         {
             itemCount++;
 
             // 生成する際のランダムな位置を取得
-            Vector3 generatePosition =itemObjectPlace.GetRandomPosition();
-            
+            Vector3 generatePosition = itemObjectPlace.GetRandomPosition();
+
             // 生成するオブジェクトを取得
-            NetworkObject prefab = itemObjectPlace.GetRandomPrefabObject();
+            NetworkObject prefab = itemObjectPlace.GetRandomPrefabByPhase(phase);
 
             if (prefab == null) continue;
 
@@ -81,7 +141,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    
+
+
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
