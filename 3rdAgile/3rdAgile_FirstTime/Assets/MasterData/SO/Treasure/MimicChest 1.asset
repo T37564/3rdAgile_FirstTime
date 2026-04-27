@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45443360a7d554f4da2f5fc7670392ed, type: 3}
-  m_Name: LegendaryChest
+  m_Name: MimicChest 1
   m_EditorClassIdentifier: Assembly-CSharp::SampleMasterData
-  id: 16
+  id: 15
   intValues:
   - key: ID
-    value: 16
+    value: 15
   - key: Amount
-    value: 60000
+    value: 35000
   - key: RequiredPeople
-    value: 4
+    value: 3
   floatValues:
   - key: Phase1Probability
     value: 0
   - key: Phase2Probability
-    value: 0.01
+    value: 0.03
   - key: Phase3Probability
-    value: 1
+    value: 0.15
   boolValues:
   - key: SpeedReduction
     value: 0
   - key: CursedFlag
     value: 0
   - key: GuardianAwakeFlag
-    value: 1
+    value: 0
   stringValues:
   - key: Name
-    value: LegendaryChest
+    value: MimicChest

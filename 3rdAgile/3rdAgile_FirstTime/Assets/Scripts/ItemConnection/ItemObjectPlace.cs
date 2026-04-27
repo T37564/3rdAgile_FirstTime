@@ -22,6 +22,23 @@ public class PhaseItemTable
     public ItemProbability[] items;
 }
 
+//[Serializable]
+//public class RandomItemData
+//{
+//    [Header("ランダム性のあるアイテムのデータ候補のリスト")]
+//    public SampleMasterData[] sampleMasterData;
+//}
+
+[Serializable]
+public class ItemDataTable
+{
+    [Header("この候補データを使うアイテム種類")]
+    public RandomDataType randomDataType;
+
+    [Header("個別のアイテムにあるランダム性のあるデータ")]
+    public SampleMasterData[] sampleMasterDatas;
+}
+
 [System.Serializable]
 public class RoomSpawnPosition
 {
@@ -42,6 +59,8 @@ public class RoomSpawnPosition
     public float positionY; // 部屋のY座標
 }
 
+
+
 public class ItemObjectPlace : MonoBehaviour
 {
     // アイテムとその確率の配列
@@ -57,10 +76,15 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("配置するアイテムの最大値")]
     [SerializeField] public int maxItemObjectCount;
 
-    [Header("アイテムのデータが入っている配列")]
-    [SerializeField] private SampleMasterData[] itemDataArrays;
+    //[Header("アイテムのデータが入っている配列")]
+    //[SerializeField] public RandomItemData randomItemDatas;
+
+    [Header("ランダム性のあるアイテムのデータテーブル")]
+    [SerializeField] private ItemDataTable[] itemDataTable;
 
     [SerializeField] private GameTimer gameTimer = null;
+
+    [SerializeField] public SampleMasterData[] itemDataArrays;
 
     private static ItemObjectPlace instance;
 
@@ -81,15 +105,6 @@ public class ItemObjectPlace : MonoBehaviour
             gameTimer.GetComponent<GameTimer>();
         }
     }
-
-    //private void Start()
-    //{
-    //    if(gameTimer == null)
-    //    {
-    //        gameTimer = FindAnyObjectByType<GameTimer>();
-    //        gameTimer.GetComponent<GameTimer>();
-    //    }
-    //}
 
 
     public NetworkObject GetRandomPrefabByPhase(GamePhase phase)
@@ -216,19 +231,40 @@ public class ItemObjectPlace : MonoBehaviour
     /// <summary>
     /// アイテムの情報をランダムに決めるメソッド
     /// </summary>
-    public SampleMasterData GetRomdomItemData()
+    public SampleMasterData GetRomdomItemData(NetworkObject networkObject)
     {
-        if (itemDataArrays == null || itemDataArrays.Length == 0)
+        RandomDataType dataType = networkObject.GetComponent<ItemDataStorage>().randomDataType;
+
+        var table = Array.Find(itemDataTable, t => t.randomDataType == dataType);
+        //var table = Array.Find(itemDataTable, t => t.itemPrefab == networkObject);
+        //var table = Array.Find(itemDataTable,t => t != null && t.itemPrefab != null &&
+        //t.itemPrefab == networkObject);
+
+        if (table == null)
         {
-            Debug.LogError("アイテムデータ候補が設定されていません");
+            Debug.Log("データをランダムに決める必要がないアイテム");
             return null;
         }
 
+        if(table.sampleMasterDatas==null|| table.sampleMasterDatas.Length == 0)
+        {
+            Debug.Log("候補データがないためデータを取得しない");
+            return null;
+        }
+
+        //if (itemDataArrays == null || itemDataArrays.Length == 0)
+        //{
+        //    Debug.LogError("アイテムデータ候補が設定されていません");
+        //    return null;
+        //}
+
         // itemDataArraysの配列の数からランダムに1つ選ぶ
-        int itemDataIndex = UnityEngine.Random.Range(0, itemDataArrays.Length);
+        int itemDataIndex = UnityEngine.Random.Range(0, table.sampleMasterDatas.Length);
 
         // itemDataArraysの配列で選ばれたものを返り値にする
-        return itemDataArrays[itemDataIndex];
+        //return itemDataArrays[itemDataIndex];
+
+        return table.sampleMasterDatas[itemDataIndex];
     }
 
 }

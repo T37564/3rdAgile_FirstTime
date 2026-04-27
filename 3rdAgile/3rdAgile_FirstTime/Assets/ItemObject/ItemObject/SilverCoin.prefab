@@ -133,6 +133,7 @@ MonoBehaviour:
     m_Bits: 8
   rayLength: 1
   isGenerateRequest: 0
+  _isCarried: 0
 --- !u!114 &2680584046864985895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,6 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataStorage
   sampleMasterData: {fileID: 11400000, guid: d45ce8882907791439e9de49068484ae, type: 2}
+  useRandomData: 0
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -191,4 +193,5 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1397100366237517205}
+  - {fileID: 2680584046864985895}
   ForceRemoteRenderTimeframe: 0
