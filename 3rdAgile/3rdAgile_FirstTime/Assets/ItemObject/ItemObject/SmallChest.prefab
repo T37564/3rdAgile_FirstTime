@@ -133,6 +133,7 @@ MonoBehaviour:
     m_Bits: 8
   rayLength: 1
   isGenerateRequest: 0
+  _isCarried: 0
 --- !u!114 &1938197116313789723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,4 +193,5 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1397100366237517205}
+  - {fileID: 1938197116313789723}
   ForceRemoteRenderTimeframe: 0

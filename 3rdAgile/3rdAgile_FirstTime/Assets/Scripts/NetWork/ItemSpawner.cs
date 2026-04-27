@@ -140,14 +140,20 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
 
         // アイテムの情報をランダムに決めてほしいアイテムの場合
-        if (storage != null && storage.useRandomData)
-        {
-            //ランダムに決めたアイテムの情報を生成したアイテムに代入する
-            SampleMasterData data =
-                itemObjectPlace.GetRomdomItemData();
+        //if (storage != null && storage.useRandomData) return;
 
-            storage.SetData(data);
-        }
+        if(storage == null) return;
+
+        if (!storage.useRandomData) return;
+        
+        //ランダムに決めたアイテムの情報を生成したアイテムに代入する
+        SampleMasterData data = itemObjectPlace.GetRomdomItemData(obj);
+        
+        if (data == null) return;
+        
+        Debug.Log(obj.name + " に " + data.name + " を設定");
+        
+        storage.SetData(data);
     }
 
 
