@@ -76,14 +76,13 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("配置するアイテムの最大値")]
     [SerializeField] public int maxItemObjectCount;
 
-    //[Header("アイテムのデータが入っている配列")]
-    //[SerializeField] public RandomItemData randomItemDatas;
-
     [Header("ランダム性のあるアイテムのデータテーブル")]
     [SerializeField] private ItemDataTable[] itemDataTable;
 
+    [Header("ゲームタイマークラス")]
     [SerializeField] private GameTimer gameTimer = null;
 
+    [Header("アイテムデータの候補リスト")]
     [SerializeField] public SampleMasterData[] itemDataArrays;
 
     private static ItemObjectPlace instance;
@@ -101,22 +100,27 @@ public class ItemObjectPlace : MonoBehaviour
 
         if (gameTimer == null)
         {
+            // シーン内のGameTimerオブジェクトを探して取得
             gameTimer = FindAnyObjectByType<GameTimer>();
             gameTimer.GetComponent<GameTimer>();
         }
     }
 
-
+    /// <summary>
+    /// フェーズごとに出現するアイテムのプレハブオブジェクトをランダムに決めるメソッド
+    /// </summary>
     public NetworkObject GetRandomPrefabByPhase(GamePhase phase)
     {
+        // phaseItemTablesの配列から、引数のフェーズに対応するアイテムテーブルを見つける
         var table = Array.Find(phaseItemTables, t => t.phase == phase);
-        Debug.Log(phase);
+
         if (table == null)
         {
             Debug.LogError($"Wave {phase} に対応するアイテムテーブルが見つかりません");
             return null;
         }
 
+        // GetRandomPrefabObjectにフェーズに対応しているアイテムを渡す
         return GetRandomPrefabObject(table.items, phase);
     }
 
@@ -214,7 +218,7 @@ public class ItemObjectPlace : MonoBehaviour
     /// </summary>
     public Vector3 GetRandomPosition()
     {
-
+        // GetRandomRoomメソッドでランダムに選ばれた部屋を取得
         RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
 
         // 部屋の座標内のランダムな座標を代入
@@ -233,12 +237,12 @@ public class ItemObjectPlace : MonoBehaviour
     /// </summary>
     public SampleMasterData GetRomdomItemData(NetworkObject networkObject)
     {
+        // enumのRandomDataTypeを取得するために、引数のアイテムのNetworkObjectからItemDataStorageコンポーネントを取得し、
+        // そこからItemDataStorageクラスにあるRandomDataTypeを取得
         RandomDataType dataType = networkObject.GetComponent<ItemDataStorage>().randomDataType;
 
+        // itemDataTableの配列から、引数のアイテムの種類に対応するアイテムデータテーブルを見つける
         var table = Array.Find(itemDataTable, t => t.randomDataType == dataType);
-        //var table = Array.Find(itemDataTable, t => t.itemPrefab == networkObject);
-        //var table = Array.Find(itemDataTable,t => t != null && t.itemPrefab != null &&
-        //t.itemPrefab == networkObject);
 
         if (table == null)
         {
@@ -252,19 +256,10 @@ public class ItemObjectPlace : MonoBehaviour
             return null;
         }
 
-        //if (itemDataArrays == null || itemDataArrays.Length == 0)
-        //{
-        //    Debug.LogError("アイテムデータ候補が設定されていません");
-        //    return null;
-        //}
-
         // itemDataArraysの配列の数からランダムに1つ選ぶ
         int itemDataIndex = UnityEngine.Random.Range(0, table.sampleMasterDatas.Length);
 
-        // itemDataArraysの配列で選ばれたものを返り値にする
-        //return itemDataArrays[itemDataIndex];
-
+        // sampleMasterDatasで決められたランダムな数値のインデックスにあるアイテムのデータを返す
         return table.sampleMasterDatas[itemDataIndex];
     }
-
 }

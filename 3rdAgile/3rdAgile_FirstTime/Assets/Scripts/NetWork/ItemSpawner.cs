@@ -20,6 +20,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     //アイテムがスポーンした数
     private int itemCount = 0;
 
+    // ゲームタイマークラス
     [SerializeField] private GameTimer gameTimer = null;
 
     public void RegisterGameTimer(GameTimer timer)
@@ -79,17 +80,10 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
        GameTimer timer = FindAnyObjectByType<GameTimer>();
         RegisterGameTimer(timer);
-        
+
+        // フェーズが変わるたびにアイテムをスポーンするようにイベント登録
         gameTimer.OnPhaseChanged += (phase) => OnPhaseChanged(phase, runner);
 
-        //前回のやり方
-        Debug.Log("GameTimer Spawned!!");
-        // gameTimer.OnPhaseChanged += OnPhaseChanged(runner);
-
-        //var obj = runner.Spawn(gameTimerPrefab, Vector3.zero, Quaternion.identity);
-        //gameTimer = obj.GetComponent<GameTimer>();
-
-        Debug.Log("GameTimer Spawned");
 
         /////////////////////////////////////////////////////////////////
         // スポーン位置の設定
@@ -138,9 +132,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private void SetupItem(NetworkObject obj)
     {
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
-
-        // アイテムの情報をランダムに決めてほしいアイテムの場合
-        //if (storage != null && storage.useRandomData) return;
 
         if(storage == null) return;
 
