@@ -387,6 +387,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0a4719dc48d5e4a8dd8ed55ec9554e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
+  phaseTimes:
+  - 120
+  - 150
+  - 30
+  - 60
   totalTime: 360
   phaseLength: 120
   _CurrentPhase: 0
@@ -730,7 +735,7 @@ MonoBehaviour:
     - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
     - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
     - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
-    - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
   - phase: 2
     items:
     - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
@@ -738,7 +743,9 @@ MonoBehaviour:
     - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
     - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
     - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
-    - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
+  - phase: 3
+    items:
     - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
   roomSpawnPositions:
   - minX: -5
@@ -758,7 +765,7 @@ MonoBehaviour:
     positionY: 10
   maxItemObjectCount: 30
   itemDataTable:
-  - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
+  - randomDataType: 0
     sampleMasterDatas:
     - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
     - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
@@ -766,7 +773,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
     - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
     - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
-  - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
+  - randomDataType: 0
     sampleMasterDatas:
     - {fileID: 11400000, guid: ff9b8c51005aa3b4d8e96a7e97a21386, type: 2}
     - {fileID: 11400000, guid: f08c23543ee3d3a42b51418ff714a5ee, type: 2}
@@ -780,6 +787,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
   - {fileID: 11400000, guid: ff9b8c51005aa3b4d8e96a7e97a21386, type: 2}
   - {fileID: 11400000, guid: f08c23543ee3d3a42b51418ff714a5ee, type: 2}
+  phaseSpawnCounts:
+  - phase: 0
+    spawnCount: 30
+  - phase: 1
+    spawnCount: 20
+  - phase: 2
+    spawnCount: 10
+  - phase: 3
+    spawnCount: 1
 --- !u!1 &1219740488
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,6 +27,8 @@ MonoBehaviour:
     value: 0.12
   - key: Phase3Probability
     value: 0.1
+  - key: Phase4Probability
+    value: 0
   boolValues:
   - key: SpeedReduction
     value: 0

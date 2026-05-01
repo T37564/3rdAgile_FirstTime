@@ -15,19 +15,12 @@ public class ItemProbability
 [Serializable]
 public class PhaseItemTable
 {
-    [Header("Wave番号")]
+    [Header("Phase番号")]
     public GamePhase phase;
 
-    [Header("このWaveで出現するアイテム")]
+    [Header("このPhaseで出現するアイテム")]
     public ItemProbability[] items;
 }
-
-//[Serializable]
-//public class RandomItemData
-//{
-//    [Header("ランダム性のあるアイテムのデータ候補のリスト")]
-//    public SampleMasterData[] sampleMasterData;
-//}
 
 [Serializable]
 public class ItemDataTable
@@ -59,6 +52,16 @@ public class RoomSpawnPosition
     public float positionY; // 部屋のY座標
 }
 
+[System.Serializable]
+public class PhaseSpawnCount
+{
+    [Header("フェーズ")]
+    public GamePhase phase;
+
+    [Header("出現させるアイテムの数")]
+    public int spawnCount;
+}
+
 
 
 public class ItemObjectPlace : MonoBehaviour
@@ -85,6 +88,9 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("アイテムデータの候補リスト")]
     [SerializeField] public SampleMasterData[] itemDataArrays;
 
+    [Header("フェーズごとに出現させるアイテムの数を設定する")]
+    [SerializeField] private PhaseSpawnCount[] phaseSpawnCounts;
+
     private static ItemObjectPlace instance;
 
     private void Awake()
@@ -104,6 +110,17 @@ public class ItemObjectPlace : MonoBehaviour
             gameTimer = FindAnyObjectByType<GameTimer>();
             gameTimer.GetComponent<GameTimer>();
         }
+    }
+
+    public int GetSpawnCount(GamePhase phase)
+    {
+        foreach (var data in phaseSpawnCounts)
+        {
+            if (data.phase == phase)
+                return data.spawnCount;
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -189,6 +206,7 @@ public class ItemObjectPlace : MonoBehaviour
             GamePhase.Phase1 => data.GetFloat("Phase1Probability"),
             GamePhase.Phase2 => data.GetFloat("Phase2Probability"),
             GamePhase.Phase3 => data.GetFloat("Phase3Probability"),
+            GamePhase.Phase4 => data.GetFloat("Phase4Probability"),
             _ => 0f
         };
     }
