@@ -23,6 +23,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     // ゲームタイマークラス
     [SerializeField] private GameTimer gameTimer = null;
 
+
     public void RegisterGameTimer(GameTimer timer)
     {
         gameTimer = timer;
@@ -55,9 +56,13 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         SpawnItems(phase,runner);
     }
 
+    
+
     private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
-        for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
+        int spawnCount = itemObjectPlace.GetSpawnCount(phase);
+
+        for (int i = 0; i < spawnCount; i++)
         {
             var prefab = itemObjectPlace.GetRandomPrefabByPhase(phase);
 
@@ -65,7 +70,12 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
             Vector3 randomPosition = itemObjectPlace.GetRandomPosition();
 
-            runner.Spawn(prefab, randomPosition, Quaternion.identity);
+            runner.Spawn(prefab, randomPosition, Quaternion.identity,
+                null,
+                (runner, prefab) =>
+                {
+                    SetupItem(prefab);
+                });
         }
     }
 
@@ -83,6 +93,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         // フェーズが変わるたびにアイテムをスポーンするようにイベント登録
         gameTimer.OnPhaseChanged += (phase) => OnPhaseChanged(phase, runner);
+
+        //gameTimer.OnPhaseChanged+=()
 
 
         /////////////////////////////////////////////////////////////////
@@ -105,7 +117,9 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
 
         //生成する数だけpositionを作ってください
-        for (int i = 0; i < itemObjectPlace.maxItemObjectCount; i++)
+        int spawnCount = itemObjectPlace.GetSpawnCount(phase);
+
+        for (int i = 0; i < spawnCount; i++)
         {
             itemCount++;
 

@@ -7,6 +7,8 @@ public class GameTimer : NetworkBehaviour
     public event Action<GamePhase> OnPhaseChanged;
     public event Action OnTimeUp;
 
+    [SerializeField] private float[] phaseTimes = { 0.0f };
+
     [SerializeField] private float totalTime = 360f; // 6 minutes
     [SerializeField] private float phaseLength = 120f; // 2 minutes per phase
 
@@ -15,13 +17,19 @@ public class GameTimer : NetworkBehaviour
 
     private GamePhase previousPhase;
 
+    /// <summary>
+    /// タイマーの残り時間を秒単位で取得し、
+    /// タイマーが終了した場合は０を返すようにしているプロパティ
+    /// </summary>
     public float RemainingTime
     {
         get
         {
+            // タイマーが終了したとき0を返す
             if (GameTimerTick.ExpiredOrNotRunning(Runner))
                 return 0f;
 
+            // タイマーがまだ動いているときは、残り時間を返す
             return Mathf.Max(0.0f, GameTimerTick.RemainingTime(Runner) ?? 0.0f);
         }
     }
@@ -30,6 +38,8 @@ public class GameTimer : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
+            totalTime = GetTotalPhaseTime();
+
             GameTimerTick = TickTimer.CreateFromSeconds(Runner, totalTime);
             CurrentPhase = GamePhase.Phase1;
         }
@@ -47,17 +57,49 @@ public class GameTimer : NetworkBehaviour
         }
 
         float elapsedTime = totalTime - RemainingTime;
-        int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
-        Debug.Log(elapsedTime);
-        GamePhase newPhase = phaseIndex switch
-        {
-            0 => GamePhase.Phase1,
-            1 => GamePhase.Phase2,
-            2 => GamePhase.Phase3,
-            _ => GamePhase.Finished
-        };
 
-        CurrentPhase = newPhase;
+        CurrentPhase = GetPhaseByElapsedTime(elapsedTime);
+
+        //int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
+        //Debug.Log(elapsedTime);
+        //GamePhase newPhase = phaseIndex switch
+        //{
+        //    0 => GamePhase.Phase1,
+        //    1 => GamePhase.Phase2,
+        //    2 => GamePhase.Phase3,
+        //    _ => GamePhase.Finished
+        //};
+
+        //CurrentPhase = newPhase;
+    }
+
+    private float GetTotalPhaseTime()
+    {
+        float sum = 0.0f;
+
+        foreach(float time in phaseTimes)
+        {
+            sum += time;
+        }
+
+        return sum;
+    }
+
+    private GamePhase GetPhaseByElapsedTime(float elapsed)
+    {
+        float cumulative = 0.0f;
+
+        for(int i = 0; i < phaseTimes.Length; i++)
+        {
+            cumulative += phaseTimes[i];
+
+            if (elapsed < cumulative)
+            {
+                return (GamePhase)(i + 1);
+            }
+        }
+
+        return GamePhase.Finished;
     }
 
     public override void Render()
