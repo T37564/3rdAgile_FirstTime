@@ -3,6 +3,7 @@
 // VirtualKeyboardController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,12 +31,21 @@ public class VirtualKeyboardController : MonoBehaviour
     // UIToolkitの暗証番号を入れるテキスト
     private Label matchingNumbersText = null;
 
+    private Label restrictionText = null;
+
     private System.Action[] clickActions;
 
     // 暗証番号を入れる変数
     private string matchingNumbers = "";
 
+    // 現在選択中のキーのインデックス
+    private int currentIndex = 0;
 
+    private float moveCooldown = 0.2f;
+
+    private Vector2 moveInput;
+
+    private float nextMoveTime;
 
     // UI Document が有効になった瞬間に呼ばれる
     private void OnEnable()
@@ -45,12 +55,19 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // UXML 内で class="key" が付いた要素を全部取得して配列に変換
         keys = root.Query<Button>(className: "key").ToList().ToArray();
-        matchingNumbersText = root.Query<Label>();
+        matchingNumbersText = root.Query<Label>("InputNumber");
+
+        restrictionText = root.Query<Label>("Restriction");
+        restrictionText.style.display = DisplayStyle.None;
 
         // ボタンの登録
         playerInput.actions["NumberUI"].performed += OnNumberUI;
 
+        // コントローラーの登録
+        playerInput.actions["MoveSelectNumber"].performed += MoveNmberUI;
+        playerInput.actions["MoveSelectNumber"].canceled += StopMoveNumberUI;
 
+        playerInput.actions["NumberAssignment"].performed += ClickCalculatorButton;
 
         clickActions = new System.Action[keys.Length];
 
@@ -59,6 +76,12 @@ public class VirtualKeyboardController : MonoBehaviour
             int index = i;
             clickActions[i] = () => OnKeyClicked(index);
             keys[i].clicked += clickActions[i];
+        }
+
+        // ゲームパッド接続中
+        if (Gamepad.current != null)
+        {
+            GamepadHighlight(0);
         }
     }
 
@@ -101,6 +124,54 @@ public class VirtualKeyboardController : MonoBehaviour
         }
     }
 
+
+
+    ///// <summary>
+    ///// ゲームパッドの入力が検知されたとき
+    ///// </summary>
+    private void MoveNmberUI(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+
+    /// <summary>
+    /// ゲームパッドの入力が消滅したとき
+    /// </summary>
+    private void StopMoveNumberUI(InputAction.CallbackContext context)
+    {
+        moveInput = Vector2.zero;
+    }
+
+    /// <summary>
+    /// ゲームパッドの入力を反映
+    /// </summary>
+    private void Update()
+    {
+        if (Time.time < nextMoveTime)
+            return;
+        if (moveInput.magnitude < 0.5f)
+            return;
+
+        if (moveInput.y > 0.5f)
+        {
+            Move(-3);
+        }
+        else if (moveInput.y < -0.5f)
+        {
+            Move(+3);
+        }
+        else if (moveInput.x > 0.5f)
+        {
+            Move(+1);
+        }
+        else if (moveInput.x < -0.5f)
+        {
+            Move(-1);
+        }
+
+        nextMoveTime = Time.time + moveCooldown;
+    }
+
     /// <summary>
     /// マウスでクリックされたときの処理
     /// </summary>
@@ -129,8 +200,6 @@ public class VirtualKeyboardController : MonoBehaviour
     /// </summary>
     private void OnNumberUI(InputAction.CallbackContext callbackContext)
     {
-        Debug.Log(callbackContext.control.path);
-
         switch (callbackContext.control.path)
         {
             // 0
@@ -228,6 +297,8 @@ public class VirtualKeyboardController : MonoBehaviour
         if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
             // 入力された番号を追加する
             matchingNumbers += index.ToString();
+        else
+            restrictionText.style.display = DisplayStyle.Flex;
 
         // 暗証番号の数値が書かれたUIの更新
         MatchingNumbersTextChange();
@@ -249,6 +320,8 @@ public class VirtualKeyboardController : MonoBehaviour
     /// </summary>
     private void DeleteButton()
     {
+        restrictionText.style.display = DisplayStyle.None;
+
         StartCoroutine(Highlight(9));
 
         if (matchingNumbers.Length > 0)
@@ -277,5 +350,57 @@ public class VirtualKeyboardController : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         keys[index].RemoveFromClassList("selected");
+    }
+
+    /// <summary>
+    /// 選択しているキーの変更処理
+    /// </summary>
+    private void Move(int dir)
+    {
+        keys[currentIndex].RemoveFromClassList("selected");
+
+        currentIndex = (currentIndex + dir + keys.Length) % keys.Length;
+
+        GamepadHighlight(currentIndex);
+
+        string st = keys[currentIndex].text;
+    }
+
+
+    /// <summary>
+    /// 選択中のキー　強調させるため色を変更する処理
+    /// </summary>
+    private void GamepadHighlight(int index)
+    {
+        // USSの色に変更（グレー）
+        keys[index].AddToClassList("selected");
+    }
+
+    /// <summary>
+    /// 電卓のボタンが押されたときの処理
+    /// </summary>
+    private void ClickCalculatorButton(InputAction.CallbackContext context)
+    {
+        if (keys[currentIndex].text == "消")
+        {
+            if (0 < matchingNumbers.Length)
+                DeleteButton();
+        }
+        else if (keys[currentIndex].text == "決")
+        {
+            if (0 < matchingNumbers.Length)
+                DecisionButton();
+        }
+        else
+        {
+            // 暗証番号の最大桁数より小さいとき
+            if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+                // 入力された番号を追加する
+                matchingNumbers += keys[currentIndex].text.ToString();
+            else
+                restrictionText.style.display = DisplayStyle.Flex;
+        }
+
+        MatchingNumbersTextChange();
     }
 }

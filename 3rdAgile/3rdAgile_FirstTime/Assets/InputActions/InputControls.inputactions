@@ -310,6 +310,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "MoveSelectNumber",
+                    "type": "Value",
+                    "id": "eaa953b8-5983-4a47-81aa-b71958b68cbe",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "NumberAssignment",
+                    "type": "Button",
+                    "id": "55254a5f-1c8d-46a0-9707-bdd67ab75fb0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -684,6 +702,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "NumberUI",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "edcd94b0-4715-4b31-8f71-3ba8e9a38e4c",
+                    "path": "<Gamepad>/dpad",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveSelectNumber",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d06717e4-b793-402f-b1db-d682ec4ee375",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveSelectNumber",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9c0e3adb-1381-4a1e-86da-76a4ff5580e5",
+                    "path": "<XInputController>/buttonSouth",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "NumberAssignment",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
