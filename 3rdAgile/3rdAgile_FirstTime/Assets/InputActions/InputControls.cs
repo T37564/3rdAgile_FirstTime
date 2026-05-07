@@ -396,6 +396,24 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveSelectNumber"",
+                    ""type"": ""Value"",
+                    ""id"": ""eaa953b8-5983-4a47-81aa-b71958b68cbe"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""NumberAssignment"",
+                    ""type"": ""Button"",
+                    ""id"": ""55254a5f-1c8d-46a0-9707-bdd67ab75fb0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -772,6 +790,39 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""action"": ""NumberUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""edcd94b0-4715-4b31-8f71-3ba8e9a38e4c"",
+                    ""path"": ""<Gamepad>/dpad"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveSelectNumber"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d06717e4-b793-402f-b1db-d682ec4ee375"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveSelectNumber"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9c0e3adb-1381-4a1e-86da-76a4ff5580e5"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NumberAssignment"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -793,6 +844,8 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         m_UI_Scroll = m_UI.FindAction("Scroll", throwIfNotFound: true);
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
         m_UI_NumberUI = m_UI.FindAction("NumberUI", throwIfNotFound: true);
+        m_UI_MoveSelectNumber = m_UI.FindAction("MoveSelectNumber", throwIfNotFound: true);
+        m_UI_NumberAssignment = m_UI.FindAction("NumberAssignment", throwIfNotFound: true);
     }
 
     ~@InputControls()
@@ -1040,6 +1093,8 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Scroll;
     private readonly InputAction m_UI_Submit;
     private readonly InputAction m_UI_NumberUI;
+    private readonly InputAction m_UI_MoveSelectNumber;
+    private readonly InputAction m_UI_NumberAssignment;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1067,6 +1122,14 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/NumberUI".
         /// </summary>
         public InputAction @NumberUI => m_Wrapper.m_UI_NumberUI;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/MoveSelectNumber".
+        /// </summary>
+        public InputAction @MoveSelectNumber => m_Wrapper.m_UI_MoveSelectNumber;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/NumberAssignment".
+        /// </summary>
+        public InputAction @NumberAssignment => m_Wrapper.m_UI_NumberAssignment;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1105,6 +1168,12 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @NumberUI.started += instance.OnNumberUI;
             @NumberUI.performed += instance.OnNumberUI;
             @NumberUI.canceled += instance.OnNumberUI;
+            @MoveSelectNumber.started += instance.OnMoveSelectNumber;
+            @MoveSelectNumber.performed += instance.OnMoveSelectNumber;
+            @MoveSelectNumber.canceled += instance.OnMoveSelectNumber;
+            @NumberAssignment.started += instance.OnNumberAssignment;
+            @NumberAssignment.performed += instance.OnNumberAssignment;
+            @NumberAssignment.canceled += instance.OnNumberAssignment;
         }
 
         /// <summary>
@@ -1128,6 +1197,12 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @NumberUI.started -= instance.OnNumberUI;
             @NumberUI.performed -= instance.OnNumberUI;
             @NumberUI.canceled -= instance.OnNumberUI;
+            @MoveSelectNumber.started -= instance.OnMoveSelectNumber;
+            @MoveSelectNumber.performed -= instance.OnMoveSelectNumber;
+            @MoveSelectNumber.canceled -= instance.OnMoveSelectNumber;
+            @NumberAssignment.started -= instance.OnNumberAssignment;
+            @NumberAssignment.performed -= instance.OnNumberAssignment;
+            @NumberAssignment.canceled -= instance.OnNumberAssignment;
         }
 
         /// <summary>
@@ -1253,5 +1328,19 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnNumberUI(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveSelectNumber" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveSelectNumber(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "NumberAssignment" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnNumberAssignment(InputAction.CallbackContext context);
     }
 }
