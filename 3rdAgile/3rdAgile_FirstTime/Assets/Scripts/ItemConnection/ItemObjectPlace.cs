@@ -154,6 +154,7 @@ public class ItemObjectPlace : MonoBehaviour
         {
             var data = item.itemPrefab.GetComponent<ItemDataStorage>().itemData;
 
+            // アイテムのフェーズの出現確率を足していく
             total += GetProbability(data, phase);
         }
 

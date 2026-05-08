@@ -31,7 +31,7 @@ public class ItemDataStorage : NetworkBehaviour
     public void SetData(SampleMasterData newData)
     {
         sampleMasterData = newData;
-        Debug.Log("ÅIİ’è = " + itemData.name);
+        //Debug.Log("ÅIİ’è = " + itemData.name);
         ApplyData();
     }
 

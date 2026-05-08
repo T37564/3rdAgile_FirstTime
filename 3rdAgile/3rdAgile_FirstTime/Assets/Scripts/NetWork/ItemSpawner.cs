@@ -60,16 +60,22 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
+        // フェーズごとに出現させるアイテムの数を取得
         int spawnCount = itemObjectPlace.GetSpawnCount(phase);
 
+        // フェーズごとに出現させるアイテムの数だけループする
         for (int i = 0; i < spawnCount; i++)
         {
+            // GetRandomPrefabByPhaseを使って、フェーズに応じたアイテムのプレハブをランダムに取得する
             var prefab = itemObjectPlace.GetRandomPrefabByPhase(phase);
 
+            // もしプレハブがnullだったら、次のループに行く
             if (prefab == null) continue;
 
+            // 生成する際のランダムな位置を取得
             Vector3 randomPosition = itemObjectPlace.GetRandomPosition();
 
+            // ネットワークを使ったアイテム生成
             runner.Spawn(prefab, randomPosition, Quaternion.identity,
                 null,
                 (runner, prefab) =>
@@ -78,6 +84,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
                     RegenerationCallOut regenerationCallOut = prefab.GetComponent<RegenerationCallOut>();
 
+                    // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                     if (regenerationCallOut != null)
                     {
                         regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
@@ -86,16 +93,24 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    // アイテムが再配置を要求したときに行われる処理
+    /// <summary>
+    /// 追加でアイテムを再配置するためのメソッド
+    /// </summary>
     private void HandleNeedRegenerate(RegenerationCallOut regen)
     {
         Debug.Log("再配置要求を受信");
 
+        // 再配置要求を出したアイテムのNetworkObjectを取得
         NetworkObject obj = regen.Object;
 
+        // 生成する際のランダムな位置を取得
         Vector3 newPos = itemObjectPlace.GetRandomPosition();
 
+        // アイテムの位置を新しいランダムな位置に変更する
         obj.transform.position = newPos;
-
+        
+        // 再配置要求フラグをリセット
         regen.isGenerateRequest = false;
     }
 
@@ -114,12 +129,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // フェーズが変わるたびにアイテムをスポーンするようにイベント登録
         gameTimer.OnPhaseChanged += (phase) => OnPhaseChanged(phase, runner);
 
-        //gameTimer.OnPhaseChanged+=()
-
-
-        /////////////////////////////////////////////////////////////////
         // スポーン位置の設定
-        /////////////////////////////////////////////////////////////////
         // スポーンする位置をいれたオブジェクトを取得
         GameObject spawnPoint = GameObject.Find("ItemObjectPlace");
 
@@ -156,7 +166,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             {
                 SetupItem(obj);
             });
-            Debug.Log(itemCount);
+            //Debug.Log(itemCount);
         }
     }
 
@@ -177,7 +187,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (data == null) return;
         
         Debug.Log(obj.name + " に " + data.name + " を設定");
-        
+
+        // アイテムの情報をセットする
         storage.SetData(data);
     }
 
