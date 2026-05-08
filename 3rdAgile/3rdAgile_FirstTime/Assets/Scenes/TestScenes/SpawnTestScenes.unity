@@ -729,7 +729,8 @@ MonoBehaviour:
     minZ: -20
     maxZ: 20
     positionY: 5.5
-  maxItemObjectCount: 30
+  itemDataTable: []
+  gameTimer: {fileID: 1046776073}
   itemDataArrays:
   - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
   - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
@@ -737,7 +738,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
   - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
   - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
-  gameTimer: {fileID: 1046776073}
+  phaseSpawnCounts: []
 --- !u!4 &1009439675
 Transform:
   m_ObjectHideFlags: 0
@@ -1087,6 +1088,7 @@ GameObject:
   - component: {fileID: 1289484023}
   - component: {fileID: 1289484022}
   - component: {fileID: 1289484025}
+  - component: {fileID: 1289484026}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1212,6 +1214,19 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1289484026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289484021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 071c7ebd5973b844eb9be1edebd83b5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTracking
+  target: {fileID: 0}
 --- !u!1 &1386069732
 GameObject:
   m_ObjectHideFlags: 0

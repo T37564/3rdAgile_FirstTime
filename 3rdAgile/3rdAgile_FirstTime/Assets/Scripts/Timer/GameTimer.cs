@@ -1,119 +1,107 @@
+//======================================================================
+// »ìÒFƒXƒYƒL
+//======================================================================
+
 using Fusion;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// ƒQ[ƒ€ŠÔ‚ğŠÇ—‚·‚éƒNƒ‰ƒXB
+/// </summary>
 public class GameTimer : NetworkBehaviour
 {
+    // ƒQ[ƒ€‚ÌƒtƒF[ƒY‚ª•Ï‚í‚é‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚éƒCƒxƒ“ƒg
     public event Action<GamePhase> OnPhaseChanged;
+    // ƒ^ƒCƒ€ƒAƒbƒv‚É‚È‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚éƒCƒxƒ“ƒg
     public event Action OnTimeUp;
 
-    [SerializeField] private float[] phaseTimes = { 0.0f };
-
+    [Header("-- Timer Settings --")]
+    [Header("ƒQ[ƒ€‘S‘Ì‚ÌŠÔi•bj")]
     [SerializeField] private float totalTime = 360f; // 6 minutes
+
+    [Header("ŠeƒtƒF[ƒY‚ÌŠÔi•bj")]
     [SerializeField] private float phaseLength = 120f; // 2 minutes per phase
 
+    // ƒQ[ƒ€‚Ìc‚èŠÔ‚ğŠÇ—‚·‚é‚½‚ß‚ÌTickTimer‚ÆAŒ»İ‚ÌƒQ[ƒ€ƒtƒF[ƒY‚ğŠÇ—‚·‚é‚½‚ß‚ÌNetworkedƒvƒƒpƒeƒB
     [Networked] private TickTimer GameTimerTick { get; set; }
     [Networked] public GamePhase CurrentPhase { get; private set; }
 
+    // ”äŠr—p‚Ì•Ï”‚ğ—pˆÓ‚µ‚ÄAƒtƒF[ƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚ÉƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·‚½‚ß‚Ég—p
     private GamePhase previousPhase;
 
     /// <summary>
-    /// ã‚¿ã‚¤ãƒãƒ¼ã®æ®‹ã‚Šæ™‚é–“ã‚’ç§’å˜ä½ã§å–å¾—ã—ã€
-    /// ã‚¿ã‚¤ãƒãƒ¼ãŒçµ‚äº†ã—ãŸå ´åˆã¯ï¼ã‚’è¿”ã™ã‚ˆã†ã«ã—ã¦ã„ã‚‹ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+    /// c‚èŠÔ‚ğ•b‚Å•Ô‚·ƒvƒƒpƒeƒBB
+    /// ƒ^ƒCƒ}[‚ªI—¹‚µ‚Ä‚¢‚é‚©A‚Ü‚¾ŠJn‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Í0‚ğ•Ô‚·B
     /// </summary>
     public float RemainingTime
     {
         get
         {
-            // ã‚¿ã‚¤ãƒãƒ¼ãŒçµ‚äº†ã—ãŸã¨ã0ã‚’è¿”ã™
+            // ƒ^ƒCƒ}[‚ªI—¹‚µ‚Ä‚¢‚é‚©A‚Ü‚¾ŠJn‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Í0‚ğ•Ô‚·
             if (GameTimerTick.ExpiredOrNotRunning(Runner))
                 return 0f;
 
-            // ã‚¿ã‚¤ãƒãƒ¼ãŒã¾ã å‹•ã„ã¦ã„ã‚‹ã¨ãã¯ã€æ®‹ã‚Šæ™‚é–“ã‚’è¿”ã™
+            // ƒ}ƒCƒiƒX‚É‚È‚ç‚È‚¢‚æ‚¤‚ÉAc‚èŠÔ‚ğ•Ô‚·
             return Mathf.Max(0.0f, GameTimerTick.RemainingTime(Runner) ?? 0.0f);
         }
     }
 
     public override void Spawned()
     {
+        // StateAuthority‚ğ‚Á‚Ä‚¢‚éƒNƒ‰ƒCƒAƒ“ƒg‚ªƒ^ƒCƒ}[‚ğ‰Šú‰»‚·‚é
         if (Object.HasStateAuthority)
         {
-            totalTime = GetTotalPhaseTime();
-
             GameTimerTick = TickTimer.CreateFromSeconds(Runner, totalTime);
             CurrentPhase = GamePhase.Phase1;
         }
 
+        // ƒtƒF[ƒY‚Ì‰Šú’l‚ğpreviousPhase‚Éİ’è‚µ‚Ä‚¨‚­
         previousPhase = CurrentPhase;
     }
 
     public override void FixedUpdateNetwork()
     {
+        // StateAuthority‚ğ‚Á‚Ä‚¢‚éƒNƒ‰ƒCƒAƒ“ƒg‚ªƒ^ƒCƒ}[‚ÌXV‚ğs‚¤
         if (!Object.HasStateAuthority) return;
+        // ƒ^ƒCƒ}[‚ªI—¹‚µ‚Ä‚¢‚éê‡‚ÍƒtƒF[ƒY‚ğFinished‚Éİ’è‚µ‚ÄI—¹
         if (GameTimerTick.Expired(Runner))
         {
             CurrentPhase = GamePhase.Finished;
             return;
         }
 
+        // Œo‰ßŠÔ‚ğŒvZ‚µ‚ÄAŒ»İ‚ÌƒtƒF[ƒY‚ğXV‚·‚é
         float elapsedTime = totalTime - RemainingTime;
-
-        CurrentPhase = GetPhaseByElapsedTime(elapsedTime);
-
-        //int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
-        //Debug.Log(elapsedTime);
-        //GamePhase newPhase = phaseIndex switch
-        //{
-        //    0 => GamePhase.Phase1,
-        //    1 => GamePhase.Phase2,
-        //    2 => GamePhase.Phase3,
-        //    _ => GamePhase.Finished
-        //};
-
-        //CurrentPhase = newPhase;
-    }
-
-    private float GetTotalPhaseTime()
-    {
-        float sum = 0.0f;
-
-        foreach(float time in phaseTimes)
+        int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
+        // ƒtƒF[ƒY‚ÌƒCƒ“ƒfƒbƒNƒX‚É‰‚¶‚ÄACurrentPhase‚ğXV‚·‚é
+        GamePhase newPhase = phaseIndex switch
         {
-            sum += time;
-        }
+            0 => GamePhase.Phase1,
+            1 => GamePhase.Phase2,
+            2 => GamePhase.Phase3,
+            _ => GamePhase.Finished
+        };
 
-        return sum;
-    }
-
-    private GamePhase GetPhaseByElapsedTime(float elapsed)
-    {
-        float cumulative = 0.0f;
-
-        for(int i = 0; i < phaseTimes.Length; i++)
-        {
-            cumulative += phaseTimes[i];
-
-            if (elapsed < cumulative)
-            {
-                return (GamePhase)(i + 1);
-            }
-        }
-
-        return GamePhase.Finished;
+        // ƒtƒF[ƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚ÉƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·‚½‚ß‚ÉACurrentPhase‚ğXV‚·‚é‘O‚É”äŠr—p‚Ì•Ï”‚Æ”äŠr‚µ‚ÄAƒtƒF[ƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚ÉƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·
+        CurrentPhase = newPhase;
     }
 
     public override void Render()
     {
+        // ƒtƒF[ƒY‚ª•Ï‚í‚Á‚½‚©‚ğ”äŠr
         if (CurrentPhase != previousPhase)
         {
-            Debug.Log($"Phase changed to {CurrentPhase}");
+            // ƒtƒF[ƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚ÉOnPhaseChangedƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·
             OnPhaseChanged?.Invoke(CurrentPhase);
 
+            // ƒtƒF[ƒY‚ªFinished‚É‚È‚Á‚½‚Æ‚«‚ÉOnTimeUpƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·
             if (CurrentPhase == GamePhase.Finished)
             {
                 OnTimeUp?.Invoke();
             }
 
+            // ƒtƒF[ƒY‚Ì”äŠr—p‚Ì•Ï”‚ğXV
             previousPhase = CurrentPhase;
         }
     }
