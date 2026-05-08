@@ -16,4 +16,7 @@ public class PlayerPrefabData : ScriptableObject
     [Header("Spawn Settings")]
     [Tooltip("プレイヤー生成位置（全員共通）")]
     public Vector3[] prefabSpawnPosition;
+
+    [Tooltip("プレイヤー生成角度（全員共通）")]
+    public Quaternion[] prefabSpawnRotation;
 }

@@ -16,6 +16,9 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
     // プレイヤーがスポーンしたときの生成位置
     private Vector3[] playerSpawnPosition = null;
 
+    // プレイヤーがスポーンしたときの生成位置
+    private Quaternion[] playerSpawnRotation = null;
+
     // ゲストのゲームオブジェクト
     private NetworkObject[] playerPrefab = null;
 
@@ -34,6 +37,7 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
 
         playerPrefab = playerPrefabData.playerPrefab;
         playerSpawnPosition = playerPrefabData.prefabSpawnPosition;
+        playerSpawnRotation = playerPrefabData.prefabSpawnRotation;
     }
 
     /// <summary>
@@ -50,7 +54,7 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
             Debug.Log("接続完了");
             runner.Spawn(playerPrefab[0],
                 playerSpawnPosition[0],
-                Quaternion.identity,
+                playerSpawnRotation[0],
                 player);
         }
         else// ゲストの処理
@@ -58,11 +62,11 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
             int index = player.AsIndex;
 
             runner.Spawn(
-                 // 先に入ったホスト分マイナスする
+                // 先に入ったホスト分マイナスする
                 playerPrefab[index - hostCount],
                 // 先に入ったホスト分マイナスする
                 playerSpawnPosition[index - hostCount],
-                Quaternion.identity,
+                playerSpawnRotation[index - hostCount],
                 player);
         }
     }

@@ -13,12 +13,17 @@ MonoBehaviour:
   m_Name: PrefabData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPrefabData
   playerPrefab:
-  - {fileID: 4852692308774931563, guid: 0e5f07fc4c3b731449d0ef3fd42e1155, type: 3}
-  - {fileID: -2237657577212432203, guid: de489dccea988aa4e817a207ace15ef9, type: 3}
-  - {fileID: -8005869482010147934, guid: 49d6478fe43a0ef49a85c16d61a77f0b, type: 3}
-  - {fileID: -7375512907485651241, guid: 1ab140c21a47a9b47b6b73a3ac958c11, type: 3}
+  - {fileID: -8137458445721675518, guid: ea5d9126517f8334394c836b02e645d1, type: 3}
+  - {fileID: -7295163730024411932, guid: 65231ffe9f43c24478d142c481fbcc2c, type: 3}
+  - {fileID: -2787309591237798139, guid: 117095430f115a7409b8c72b2861ac5b, type: 3}
+  - {fileID: -8579772963901048626, guid: 26400aac7dce2f042bd0d611bbdc0c6b, type: 3}
   prefabSpawnPosition:
-  - {x: -4.5, y: 0, z: 7}
-  - {x: -1.4, y: 0, z: 7}
-  - {x: 1.4, y: 0, z: 7}
-  - {x: 4.5, y: 0, z: 7}
+  - {x: -4.5, y: -1.3, z: 7}
+  - {x: -1.4, y: -1.25, z: 7}
+  - {x: 1.4, y: -1.2, z: 7}
+  - {x: 4.5, y: -1.15, z: 7}
+  prefabSpawnRotation:
+  - {x: 0, y: -0.9848077, z: 0, w: -0.1736482}
+  - {x: 0, y: 0.9961947, z: 0, w: 0.087155804}
+  - {x: 0, y: 1, z: 0, w: -0.00000004371139}
+  - {x: 0, y: 0.9961947, z: 0, w: -0.08715577}
