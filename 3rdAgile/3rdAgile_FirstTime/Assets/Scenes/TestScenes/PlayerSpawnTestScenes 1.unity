@@ -748,10 +748,10 @@ MonoBehaviour:
     items:
     - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
   roomSpawnPositions:
-  - minX: -5
-    maxX: 5
-    minZ: -5
-    maxZ: 5
+  - minX: -25
+    maxX: 30
+    minZ: -25
+    maxZ: 25
     positionY: 0.5
   - minX: -20
     maxX: 20
@@ -763,7 +763,6 @@ MonoBehaviour:
     minZ: -20
     maxZ: 20
     positionY: 10
-  maxItemObjectCount: 30
   itemDataTable:
   - randomDataType: 0
     sampleMasterDatas:

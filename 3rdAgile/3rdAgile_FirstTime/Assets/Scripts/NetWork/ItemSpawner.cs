@@ -75,8 +75,28 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 (runner, prefab) =>
                 {
                     SetupItem(prefab);
+
+                    RegenerationCallOut regenerationCallOut = prefab.GetComponent<RegenerationCallOut>();
+
+                    if (regenerationCallOut != null)
+                    {
+                        regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
+                    }
                 });
         }
+    }
+
+    private void HandleNeedRegenerate(RegenerationCallOut regen)
+    {
+        Debug.Log("再配置要求を受信");
+
+        NetworkObject obj = regen.Object;
+
+        Vector3 newPos = itemObjectPlace.GetRandomPosition();
+
+        obj.transform.position = newPos;
+
+        regen.isGenerateRequest = false;
     }
 
     /// <summary>

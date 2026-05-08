@@ -76,9 +76,6 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("部屋ごとのアイテム配置範囲のリスト")]
     [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
 
-    [Header("配置するアイテムの最大値")]
-    [SerializeField] public int maxItemObjectCount;
-
     [Header("ランダム性のあるアイテムのデータテーブル")]
     [SerializeField] private ItemDataTable[] itemDataTable;
 
