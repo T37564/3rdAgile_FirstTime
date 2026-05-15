@@ -52,7 +52,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         // スポーンさせるPlayerのオブジェクトをさがす
-        GameObject prefabObj = Resources.Load<GameObject>("Cube (1)");
+        GameObject prefabObj = Resources.Load<GameObject>("TestPlayerObject");
 
         // 見つからなかったとき
         if (prefabObj == null)

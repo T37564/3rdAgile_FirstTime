@@ -36,6 +36,10 @@ public class TimerUI : MonoBehaviour
         if (gameTimer == null)
             return;
 
+        // Spawn前はNetworkedプロパティにアクセスできないため処理しない
+        if (!gameTimer.Object || !gameTimer.Object.IsValid)
+            return;
+
         // ゲームの残り時間を取得
         float time = gameTimer.RemainingTime;
 

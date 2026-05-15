@@ -40,6 +40,8 @@ namespace Network.Player
 
         private bool prevHoldingItem;
 
+        private Animator animator;
+
         public Transform Transform => transform;
 
 
@@ -69,6 +71,8 @@ namespace Network.Player
 
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
+
+            animator = GetComponent<Animator>();
         }
 
         /// <summary>
@@ -100,6 +104,17 @@ namespace Network.Player
             }
 
             transform.position += move * moveSpeed * Runner.DeltaTime;
+
+            // =========================
+            // アニメーション制御
+            // =========================
+            bool isMoving = move.sqrMagnitude > 0.01f;
+
+            bool isRunning = moveInput.magnitude > 0.8f;
+
+            animator.SetBool("Walk", isMoving && !isRunning);
+
+            animator.SetBool("Run", isRunning);
         }
 
         private void TryInteract()
@@ -166,7 +181,7 @@ namespace Network.Player
         /// </summary>
         public void TakeDamage()
         {
-            if(!Object.HasStateAuthority) return;
+            if (!Object.HasStateAuthority) return;
             if (!IsAlive) return;
 
             IsAlive = false;
