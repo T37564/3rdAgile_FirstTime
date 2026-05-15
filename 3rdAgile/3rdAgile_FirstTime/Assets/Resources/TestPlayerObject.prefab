@@ -74,13 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 9052f8d1945d83b48b0dfb6e6b7c0422, type: 2}
     - target: {fileID: 5866666021909216657, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
       propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'shoulder.L'\n\tTransform 'neck'\n\tTransform
-        'lower_leg.R'\n\tTransform 'upper_leg.R'\n\tTransform 'upper_arm.L'\n\tTransform
-        'lower_arm.L'\n\tTransform 'upper_leg.L'\n\tTransform 'spine'\n\tTransform
-        'head'\n\tTransform 'ribs'\n\tand more ...\n\tFrom animation clip 'mixamo.com'\n\tFrom
-        animation clip 'mixamo.com'\n\tFrom animation clip 'mixamo.com'"
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8623781395447899769, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -90,6 +84,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 457229136349535435}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2825020817202203413}
@@ -108,12 +105,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7025618632135901648}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7788251833897628540}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1388833653131795362}
   m_SourcePrefab: {fileID: 100100000, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
 --- !u!1 &873767371092440652 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
   m_PrefabInstance: {fileID: 63427641327717149}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &457229136349535435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873767371092440652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkMecanimAnimator
+  Animator: {fileID: 5876004214861674124}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 000000002b1a167c7940695520e23b685928a8ce6bd5a32d398fdc04
+  TriggerHashes: 00000000
+  TotalWords: 1
 --- !u!114 &2825020817202203413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,7 +212,10 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 457229136349535435}
   - {fileID: 8935251030272715918}
+  - {fileID: -7788251833897628540}
+  - {fileID: -1388833653131795362}
   ForceRemoteRenderTimeframe: 0
 --- !u!54 &-3683041212394220149
 Rigidbody:
@@ -243,3 +267,37 @@ CapsuleCollider:
   m_Height: 1.2
   m_Direction: 1
   m_Center: {x: 0, y: 0.58, z: 0}
+--- !u!114 &-7788251833897628540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873767371092440652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254dc263fce0ecf498ee35776659af9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraBinder
+--- !u!114 &-1388833653131795362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873767371092440652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
+--- !u!95 &5876004214861674124 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b0153fedaaf059b47a44de9f4148eef7, type: 3}
+  m_PrefabInstance: {fileID: 63427641327717149}
+  m_PrefabAsset: {fileID: 0}
