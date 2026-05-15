@@ -1146,11 +1146,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f08c23543ee3d3a42b51418ff714a5ee, type: 2}
   phaseSpawnCounts:
   - phase: 0
-    spawnCount: 30
+    spawnCount: 15
   - phase: 1
-    spawnCount: 20
-  - phase: 2
     spawnCount: 10
+  - phase: 2
+    spawnCount: 5
   - phase: 3
     spawnCount: 1
 --- !u!1 &1164947927

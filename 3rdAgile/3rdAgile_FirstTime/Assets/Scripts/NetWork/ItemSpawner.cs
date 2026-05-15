@@ -43,6 +43,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError("Runnerが見つからない");
         }
 
+        // タイマーがある時は、ゲームタイマーを取得して登録する
         if (gameTimer != null)
         {
             gameTimer = FindAnyObjectByType<GameTimer>();
@@ -50,14 +51,19 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-
+    /// <summary>
+    /// フェーズが変わるたびに設定したフェーズのアイテムをスポーンするためのメソッド
+    /// </summary>
     private void OnPhaseChanged(GamePhase phase,NetworkRunner runner)
     {
         SpawnItems(phase,runner);
     }
 
-    
 
+    /// <summary>
+    /// 指定したフェーズごとに生成するアイテムの数、座標、アイテムの種類を
+    /// ランダムに決めて生成するメソッド
+    /// </summary>
     private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
         // フェーズごとに出現させるアイテムの数を取得
@@ -123,6 +129,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 管理者だけ実行
         if (!runner.IsServer) return;
 
+        // タイマーがある時は、ゲームタイマーを取得して登録する
        GameTimer timer = FindAnyObjectByType<GameTimer>();
         RegisterGameTimer(timer);
 
@@ -149,6 +156,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         //生成する数だけpositionを作ってください
         int spawnCount = itemObjectPlace.GetSpawnCount(phase);
 
+        // 出現させるアイテムの数だけループする
+        // ランダムに決められた座標に、ランダムに決められたアイテムを生成する
         for (int i = 0; i < spawnCount; i++)
         {
             itemCount++;
@@ -166,7 +175,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             {
                 SetupItem(obj);
             });
-            //Debug.Log(itemCount);
         }
     }
 
@@ -175,6 +183,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void SetupItem(NetworkObject obj)
     {
+        // オブジェクトにあるアイテムのデータを取得する
         ItemDataStorage storage = obj.GetComponent<ItemDataStorage>();
 
         if(storage == null) return;
