@@ -306,7 +306,11 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 新しいホストに自動で引き継がれる処理を行うためのコールバック。
     /// ゲームの継続・オブジェクトの再割り当てなどを行う。
     /// </summary>
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+    {
+        HostMigrationManager hostMigrationManager = FindAnyObjectByType<HostMigrationManager>();
+        hostMigrationManager.HandleHostMigration();
+    }
 
 
 
