@@ -6,6 +6,15 @@ using Fusion;
 using UnityEngine;
 using System;
 
+[Serializable]
+public class GamePhaseTime
+{
+    [Header("フェーズの種類")]
+    public GamePhase phase;
+    [Header("このフェーズの時間（秒）")]
+    public float timeInSeconds;
+}
+
 /// <summary>
 /// ゲーム時間を管理するクラス。
 /// </summary>
@@ -29,6 +38,9 @@ public class GameTimer : NetworkBehaviour
 
     // 比較用の変数を用意して、フェーズが変わったときにイベントを呼び出すために使用
     private GamePhase previousPhase;
+
+    [Header("フェーズごとの時間設定")]
+    [SerializeField] private GamePhaseTime[] gamePhaseTimes;
 
     /// <summary>
     /// 残り時間を秒で返すプロパティ。
@@ -72,19 +84,32 @@ public class GameTimer : NetworkBehaviour
         }
 
         // 経過時間を計算して、現在のフェーズを更新する
+        
         float elapsedTime = totalTime - RemainingTime;
-        int phaseIndex = Mathf.FloorToInt(elapsedTime / phaseLength);
-        // フェーズのインデックスに応じて、CurrentPhaseを更新する
-        GamePhase newPhase = phaseIndex switch
-        {
-            0 => GamePhase.Phase1,
-            1 => GamePhase.Phase2,
-            2 => GamePhase.Phase3,
-            _ => GamePhase.Finished
-        };
+
+        GamePhase newPhase = GetPhaseByElapsedTime(elapsedTime);
+
+        CurrentPhase = newPhase;
 
         // フェーズが変わったときにイベントを呼び出すために、CurrentPhaseを更新する前に比較用の変数と比較して、フェーズが変わったときにイベントを呼び出す
         CurrentPhase = newPhase;
+    }
+
+    private GamePhase GetPhaseByElapsedTime(float elapsedTime)
+    {
+        float currentTime = 0.0f;
+
+        foreach(var phaseTime in gamePhaseTimes)
+        {
+            currentTime += phaseTime.timeInSeconds;
+
+            if (elapsedTime < currentTime)
+            {
+                return phaseTime.phase;
+            }
+        }
+
+        return GamePhase.Finished; // 全てのフェーズを過ぎた場合はFinishedを返す
     }
 
     public override void Render()
