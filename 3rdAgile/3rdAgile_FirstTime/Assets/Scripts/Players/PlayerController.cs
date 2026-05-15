@@ -80,19 +80,42 @@ namespace Network.Player
         /// </summary>
         public override void FixedUpdateNetwork()
         {
-            if (!Object.HasStateAuthority) return;
-            if (!GetInput<PlayerInputData>(out var input)) return;
+            if (!GetInput<PlayerInputData>(out var input))
+                return;
 
-            if (IsAlive)
+            if (Runner.IsForward)
             {
-                Move(input.move);
+                UpdateAnimation(input.move);
             }
 
-            if (input.tryInteract)
+            if (Object.HasStateAuthority)
             {
-                TryInteract();
+                if (IsAlive)
+                {
+                    Move(input.move);
+                }
+
+                if (input.tryInteract)
+                {
+                    TryInteract();
+                }
             }
         }
+
+        /// <summary>
+        /// アニメーション再生処理
+        /// </summary>
+        private void UpdateAnimation(Vector2 moveInput)
+        {
+            bool isMoving = moveInput.sqrMagnitude > 0.01f;
+
+            bool isRunning = moveInput.magnitude > 0.8f;
+
+            animator.SetBool("Walk", isMoving && !isRunning);
+
+            animator.SetBool("Run", isRunning);
+        }
+
 
         private void Move(Vector2 moveInput)
         {
