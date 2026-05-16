@@ -392,15 +392,15 @@ MonoBehaviour:
   _CurrentPhase: 0
   gamePhaseTimes:
   - phase: 0
-    timeInSeconds: 5
+    timeInSeconds: 30
   - phase: 1
-    timeInSeconds: 5
+    timeInSeconds: 30
   - phase: 2
-    timeInSeconds: 5
+    timeInSeconds: 30
   - phase: 3
-    timeInSeconds: 5
+    timeInSeconds: 30
   - phase: 4
-    timeInSeconds: 1
+    timeInSeconds: 30
 --- !u!4 &385890816
 Transform:
   m_ObjectHideFlags: 0
