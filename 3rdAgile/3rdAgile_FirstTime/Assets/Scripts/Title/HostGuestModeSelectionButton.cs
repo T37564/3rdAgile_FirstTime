@@ -102,17 +102,17 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     {
         // runnerがちゃんと存在するか確認
         if (networkGameStarter == null || networkGameStarter.networkRunner == null) return;
-        
+
         // ルーム内の人数を取得
         int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
-        
-        // 人数チェック（例：4人揃うまで開始しない）
-        if (playerCount != 2)
+
+        // 人数チェック（例：2人以上揃うまで開始しない）
+        if (2 <= playerCount)
         {
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false,"We don't have enough people.",2));
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false, "We don't have enough people.", 2));
             return;
         }
-        
+
         // シーン遷移
         networkGameStarter.networkRunner.LoadScene("PlayerSpawnTestScenes 1");
     }
