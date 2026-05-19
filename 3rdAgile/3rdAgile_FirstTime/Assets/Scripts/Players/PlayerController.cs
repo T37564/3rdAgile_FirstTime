@@ -30,7 +30,7 @@ namespace Network.Player
         [Header("インタラクト対象レイヤー")]
         [SerializeField] private LayerMask interactLayerMask;
 
-        [Networked] private NetworkBool IsHoldingItem { get; set; }
+        [Networked] public NetworkBool IsHoldingItem { get; set; }
 
         [Networked] private NetworkBool IsAlive { get; set; }
 

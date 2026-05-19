@@ -6,7 +6,7 @@ using Fusion;
 
 public class ItemInteractable : NetworkBehaviour,IInteractable
 {
-    private int requiredPeople = 0;
+    public int RequiredPeople { get; private set; }
 
     // アイテムを運ぶプレイヤーのリスト
     private List<PlayerController> carriers = 
@@ -15,7 +15,7 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
     // IInteractableインターフェースの実装
     public Transform Transform => transform;
 
-    private ItemDataStorage itemDataStorage;
+    public ItemDataStorage itemDataStorage;
 
     private void Awake()
     {
@@ -24,8 +24,8 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
 
         // アイテムの必要人数を取得
         // 必要人数の情報が書かれていなかった場合の保険として1人に設定する（無くてもいい）
-        requiredPeople = itemDataStorage.itemData.GetInt("RequiredPeople", 1);
-        Debug.Log("必要人数: " + requiredPeople);
+        RequiredPeople = itemDataStorage.itemData.GetInt("RequiredPeople", 1);
+        Debug.Log("必要人数: " + RequiredPeople);
     }
 
     public bool CanInteract(PlayerController player)
@@ -42,7 +42,7 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
         }
 
         // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
-        if (carriers.Count>= requiredPeople)
+        if (carriers.Count>= RequiredPeople)
         {
             return false;
         }
@@ -73,6 +73,6 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
     /// <returns></returns>
     private bool CanCarry()
     {
-        return carriers.Count == requiredPeople;
+        return carriers.Count == RequiredPeople;
     }
 }
