@@ -1,3 +1,9 @@
+// -----------------------------------------------------------------------------------
+// ホスト変更処理、フェイズ、プレイヤー位置復元処理、アイテム再生成処理など
+// HostMigrationManager.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
+
 using UnityEngine;
 
 public class HostMigrationManager : SingletonMonobehaviour<HostMigrationManager>

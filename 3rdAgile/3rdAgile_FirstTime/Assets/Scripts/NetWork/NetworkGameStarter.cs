@@ -162,6 +162,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             }
             else
             {
+                Debug.Log(result.ShutdownReason);
+
                 if (networkRunner != null)
                 {
                     // Runnerを終了
@@ -176,7 +178,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                 // エラー表示
                 CoroutineRunner.Instance.StartCoroutine(
                     TitleCanvasDisplaySettings.Instance
-                    .ErrorTextDisplay(true, "The room does not exist", 1));
+                    .ShowErrorMessage(true, "The room does not exist", 1));
 
                 // UIを戻す
                 TitleCanvasDisplaySettings.Instance.ResetTitleUI();
@@ -199,7 +201,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             // エラーが出たことを画面に表示
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(true, "An unexpected error has occurred. Please try again.", 2));
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ShowErrorMessage(true, "An unexpected error has occurred. Please try again.", 1));
 
             // UIの状態を戻す処理
             TitleCanvasDisplaySettings.Instance.ResetTitleUI();

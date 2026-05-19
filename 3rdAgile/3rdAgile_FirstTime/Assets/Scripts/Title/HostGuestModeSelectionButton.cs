@@ -1,33 +1,36 @@
 // -----------------------------------------------------------------------------------
 // ホストモード、ゲストモードそれぞれボタンを押したときの処理
-// BasicSpawner.cs
+// HostGuestModeSelectionButton.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class HostGuestModeSelectionButton : MonoBehaviour
 {
-    [Header("")]
+    [Header("NetworkGameStarterの参照")]
     [SerializeField] private NetworkGameStarter networkGameStarter = null;
 
     // true=ホストモード / false=ゲストモード
     public bool isHostMode = false;
 
     /// <summary>
-    /// ホストモードのボタンが押されたとき
+    /// CreateRoomボタンが押された時に呼ばれる
     /// </summary>
     public void NameInputDisplayAsHost()
     {
+        // ホストモードに切り替える
         isHostMode = true;
         NameInputDisplay();
     }
 
     /// <summary>
-    /// ゲストモードのボタンが押されたとき
+    /// EnterRoomボタンが押されたとき
     /// </summary>
     public void NameInputDisplayAsGuest()
     {
+        // ゲストモードに切り替える
         isHostMode = false;
         NameInputDisplay();
     }
@@ -36,15 +39,19 @@ public class HostGuestModeSelectionButton : MonoBehaviour
 
 
     /// <summary>
-    /// InputFieldを表示して、リスナーを一度だけ登録
+    /// InputFieldを表示し、Submitイベントを登録し直す
     /// </summary>
     public void NameInputDisplay()
     {
+        // ルーム名入力UIを表示する
         TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(true);
 
-        var input = TitleCanvasDisplaySettings.Instance.roomNameInput;
-        input.onSubmit.RemoveAllListeners(); // 以前のリスナーを削除
+        // ルーム名入力用InputFieldを取得
+        TMP_InputField input = TitleCanvasDisplaySettings.Instance.roomNameInput;
+        // 以前のリスナーを削除
+        input.onSubmit.RemoveAllListeners();
 
+        // Enterキー押下時にOnEnterPressedを呼ぶ
         input.onSubmit.AddListener(OnEnterPressed);
     }
 
@@ -55,9 +62,13 @@ public class HostGuestModeSelectionButton : MonoBehaviour
 
     private void OnEnterPressed(string roomName)
     {
+        // 名前照合ミスを減らすため前後空白削除
+        roomName = roomName.Trim();
+
         // 空白だけ、または何も入力されていない場合は何もしない
         if (string.IsNullOrWhiteSpace(roomName)) return;
 
+        // それぞれの入り方でルームに入る
         if (isHostMode)
         {
             HostModeStartButton(roomName);
@@ -71,36 +82,36 @@ public class HostGuestModeSelectionButton : MonoBehaviour
 
 
     /// <summary>
-    /// ホストモードのUIのスタートボタンにアタッチするメソッド
+    /// CreateRoomボタン押下時に呼ばれる
     /// </summary>
     private void HostModeStartButton(string roomName)
     {
         // ホストとしてルーム作成
         networkGameStarter.CreateHostRoom(roomName);
 
-        // ルーム名入力テキスト非表示
+        // ルーム名入力UIを非表示にする
         TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 
     /// <summary>
-    /// ゲストモードのUIのスタートボタンにアタッチするメソッド
+    /// EnterRoom開始ボタン押下時に呼ばれる
     /// </summary>
     private void GuestModeStartButton(string roomName)
     {
         // ゲストとしてルームに入る
         networkGameStarter.JoinHostRoom(roomName);
 
-        // ルーム名入力テキスト非表示
+        // ルーム名入力UIを非表示にする
         TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(false);
     }
 
     /// <summary>
     /// スタートボタンが押されたときの処理
-    /// ゲームシーンに移動する
+    /// 人数確認後、ゲームシーンへ移動する
     /// </summary>
     public void ClickStartButton()
     {
-        // runnerがちゃんと存在するか確認
+        // NetworkRunnerが存在するか確認
         if (networkGameStarter == null || networkGameStarter.networkRunner == null) return;
 
         // ルーム内の人数を取得
@@ -109,11 +120,12 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         // 2人未満の場合はゲーム開始できない
         if (playerCount < 2)
         {
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false, "We don't have enough people.", 2));
+            // 人数不足エラーを表示
+            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ShowErrorMessage(false, "We don't have enough people.", 2));
             return;
         }
 
-        // シーン遷移
+        // Fusionを使用してゲームシーンへ移動
         networkGameStarter.networkRunner.LoadScene("PlayerSpawnTestScenes 1");
     }
 }
