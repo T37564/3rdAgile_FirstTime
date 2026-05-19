@@ -183,8 +183,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                 TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
             }
         }
-        catch // エラー時処理
+        catch (Exception error)// エラー時処理
         {
+            Debug.LogException(error);
+
             if (networkRunner != null)
             {
                 // Runnerを終了
