@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HostMigrationManager : MonoBehaviour
+public class HostMigrationManager : SingletonMonobehaviour<HostMigrationManager>
 {
     /// <summary>
     /// ƒzƒXƒg‚ª”²‚¯‚½‚Æ‚«
@@ -8,6 +8,7 @@ public class HostMigrationManager : MonoBehaviour
     /// </summary>
     public void HandleHostMigration()
     {
+
     }
 
     /// <summary>

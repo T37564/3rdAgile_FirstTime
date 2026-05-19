@@ -182,7 +182,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
 
-        // ① ReturnToTitle を安全に呼ぶ
+        // ReturnToTitle を安全に呼ぶ
         var starter = FindAnyObjectByType<NetworkGameStarter>();
 
         if (starter != null)
@@ -194,7 +194,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager.LoadScene("MatchingTestScenes");
         }
 
-        // ② Runner を破壊して DontDestroyOnLoad を解除
+        // Runner を破壊して DontDestroyOnLoad を解除
         if (runner != null)
         {
             Destroy(runner.gameObject);
@@ -308,8 +308,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
     {
-        HostMigrationManager hostMigrationManager = FindAnyObjectByType<HostMigrationManager>();
-        hostMigrationManager.HandleHostMigration();
+        // ホスト変更処理
+        HostMigrationManager.Instance.HandleHostMigration();
     }
 
 
