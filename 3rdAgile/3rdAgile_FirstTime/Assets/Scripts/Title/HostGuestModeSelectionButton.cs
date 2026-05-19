@@ -106,8 +106,8 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         // ルーム内の人数を取得
         int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
 
-        // 人数チェック（例：2人以上揃うまで開始しない）
-        if (2 <= playerCount)
+        // 2人未満の場合はゲーム開始できない
+        if (playerCount < 2)
         {
             CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ErrorTextDisplay(false, "We don't have enough people.", 2));
             return;
