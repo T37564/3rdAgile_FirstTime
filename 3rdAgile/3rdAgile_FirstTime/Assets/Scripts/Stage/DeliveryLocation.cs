@@ -25,17 +25,13 @@ public class DeliveryLocation : NetworkBehaviour
     // アイテムのObject
     private GameObject currentItemObject = null;
     private ItemInteractable currentItem;
+    private ItemDataStorage currentItemStorage;
 
-    private readonly HashSet<PlayerController> deliveryPlayer = new();
+    private readonly HashSet<PlayerController> deliveryPlayers = new();
 
     // 範囲内に入ったアイテムを運んでいるプレイヤーの数
     private int itemDeliveryCount = 0;
 
-    // アイテムの運ぶのに必要な人数
-    private int NumberOfPeopleRequiredForDelivery = 0;
-
-    private bool isItemCollision = false;
-    // アイテムの名前
 
     private void Awake()
     {
@@ -46,29 +42,29 @@ public class DeliveryLocation : NetworkBehaviour
     {
         if (!Object.HasInputAuthority) return;
 
-        if (currentItemObject == null) return;
+        if (currentItem == null) return;
+
+        int requiredPlayers = currentItem.RequiredPeople;
 
         // アイテムを運ぶのに必要な人数より範囲内に運んでいるプレイヤーが少ない場合は処理をしない
-        if (deliveryPlayer.Count < NumberOfPeopleRequiredForDelivery) return;
+        if (deliveryPlayers.Count < requiredPlayers) return;
 
         // 以下で回収以降の処理を書く
         // 1.取ったアイテムを納品　アイテムのポイントをScoreManagerに送り更新をしてもらい、アイテムを削除
-        ReleaseItem();
+        //ReleaseItem();
 
         // 納品したアイテムを削除するためアイテムの情報は明示的に消す
-        Destroy(currentItemObject);
-        currentItemObject = null;
 
-        // 納品したらアイテムが範囲内に無いかを見る
-        // あった場合そのアイテムの情報を取る
-        FindNearItemObject();
+        DeliveryCurrentItem();
     }
 
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.CompareTag(TagName.ITEM))
         {
-            GetItem(collider.gameObject);
+            //GetItem(collider.gameObject);
+            TrySetItem(collider.gameObject);
+            return;
             // アイテムの必要人数を取る
             // colliderをアイテムのクラスにasキャストして必要人数を取るのが正解か？
         }
@@ -79,7 +75,7 @@ public class DeliveryLocation : NetworkBehaviour
             {
                 if (playerController.IsHoldingItem)
                 {
-                    itemDeliveryCount++;
+                    deliveryPlayers.Add(playerController);
                 }
             }
         }
@@ -89,13 +85,50 @@ public class DeliveryLocation : NetworkBehaviour
     {
         if (collider.CompareTag(TagName.ITEM))
         {
-            isItemCollision = false;
+            if (collider.gameObject == currentItemObject)
+            {
+                ClearItem();
+                FindNearItemObject();
+            }
+            return;
         }
 
         if (collider.CompareTag(TagName.PLAYER))
         {
-            itemDeliveryCount--;
+            if (collider.TryGetComponent(out PlayerController playerController))
+            {
+                deliveryPlayers.Remove(playerController);
+            }
         }
+    }
+
+    private void TrySetItem(GameObject itemObject)
+    {
+        if (!itemObject.TryGetComponent(out ItemInteractable deliveryItem)) return;
+        if(!itemObject.TryGetComponent(out ItemDataStorage deliveryItemStrage)) return;
+
+        currentItemObject = itemObject;
+        currentItem = deliveryItem;
+        currentItemStorage = deliveryItemStrage;
+    }
+
+    private void DeliveryCurrentItem()
+    {
+        int score = currentItemStorage.itemData.GetInt("Amount");
+
+        ScoreManager.Instance.AddScore(score);
+
+        Runner.Despawn(currentItemObject.GetComponent<NetworkObject>());
+
+        ClearItem();
+        FindNearItemObject();
+    }
+
+    private void ClearItem()
+    {
+        currentItemObject = null;
+        currentItem = null;
+        currentItemStorage = null;
     }
 
     private void FindNearItemObject()
@@ -103,6 +136,7 @@ public class DeliveryLocation : NetworkBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, layerMask);
 
         float minSqrDistance = float.MaxValue;
+        GameObject nearestItem = null;
 
         foreach (Collider hit in hits)
         {
@@ -110,25 +144,29 @@ public class DeliveryLocation : NetworkBehaviour
             if (sqrDistance < minSqrDistance)
             {
                 minSqrDistance = sqrDistance;
+                nearestItem = hit.gameObject;
             }
-            GetItem(hit.gameObject);
+        }
+        if (nearestItem != null)
+        {
+            TrySetItem(nearestItem);
         }
     }
 
-    /// <summary>
-    /// 取得したアイテムを保持するためのメソッド
-    /// </summary>
-    private void GetItem(GameObject hitItem)
-    {
-        isItemCollision = true;
-        currentItemObject = hitItem;
-        ItemName = currentItemObject.name;
-    }
+    ///// <summary>
+    ///// 取得したアイテムを保持するためのメソッド
+    ///// </summary>
+    //private void GetItem(GameObject hitItem)
+    //{
+    //    isItemCollision = true;
+    //    ItemName = currentItemObject.name;
+    //    TrySetItem(hitItem);
+    //}
 
-    private void ReleaseItem()
-    {
-        isItemCollision = false;
-        currentItemObject = null;
-        ItemName = null;
-    }
+    //private void ReleaseItem()
+    //{
+    //    isItemCollision = false;
+    //    currentItemObject = null;
+    //    ItemName = null;
+    //}
 }

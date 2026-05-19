@@ -8,7 +8,7 @@ using Fusion;
 /// <summary>
 /// スコアに関する処理を持つクラス
 /// </summary>
-public class ScoreManager : NetworkBehaviour
+public class ScoreManager : SingletonNetworkBehaviour<ScoreManager>
 {
     /// <summary>
     /// 総スコア

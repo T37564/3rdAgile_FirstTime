@@ -329,6 +329,7 @@ MonoBehaviour:
   totalTime: 360
   phaseLength: 120
   _CurrentPhase: 0
+  gamePhaseTimes: []
 --- !u!4 &385890816
 Transform:
   m_ObjectHideFlags: 0
@@ -1037,6 +1038,7 @@ GameObject:
   - component: {fileID: 1822162576}
   - component: {fileID: 1822162575}
   - component: {fileID: 1822162574}
+  - component: {fileID: 1822162579}
   m_Layer: 0
   m_Name: Cube
   m_TagString: DeliveryBox
@@ -1056,6 +1058,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51cee1012f19be7498bc74408cc4092b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeliveryLocation
+  searchRadius: 3
 --- !u!65 &1822162575
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1143,12 +1146,31 @@ Transform:
   m_GameObject: {fileID: 1822162573}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.44, y: 0.5, z: -10.49}
+  m_LocalPosition: {x: -0.44, y: 0.987, z: -10.49}
   m_LocalScale: {x: 3, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1822162579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822162573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 4021654398
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1822162574}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
