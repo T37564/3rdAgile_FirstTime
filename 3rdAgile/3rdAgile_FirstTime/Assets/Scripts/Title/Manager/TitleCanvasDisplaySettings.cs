@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// プレイヤー参加/退出のUI更新、人数表示、ラベル変更など。
+// タイトル画面・ロビー画面・システムメッセージUIを管理するクラス
 // TitleCanvasDisplaySettings.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -81,6 +81,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     /// </summary>
     public void ResetSystemMessageCanvas()
     {
+        // エラーを伝えるためのキャンバス非表示
         systemMessageCanvas.SetActive(false);
 
         // テキストの中身を空にする
@@ -92,15 +93,17 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
 
 
     /// <summary>
-    /// エラーメッセージを数秒間表示する処理
+    /// エラーメッセージを数秒間表示する
     /// </summary>
-    public IEnumerator ShowErrorMessage(bool displayBackImage,string errorMessage, int textIndex)
+    public IEnumerator ShowErrorMessage(bool displayBackImage, string errorMessage, int textIndex)
     {
+        // エラーを伝えるためのキャンバス表示
         systemMessageCanvas.SetActive(true);
 
-        // 黒背景表示非表示
+        // 黒背景の表示/非表示を切り替える
         systemMessageBackImage.enabled = displayBackImage;
 
+        // indexが範囲外の時
         if (textIndex < 0 || errorText.Length <= textIndex)
             yield break;
 
@@ -109,7 +112,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
 
         yield return new WaitForSecondsRealtime(DISPLAY_TIME);
 
-        // キャンバスの状態を戻す
+        // SystemMessageUI初期化
         ResetSystemMessageCanvas();
     }
 }

@@ -9,6 +9,9 @@ using UnityEngine;
 
 public class HostGuestModeSelectionButton : MonoBehaviour
 {
+    // プレイヤー最低人数
+    private readonly int MINIMUM_NUMBER_OF_PEOPLE = 2;
+
     [Header("NetworkGameStarterの参照")]
     [SerializeField] private NetworkGameStarter networkGameStarter = null;
 
@@ -57,9 +60,8 @@ public class HostGuestModeSelectionButton : MonoBehaviour
 
 
     /// <summary>
-    /// エンターが押されたとき
+    /// Enterキー押下時に呼ばれる
     /// </summary>
-
     private void OnEnterPressed(string roomName)
     {
         // 名前照合ミスを減らすため前後空白削除
@@ -68,7 +70,7 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         // 空白だけ、または何も入力されていない場合は何もしない
         if (string.IsNullOrWhiteSpace(roomName)) return;
 
-        // それぞれの入り方でルームに入る
+        // モードに応じてルーム参加処理を分岐
         if (isHostMode)
         {
             HostModeStartButton(roomName);
@@ -94,7 +96,7 @@ public class HostGuestModeSelectionButton : MonoBehaviour
     }
 
     /// <summary>
-    /// EnterRoom開始ボタン押下時に呼ばれる
+    /// EnterRoomボタン押下時に呼ばれる
     /// </summary>
     private void GuestModeStartButton(string roomName)
     {
@@ -118,14 +120,14 @@ public class HostGuestModeSelectionButton : MonoBehaviour
         int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
 
         // 2人未満の場合はゲーム開始できない
-        if (playerCount < 2)
+        if (playerCount < MINIMUM_NUMBER_OF_PEOPLE)
         {
             // 人数不足エラーを表示
             CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ShowErrorMessage(false, "We don't have enough people.", 2));
             return;
         }
 
-        // Fusionを使用してゲームシーンへ移動
+        // Fusionのシーン同期機能を使ってゲームシーンへ移動
         networkGameStarter.networkRunner.LoadScene("PlayerSpawnTestScenes 1");
     }
 }

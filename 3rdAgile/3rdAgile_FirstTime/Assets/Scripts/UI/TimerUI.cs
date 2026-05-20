@@ -1,22 +1,24 @@
+// -----------------------------------------------------------------------------------
+// ゲームの残り時間をUIに表示するクラス。
+// TimerUI.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UIElements;
 
-/// <summary>
-/// ゲームの残り時間をUIに表示するクラス。
-/// </summary>
 public class TimerUI : MonoBehaviour
 {
     [Header("タイマー表示用のUIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
-    [Header("ゲーム時間を管理するクラス")]
+    [Header("GameTimer参照")]
     [SerializeField] private GameTimer gameTimer = null;
 
     // 残り時間を表示するLabel
     private Label timerLabel = null;
 
     /// <summary>
-    /// UI生成時にLabelを取得する。
+    /// UIDocument生成後にLabelを取得する
     /// </summary>
     private void Start()
     {
@@ -32,12 +34,16 @@ public class TimerUI : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        // GameTimerが設定されていない場合は処理しない
+        // GameTimer参照が未設定の場合は処理しない
         if (gameTimer == null)
             return;
 
+        // timerLabelが取得できていない場合は処理しない
+        if (timerLabel == null)
+            return;
+
         // Spawn前はNetworkedプロパティにアクセスできないため処理しない
-        if (!gameTimer.Object || !gameTimer.Object.IsValid)
+        if (gameTimer.Object == null || !gameTimer.Object.IsValid)
             return;
 
         // ゲームの残り時間を取得

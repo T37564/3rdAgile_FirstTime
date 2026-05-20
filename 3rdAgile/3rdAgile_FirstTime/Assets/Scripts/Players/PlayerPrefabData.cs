@@ -1,6 +1,7 @@
 // -----------------------------------------------------------------------------------
 // プレイヤーのPrefabデータをまとめて管理するScriptableObject
 // ロビー・ゲームシーン共通で使用
+// PlayerPrefabData.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using Fusion;
@@ -9,14 +10,14 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Game/PlayerPrefabData")]
 public class PlayerPrefabData : ScriptableObject
 {
-    [Header("Guest&Host")]
-    [Tooltip("プレイヤー用のPrefab配列")]
-    public NetworkObject[] playerPrefab;
+    [Header("Player Prefab")]
+    [Tooltip("プレイヤーPrefab配列")]
+    public NetworkObject[] playerPrefabs;
 
     [Header("Spawn Settings")]
-    [Tooltip("プレイヤー生成位置（全員共通）")]
-    public Vector3[] prefabSpawnPosition;
+    [Tooltip("各プレイヤーの生成位置")]
+    public Vector3[] playerSpawnPositions;
 
-    [Tooltip("プレイヤー生成角度（全員共通）")]
-    public Quaternion[] prefabSpawnRotation;
+    [Tooltip("各プレイヤーの生成時回転")]
+    public Quaternion[] playerSpawnRotations;
 }
