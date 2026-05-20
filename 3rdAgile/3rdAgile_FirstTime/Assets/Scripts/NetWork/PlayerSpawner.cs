@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // NetworkRunner が発行するプレイヤー参加・退出などのコールバックを受け取るスクリプト。
 // プレイヤー生成や接続時の初期処理をここで行う。
-// BasicSpawner.cs
+// PlayerSpawner.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using Fusion;
@@ -18,31 +18,19 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     // どのプレイヤーがどのオブジェクトを操作しているか
     private Dictionary<PlayerRef, NetworkObject> playerObjects = new Dictionary<PlayerRef, NetworkObject>();
 
-
-    /// <summary>
-    /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
-    /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
-    /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-        players.Add(player);
-        Debug.Log($"Player joined: {player}");
-    }
-
-
-
     /// <summary>
     /// 全クライアントのシーンロード完了時に呼ばれる。
     /// ロード完了後の初期化処理やスポーン処理を開始するためのコールバック。
     /// </summary>
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        // ホストのみ実行
         if (!runner.IsServer) return;
 
-        // スポーンする位置をいれたオブジェクトを取得
+        // スポーン位置管理用オブジェクトを取得
         Transform spawnPoint = GameObject.Find("SpawnPoint").transform;
 
-        // 子オブジェクト分配列を作成
+        // 配列へ子オブジェクトを格納
         Transform[] spawnPosition = new Transform[spawnPoint.childCount];
 
         // 配列に子オブジェクトの位置情報を入れる
@@ -51,13 +39,13 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             spawnPosition[i] = spawnPoint.GetChild(i);
         }
 
-        // スポーンさせるPlayerのオブジェクトをさがす
+        // プレイヤーPrefabを取得
         GameObject prefabObj = Resources.Load<GameObject>("TestPlayerObject");
 
         // 見つからなかったとき
         if (prefabObj == null)
         {
-            Debug.LogError("PlayerPrefab が見つからないわよ！");
+            Debug.LogError("PlayerPrefab が見つからない");
             return;
         }
 
@@ -67,13 +55,14 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // 見つからなかったとき
         if (networkPlayerObject == null)
         {
-            Debug.LogError("NetworkObject が付いてないわよ！");
+            Debug.LogError("NetworkObject が付いてない");
             return;
         }
 
         // 参加したすべてのプレイヤーを Spawn する
         for (int i = 0; i < players.Count; i++)
         {
+            // オブジェクトスポーン
             NetworkObject spawnedPlayerObject = runner.Spawn(networkPlayerObject,
                          spawnPosition[i].position,
                          Quaternion.identity,
@@ -82,13 +71,13 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
             // PlayerRef と NetworkObject を紐づける
             playerObjects[players[i]] = spawnedPlayerObject;
-
-            Debug.Log($"Spawned player for {players[i]}");
         }
     }
 
 
 
+
+    #region Player
     /// <summary>
     /// プレイヤーがセッションから離脱した時に自動で呼ばれるコールバック。
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
@@ -96,44 +85,47 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log("抜けた？");
-
-        // 自分のオブジェクトがあれば消すだけ
+        // 対象プレイヤーのオブジェクトが存在する場合
         if (playerObjects.TryGetValue(player, out var obj))
         {
+            // プレイヤーオブジェクトを削除
             runner.Despawn(obj);
+
+            // プレイヤーオブジェクト情報を削除
             playerObjects.Remove(player);
+
+            // プレイヤーのID情報を消す
             players.Remove(player);
         }
 
         // ホストが抜けた場合
         if (player.RawEncoded == -1)
         {
-            Debug.Log("Host left → 全員タイトルへ戻るわよ！！");
+            Debug.Log("ホストが退出しました");
 
             // 全端末（ホストもゲストも）タイトルへ
-            FindAnyObjectByType<NetworkGameStarter>().ReturnToTitle();
+            FindAnyObjectByType<NetworkGameStarter>().ShutdownRunner();
             return;
         }
 
-        // クライアントが抜けた場合：ゲーム続行
+        // クライアントが抜けた場合はゲーム続行
         Debug.Log($"Client {player} left, game continues");
     }
 
-
-
-
-
     /// <summary>
-    /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
-    /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
-    /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
+    /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
+    /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
     /// </summary>
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        // プレイヤー一覧へ追加
+        players.Add(player);
+        Debug.Log($"Player joined: {player}");
+    }
 
+    #endregion
 
-
-
+    #region Input
     /// <summary>
     /// 毎フレーム呼ばれる入力送信コールバック。
     /// キーボード・マウス・ゲームパッドなどのローカル入力を取得し、
@@ -151,6 +143,16 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// 通常は前回の入力を継続したり、空の入力を渡したりして補完する。
     /// </summary>
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+    #endregion
+
+    #region Connection
+    /// <summary>
+    /// NetworkRunner がシャットダウンした時に呼ばれるコールバック。
+    /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
+    /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
+    /// </summary>
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+
 
     /// <summary>
     /// クライアントがサーバー（ホスト）への接続に成功した時に呼ばれるコールバック。
@@ -158,7 +160,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤー生成の準備などを行う。
     /// </summary>
     public void OnConnectedToServer(NetworkRunner runner) { }
-
 
 
     /// <summary>
@@ -169,7 +170,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
 
 
-
     /// <summary>
     /// クライアントがサーバーへ接続要求を送ってきた時に呼ばれるコールバック。
     /// ここで接続を許可（Approve）するか、拒否（Refuse/Reject）するか判断できる。
@@ -178,81 +178,41 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
 
 
-
     /// <summary>
     /// クライアントがサーバーへの接続を試みたが失敗した時に呼ばれるコールバック。
     /// ネットワーク不良・サーバーが存在しない・モード不一致などが原因。
     /// UIでエラーメッセージ表示やリトライ処理に使用する。
     /// </summary>
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+    #endregion
 
-
-    /// <summary>
-    /// 他のプレイヤー（またはサーバー）が SendUserSimulationMessage() を使って
-    /// 任意データを送信してきた時に呼ばれるコールバック。
-    /// ゲーム内のカスタムイベント伝達に便利（チャット、通知、エモートなど）。
-    /// </summary>
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
-
-
+    #region Lobby
     /// <summary>
     /// 現在参加可能なセッション（ゲーム部屋）の一覧が更新された時に呼ばれる。
     /// ロビー画面のリスト更新や、「部屋が増えた・消えた」をUIに反映するのに使う。
     /// </summary>
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    #endregion
 
-
-
+    #region Authentication
     /// <summary>
     /// カスタム認証（外部サービスや独自APIなど）を使った時、
     /// サーバーから認証結果が返ってきた瞬間に呼ばれるコールバック。
     /// ログイン成功/失敗や、ユーザー固有データの受信に使える。
     /// </summary>
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    #endregion
 
-
-
-
+    #region Message
     /// <summary>
-    /// ホストモードでホストが切断された時、
-    /// 新しいホストに自動で引き継がれる処理を行うためのコールバック。
-    /// ゲームの継続・オブジェクトの再割り当てなどを行う。
+    /// 他のプレイヤー（またはサーバー）が SendUserSimulationMessage() を使って
+    /// 任意データを送信してきた時に呼ばれるコールバック。
+    /// ゲーム内のカスタムイベント伝達に便利（チャット、通知、エモートなど）。
     /// </summary>
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    #endregion
 
-
-
-
-
-
-    /// <summary>
-    /// ネットワークシーンのロード開始時に呼ばれる。
-    /// ローディング画面の表示など、遷移中の準備処理を行う。
-    /// </summary>
-    public void OnSceneLoadStart(NetworkRunner runner) { }
-
-
-
-
-    /// <summary>
-    /// オブジェクトがプレイヤーのAOI(興味領域)から外れた時に呼ばれる。
-    /// 視界外に出たオブジェクトの非表示処理や更新停止などを行う。
-    /// </summary>
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
-
-
-
-
-    /// <summary>
-    /// オブジェクトがプレイヤーのAOI(興味領域)に入った時に呼ばれる。
-    /// 表示や動作の有効化など、視界に入ったオブジェクトの初期処理を行う。
-    /// </summary>
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
-
-
+    #region Receive
     /// <summary>
     /// 他クライアントから送られたReliableデータ受信時に呼ばれる。
     /// 確実に届けたい重要データの処理を行う。
@@ -260,10 +220,42 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
 
 
-
     /// <summary>
     /// Reliableデータの送受信進捗が更新された時に呼ばれる。
     /// 大容量データの進捗表示や転送状況の監視に使用する。
     /// </summary>
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+    #endregion
+
+    #region AOI
+    /// <summary>
+    /// オブジェクトがプレイヤーのAOI(興味領域)から外れた時に呼ばれる。
+    /// 視界外に出たオブジェクトの非表示処理や更新停止などを行う。
+    /// </summary>
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+
+
+    /// <summary>
+    /// オブジェクトがプレイヤーのAOI(興味領域)に入った時に呼ばれる。
+    /// 表示や動作の有効化など、視界に入ったオブジェクトの初期処理を行う。
+    /// </summary>
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    #endregion
+
+    #region Scene
+    /// <summary>
+    /// ネットワークシーンのロード開始時に呼ばれる。
+    /// ローディング画面の表示など、遷移中の準備処理を行う。
+    /// </summary>
+    public void OnSceneLoadStart(NetworkRunner runner) { }
+    #endregion
+
+    #region Host Migration
+    /// <summary>
+    /// ホストモードでホストが切断された時、
+    /// 新しいホストに自動で引き継がれる処理を行うためのコールバック。
+    /// ゲームの継続・オブジェクトの再割り当てなどを行う。
+    /// </summary>
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    #endregion
 }

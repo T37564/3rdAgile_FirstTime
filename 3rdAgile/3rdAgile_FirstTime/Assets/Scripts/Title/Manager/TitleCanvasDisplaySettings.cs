@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------
-// プレイヤー参加/退出のUI更新、人数表示、ラベル変更など。
-// NetworkGameStarter.cs
+// タイトル画面・ロビー画面・システムメッセージUIを管理するクラス
+// TitleCanvasDisplaySettings.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using System.Collections;
@@ -10,11 +10,11 @@ using UnityEngine.UI;
 
 public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisplaySettings>
 {
-    private readonly float DISPLASYTIME = 3.0f;
+    // 画面に表示する時間
+    private readonly float DISPLAY_TIME = 3.0f;
 
 
-    [Header("タイトル画面のキャンバス")]
-    [Header("タイトルのキャンバス本体")]
+    [Header("Title UI")]
     [SerializeField] public GameObject titleCanvas = null;
 
     [Header("ローディング用のイメージ")]
@@ -25,8 +25,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
 
 
 
-    [Header("ロビー画面のキャンバス")]
-    [Header("ロビーのキャンバス本体")]
+    [Header("Lobby UI")]
     [SerializeField] public GameObject lobbyCanvas = null;
 
     [Header("ゲームスタート用のボタン")]
@@ -35,8 +34,9 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     [Header("ロビーの人数を記入するUI")]
     [SerializeField] public TextMeshProUGUI playerCountDisplayText = null;
 
-    [Header("システムメッセージのキャンバス")]
-    [Header("システムメッセージのキャンバス本体")]
+
+
+    [Header("System Message UI")]
     [SerializeField] public GameObject systemMessageCanvas = null;
 
     [Header("エラーメッセージを表示する際の背景画像")]
@@ -46,7 +46,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     [SerializeField] public TextMeshProUGUI[] errorText = null;
 
     /// <summary>
-    /// 最初に一度だけ実行
+    /// すべてのキャンバスを初期化
     /// </summary>
     private void Start()
     {
@@ -58,7 +58,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     }
 
     /// <summary>
-    /// タイトルUICanvasを初期状態に戻す処理
+    /// タイトルUIを初期状態に戻す
     /// </summary>
     public void ResetTitleUI()
     {
@@ -68,7 +68,7 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     }
 
     /// <summary>
-    /// ロビーUICanvasを初期状態に戻す処理
+    /// ロビーUIを初期状態に戻す
     /// </summary>
     public void ResetLobbyUI()
     {
@@ -77,13 +77,14 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     }
 
     /// <summary>
-    /// メッセージ表示用UICanvasを初期状態に戻す処理
+    /// システムメッセージUIを初期状態に戻す
     /// </summary>
-
     public void ResetSystemMessageCanvas()
     {
+        // エラーを伝えるためのキャンバス非表示
         systemMessageCanvas.SetActive(false);
 
+        // テキストの中身を空にする
         foreach (var item in errorText)
         {
             item.text = string.Empty;
@@ -92,18 +93,26 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
 
 
     /// <summary>
-    /// エラーメッセージを数秒間表示する処理
+    /// エラーメッセージを数秒間表示する
     /// </summary>
-    public IEnumerator ErrorTextDisplay(bool displayBackImage,string errorMessage, int textSize)
+    public IEnumerator ShowErrorMessage(bool displayBackImage, string errorMessage, int textIndex)
     {
+        // エラーを伝えるためのキャンバス表示
         systemMessageCanvas.SetActive(true);
 
+        // 黒背景の表示/非表示を切り替える
         systemMessageBackImage.enabled = displayBackImage;
 
-        errorText[textSize].text = errorMessage;
+        // indexが範囲外の時
+        if (textIndex < 0 || errorText.Length <= textIndex)
+            yield break;
 
-        yield return new WaitForSecondsRealtime(DISPLASYTIME);
+        // 指定したテキスト欄にエラーメッセージを表示
+        errorText[textIndex].text = errorMessage;
 
+        yield return new WaitForSecondsRealtime(DISPLAY_TIME);
+
+        // SystemMessageUI初期化
         ResetSystemMessageCanvas();
     }
 }
