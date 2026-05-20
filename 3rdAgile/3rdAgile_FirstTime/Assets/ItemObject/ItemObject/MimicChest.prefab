@@ -4985,7 +4985,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataStorage
   sampleMasterData: {fileID: 11400000, guid: ff9b8c51005aa3b4d8e96a7e97a21386, type: 2}
-  useRandomData: 1
+  useRandomData: 0
   randomDataType: 0
   _dataId: 0
 --- !u!114 &-6119929225545762286
@@ -5000,6 +5000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e567f0cd10943b8488959947c5fe1a76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemInteractable
+  itemDataStorage: {fileID: 0}
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
