@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55ca160df19f3a041a4357830358af39, type: 3}
   m_Name: PrefabData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPrefabData
-  playerPrefab:
+  playerPrefabs:
   - {fileID: -8137458445721675518, guid: ea5d9126517f8334394c836b02e645d1, type: 3}
   - {fileID: -7295163730024411932, guid: 65231ffe9f43c24478d142c481fbcc2c, type: 3}
   - {fileID: -2787309591237798139, guid: 117095430f115a7409b8c72b2861ac5b, type: 3}
   - {fileID: -8579772963901048626, guid: 26400aac7dce2f042bd0d611bbdc0c6b, type: 3}
-  prefabSpawnPosition:
+  playerSpawnPositions:
   - {x: -4.5, y: -1.3, z: 7}
-  - {x: -1.4, y: -1.25, z: 7}
-  - {x: 1.4, y: -1.2, z: 7}
-  - {x: 4.5, y: -1.15, z: 7}
-  prefabSpawnRotation:
-  - {x: 0, y: -0.9848077, z: 0, w: -0.1736482}
+  - {x: -1.4, y: -1.25, z: 6.9}
+  - {x: 1.4, y: -1.2, z: 6.85}
+  - {x: 4.5, y: -1.15, z: 6.75}
+  playerSpawnRotations:
+  - {x: 0, y: -0.9659258, z: 0, w: -0.25881904}
   - {x: 0, y: 0.9961947, z: 0, w: 0.087155804}
-  - {x: 0, y: 1, z: 0, w: -0.00000004371139}
   - {x: 0, y: 0.9961947, z: 0, w: -0.08715577}
+  - {x: 0, y: 0.9659258, z: 0, w: -0.25881904}
