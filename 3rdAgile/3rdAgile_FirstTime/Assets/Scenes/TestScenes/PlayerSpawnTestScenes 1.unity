@@ -329,7 +329,15 @@ MonoBehaviour:
   totalTime: 360
   phaseLength: 120
   _CurrentPhase: 0
-  gamePhaseTimes: []
+  gamePhaseTimes:
+  - phase: 0
+    timeInSeconds: 30
+  - phase: 1
+    timeInSeconds: 30
+  - phase: 2
+    timeInSeconds: 20
+  - phase: 3
+    timeInSeconds: 10
 --- !u!4 &385890816
 Transform:
   m_ObjectHideFlags: 0
@@ -640,12 +648,46 @@ MonoBehaviour:
   - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
   - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
   - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
-  phaseItemTables: []
+  - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
+  - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
+  phaseItemTables:
+  - phase: 0
+    items:
+    - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
+  - phase: 1
+    items:
+    - itemPrefab: {fileID: -5405382398450028345, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 988e9a95d00ce1343855c76c0cde4504, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: d3691e175183a40498e7bce4b917189a, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
+  - phase: 2
+    items:
+    - itemPrefab: {fileID: -5405382398450028345, guid: 4db1e3b2815d60f459bdeceb09e9a9ee, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 9ba417a8dc494a94791dcf6cc86d645c, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 49e51ce08a845944cb8c38e13bed3558, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: fb4215835552ba744b86a2e5d91f798e, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 731a17e99bb38d64bb7a4c14251e0ff1, type: 3}
+    - itemPrefab: {fileID: -5405382398450028345, guid: 03ba3854ba7b75f4b90b0e8993f0c96f, type: 3}
+  - phase: 3
+    items:
+    - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
   roomSpawnPositions:
-  - minX: -5
-    maxX: 5
-    minZ: -5
-    maxZ: 5
+  - minX: -15
+    maxX: 15
+    minZ: -15
+    maxZ: 15
     positionY: 0.5
   - minX: -20
     maxX: 20
@@ -657,8 +699,16 @@ MonoBehaviour:
     minZ: -40
     maxZ: 40
     positionY: 10
-  itemDataTable: []
-  gameTimer: {fileID: 0}
+  itemDataTable:
+  - randomDataType: 0
+    sampleMasterDatas:
+    - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
+    - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
+    - {fileID: 11400000, guid: d37aa02c477a5c2478cb43fb852e3a6b, type: 2}
+    - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
+    - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
+    - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
+  gameTimer: {fileID: 385890815}
   itemDataArrays:
   - {fileID: 11400000, guid: 53183ae1d7fafd14195ac5e8d79736aa, type: 2}
   - {fileID: 11400000, guid: 21f6d37acc0361f458183e272ef08c4c, type: 2}
@@ -666,7 +716,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de99c8b401d1d9342a30097f60531b19, type: 2}
   - {fileID: 11400000, guid: cf5e2f30a1a00404a9d75548ba266da4, type: 2}
   - {fileID: 11400000, guid: b0f79239fd589994e80a90ca555e5023, type: 2}
-  phaseSpawnCounts: []
+  phaseSpawnCounts:
+  - phase: 0
+    spawnCount: 20
+  - phase: 1
+    spawnCount: 15
+  - phase: 2
+    spawnCount: 10
+  - phase: 3
+    spawnCount: 1
 --- !u!1 &972300162
 GameObject:
   m_ObjectHideFlags: 0
