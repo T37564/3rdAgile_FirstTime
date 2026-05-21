@@ -14,10 +14,8 @@ namespace Network.Player
     {
         // プレイヤーがアイテムを拾ったときのイベント
         public event Action OnPickUpItem;
-
         // プレイヤーの生死に関するイベント
         public event Action OnPlayerDied;
-
         public event Action OnPlayerRevived;
 
         [Header("-- Player Settings --")]
@@ -36,11 +34,11 @@ namespace Network.Player
 
         private PlayerInputHandler inputHandler;
 
+        private Animator animator;
+
         private bool prevAlive;
 
         private bool prevHoldingItem;
-
-        private Animator animator;
 
         public Transform Transform => transform;
 
