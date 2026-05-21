@@ -45,6 +45,13 @@ public class RegenerationCallOut : NetworkBehaviour
         }
     }
 
+    public void RegeneratePosition(Vector3 newPosition)
+    {
+        if (!Object.HasStateAuthority) return;
+
+        transform.position = newPosition;
+    }
+
     private bool IsGround()
     {
         return Physics.Raycast(transform.position, Vector3.down, rayLength, layerMask);

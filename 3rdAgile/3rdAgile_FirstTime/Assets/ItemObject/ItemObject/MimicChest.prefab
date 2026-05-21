@@ -4853,6 +4853,7 @@ GameObject:
   - component: {fileID: -6119929225545762286}
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
+  - component: {fileID: -5837523422435495001}
   m_Layer: 0
   m_Name: MimicChest
   m_TagString: Untagged
@@ -5001,6 +5002,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemInteractable
   itemDataStorage: {fileID: 0}
+  followSpeed: 8
+  carryOffset: {x: 0, y: 0.5, z: 0}
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5048,4 +5051,22 @@ MonoBehaviour:
   - {fileID: 1397100366237517205}
   - {fileID: 1938197116313789723}
   - {fileID: -6119929225545762286}
+  - {fileID: -5837523422435495001}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &-5837523422435495001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
