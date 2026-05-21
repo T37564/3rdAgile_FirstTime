@@ -106,15 +106,20 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private void HandleNeedRegenerate(RegenerationCallOut regen)
     {
         Debug.Log("再配置要求を受信");
+        if (!regen.Object.HasStateAuthority)
+            return;
 
         // 再配置要求を出したアイテムのNetworkObjectを取得
-        NetworkObject obj = regen.Object;
+        //NetworkObject obj = regen.Object;
 
         // 生成する際のランダムな位置を取得
         Vector3 newPos = itemObjectPlace.GetRandomPosition();
 
+        //regen.Object.transform.position = newPos;
+        regen.RegeneratePosition(newPos);
+
         // アイテムの位置を新しいランダムな位置に変更する
-        obj.transform.position = newPos;
+        //obj.transform.position = newPos;
         
         // 再配置要求フラグをリセット
         regen.isGenerateRequest = false;
