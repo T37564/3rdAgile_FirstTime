@@ -1,21 +1,25 @@
 using Network.Player;
-using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using Fusion;
 
-public class ItemInteractable : NetworkBehaviour,IInteractable
+public class ItemInteractable : NetworkBehaviour, IInteractable
 {
     public int RequiredPeople { get; private set; }
 
     // アイテムを運ぶプレイヤーのリスト
-    private List<PlayerController> carriers = 
+    private List<PlayerController> carriers =
         new List<PlayerController>();
 
     // IInteractableインターフェースの実装
     public Transform Transform => transform;
 
     public ItemDataStorage itemDataStorage;
+
+    [SerializeField] private float followSpeed = 8.0f;
+    [SerializeField] private Vector3 carryOffset = new Vector3(0, 0.5f, 0);
+
+    private bool isCarrying = false;
 
     private void Awake()
     {
@@ -30,7 +34,7 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
 
     public bool CanInteract(PlayerController player)
     {
-        if(itemDataStorage == null)
+        if (itemDataStorage == null)
         {
             Debug.LogError("ItemDataStorageが見つかりませんでした。");
             return false;
@@ -42,7 +46,7 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
         }
 
         // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
-        if (carriers.Count>= RequiredPeople)
+        if (carriers.Count >= RequiredPeople)
         {
             return false;
         }
@@ -62,8 +66,7 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
 
         if (CanCarry())
         {
-            Debug.Log("アイテムを運び始める");
-            
+            StartCarry();
         }
     }
 
@@ -74,5 +77,56 @@ public class ItemInteractable : NetworkBehaviour,IInteractable
     private bool CanCarry()
     {
         return carriers.Count == RequiredPeople;
+    }
+
+    private void StartCarry()
+    {
+        isCarrying = true;
+        Debug.Log("アイテムを運び始める");
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        if (!isCarrying) return;
+
+        // 運搬中の処理
+        FollowCarries();
+    }
+
+    private void FollowCarries()
+    {
+        if (carriers.Count == 0) return;
+
+        Vector3 center = Vector3.zero;
+
+        foreach (var carrier in carriers)
+        {
+            center += carrier.Transform.position;
+        }
+
+        center /= carriers.Count;
+
+        Vector3 targetPosition = center + carryOffset;
+
+        transform.position = Vector3.Lerp(
+            transform.position,
+            targetPosition,
+            followSpeed * Runner.DeltaTime
+        );
+    }
+
+    public void Release(PlayerController player)
+    {
+        if(!carriers.Contains(player)) return;
+
+        carriers.Remove(player);
+
+        if (carriers.Count < RequiredPeople)
+        {
+            isCarrying = false;
+            Debug.Log("人数不足でアイテムの運搬を中止");
+        }
     }
 }
