@@ -12,11 +12,13 @@ namespace Network.Player
     [RequireComponent(typeof(PlayerInputHandler))]
     public class PlayerController : NetworkBehaviour, IDamage, IInteractable
     {
+        #region イベント
         // プレイヤーがアイテムを拾ったときのイベント
         public event Action OnPickUpItem;
         // プレイヤーの生死に関するイベント
         public event Action OnPlayerDied;
         public event Action OnPlayerRevived;
+        #endregion
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
@@ -28,23 +30,31 @@ namespace Network.Player
         [Header("インタラクト対象レイヤー")]
         [SerializeField] private LayerMask interactLayerMask;
 
+        #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
 
         [Networked] private NetworkBool IsAlive { get; set; }
+        #endregion
 
+        // ローカルでプレイヤーの入力を受け取るためのコンポーネント
         private PlayerInputHandler inputHandler;
 
+        // アニメーション制御用のコンポーネント
         private Animator animator;
 
+        #region 前のフレームの状態を保存するための変数
         private bool prevAlive;
 
         private bool prevHoldingItem;
+        #endregion
 
+        // プレイヤーが現在持っているアイテム（持っていないときはnull）
         private ItemInteractable holdingItem;
 
+        // プレイヤーの現在の回転角度
         private Quaternion currentAngle = Quaternion.identity;
-        private Quaternion previousAngle = Quaternion.identity;
 
+        // IInteractableインターフェースの実装
         public Transform Transform => transform;
 
 
@@ -127,30 +137,38 @@ namespace Network.Player
             //Vector3に変換
             Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
 
+            // 正規化
             if (move.sqrMagnitude > 1f)
             {
                 move.Normalize();
             }
 
+            // 移動
             transform.position += move * moveSpeed * Runner.DeltaTime;
 
             // 入力があるときだけ回転
             if (move.sqrMagnitude > 0.01f)
             {
-                if (!IsHoldingItem)
+                // アイテムを持っているときはアイテムの方向に回転
+                if (IsHoldingItem)
+                {
+                    // プレイヤーの回転をアイテムの方向に固定
+                    Vector3 direction = (holdingItem.Transform.position - transform.position);
+                    direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
+
+                    if (direction.sqrMagnitude > 0.01f)
+                    {
+                        currentAngle = Quaternion.LookRotation(direction);
+
+                        transform.rotation = currentAngle;
+                    }
+                }
+                // アイテムを持っていないときは移動方向に回転
+                else
                 {
                     float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
 
                     currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
-
-                    transform.rotation = currentAngle;
-                }
-                else
-                {
-                    // プレイヤーの回転をアイテムの方向に固定
-                    Vector3 distance = (transform.position - holdingItem.Transform.position);
-                    distance = distance.normalized;
-                    currentAngle = Quaternion.Euler(distance);
 
                     transform.rotation = currentAngle;
                 }
