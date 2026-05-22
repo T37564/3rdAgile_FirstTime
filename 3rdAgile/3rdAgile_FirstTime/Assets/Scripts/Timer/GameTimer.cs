@@ -42,6 +42,10 @@ public class GameTimer : NetworkBehaviour
     [Header("フェーズごとの時間設定")]
     [SerializeField] private GamePhaseTime[] gamePhaseTimes;
 
+    // タイマーが開始されているかの判定
+    [Networked]
+    private NetworkBool isStartedTimer { get; set; }
+
     /// <summary>
     /// 残り時間を秒で返すプロパティ。
     /// タイマーが終了しているか、まだ開始されていない場合は0を返す。
@@ -65,6 +69,7 @@ public class GameTimer : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             GameTimerTick = TickTimer.CreateFromSeconds(Runner, totalTime);
+            isStartedTimer = true;
             CurrentPhase = GamePhase.Phase1;
         }
 
@@ -93,6 +98,14 @@ public class GameTimer : NetworkBehaviour
 
         // フェーズが変わったときにイベントを呼び出すために、CurrentPhaseを更新する前に比較用の変数と比較して、フェーズが変わったときにイベントを呼び出す
         CurrentPhase = newPhase;
+
+        // ゲーム終了したかの判定を取る
+        if (isStartedTimer && RemainingTime == 0)
+        {
+            ScoreUI scoreUI= FindAnyObjectByType<ScoreUI>();
+
+            scoreUI.enabled = true;
+        }
     }
 
     private GamePhase GetPhaseByElapsedTime(float elapsedTime)
