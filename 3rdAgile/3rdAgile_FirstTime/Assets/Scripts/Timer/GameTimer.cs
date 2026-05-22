@@ -3,8 +3,9 @@
 //======================================================================
 
 using Fusion;
-using UnityEngine;
 using System;
+using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 [Serializable]
 public class GamePhaseTime
@@ -27,10 +28,10 @@ public class GameTimer : NetworkBehaviour
 
     [Header("-- Timer Settings --")]
     [Header("ゲーム全体の時間（秒）")]
-    [SerializeField] private float totalTime = 360f; // 6 minutes
+    [SerializeField] private float totalTime = 8f; // 6 minutes
 
     [Header("各フェーズの時間（秒）")]
-    [SerializeField] private float phaseLength = 120f; // 2 minutes per phase
+    [SerializeField] private float phaseLength = 2f; // 2 minutes per phase
 
     // ゲームの残り時間を管理するためのTickTimerと、現在のゲームフェーズを管理するためのNetworkedプロパティ
     [Networked] private TickTimer GameTimerTick { get; set; }
@@ -81,15 +82,24 @@ public class GameTimer : NetworkBehaviour
     {
         // StateAuthorityを持っているクライアントがタイマーの更新を行う
         if (!Object.HasStateAuthority) return;
+
         // タイマーが終了している場合はフェーズをFinishedに設定して終了
-        if (GameTimerTick.Expired(Runner))
+        if (isStartedTimer && GameTimerTick.Expired(Runner))
         {
             CurrentPhase = GamePhase.Finished;
+
+            UIController uiController = FindAnyObjectByType<UIController>();
+
+            if (uiController != null)
+            {
+                uiController.ShowScoreUI();
+            }
+
             return;
         }
 
         // 経過時間を計算して、現在のフェーズを更新する
-        
+
         float elapsedTime = totalTime - RemainingTime;
 
         GamePhase newPhase = GetPhaseByElapsedTime(elapsedTime);
@@ -98,21 +108,13 @@ public class GameTimer : NetworkBehaviour
 
         // フェーズが変わったときにイベントを呼び出すために、CurrentPhaseを更新する前に比較用の変数と比較して、フェーズが変わったときにイベントを呼び出す
         CurrentPhase = newPhase;
-
-        // ゲーム終了したかの判定を取る
-        if (isStartedTimer && RemainingTime == 0)
-        {
-            ScoreUI scoreUI= FindAnyObjectByType<ScoreUI>();
-
-            scoreUI.enabled = true;
-        }
     }
 
     private GamePhase GetPhaseByElapsedTime(float elapsedTime)
     {
         float currentTime = 0.0f;
 
-        foreach(var phaseTime in gamePhaseTimes)
+        foreach (var phaseTime in gamePhaseTimes)
         {
             currentTime += phaseTime.timeInSeconds;
 

@@ -11,6 +11,9 @@ public class ScoreUI : MonoBehaviour
     [Header("スコア表示用のUIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
+    [Header("ScoreUI の Source Asset")]
+    [SerializeField] private VisualTreeAsset scoreUI = null;
+
     /// <summary>
     /// スコアを取得してUIへ表示する
     /// </summary>
@@ -20,6 +23,11 @@ public class ScoreUI : MonoBehaviour
         ScoreManager scoreManager = FindAnyObjectByType<ScoreManager>();
 
         if (scoreManager == null) return;
+
+        // UIの変更
+        uiDocument.rootVisualElement.Clear();
+
+        scoreUI.CloneTree(uiDocument.rootVisualElement);
 
         // UIDocumentのルート要素を取得
         VisualElement root = uiDocument.rootVisualElement;
