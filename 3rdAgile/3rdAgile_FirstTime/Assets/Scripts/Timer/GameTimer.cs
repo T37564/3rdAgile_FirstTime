@@ -28,10 +28,10 @@ public class GameTimer : NetworkBehaviour
 
     [Header("-- Timer Settings --")]
     [Header("ゲーム全体の時間（秒）")]
-    [SerializeField] private float totalTime = 8f; // 6 minutes
+    [SerializeField] private float totalTime = 360f; // 6 minutes
 
     [Header("各フェーズの時間（秒）")]
-    [SerializeField] private float phaseLength = 2f; // 2 minutes per phase
+    [SerializeField] private float phaseLength = 120f; // 2 minutes per phase
 
     // ゲームの残り時間を管理するためのTickTimerと、現在のゲームフェーズを管理するためのNetworkedプロパティ
     [Networked] private TickTimer GameTimerTick { get; set; }

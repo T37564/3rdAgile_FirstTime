@@ -42,6 +42,9 @@ namespace Network.Player
 
         private ItemInteractable holdingItem;
 
+        private Quaternion currentAngle = Quaternion.identity;
+        private Quaternion previousAngle = Quaternion.identity;
+
         public Transform Transform => transform;
 
 
@@ -116,9 +119,12 @@ namespace Network.Player
             animator.SetBool("Run", isRunning);
         }
 
-
+        /// <summary>
+        /// 受け取ったVector2型を使って移動
+        /// </summary>
         private void Move(Vector2 moveInput)
         {
+            //Vector3に変換
             Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
 
             if (move.sqrMagnitude > 1f)
@@ -128,16 +134,31 @@ namespace Network.Player
 
             transform.position += move * moveSpeed * Runner.DeltaTime;
 
-            // =========================
+            // 入力があるときだけ回転
+            if (move.sqrMagnitude > 0.01f)
+            {
+                if (!IsHoldingItem)
+                {
+                    float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+
+                    currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
+
+                    transform.rotation = currentAngle;
+                }
+                else
+                {
+                    // プレイヤーの回転をアイテムの方向に固定
+                    Vector3 distance = (transform.position - holdingItem.Transform.position);
+                    distance = distance.normalized;
+                    currentAngle = Quaternion.Euler(distance);
+
+                    transform.rotation = currentAngle;
+                }
+            }
+
+
             // アニメーション制御
-            // =========================
-            bool isMoving = move.sqrMagnitude > 0.01f;
-
-            bool isRunning = moveInput.magnitude > 0.8f;
-
-            animator.SetBool("Walk", isMoving && !isRunning);
-
-            animator.SetBool("Run", isRunning);
+            UpdateAnimation(moveInput);
         }
 
         private void TryInteract()
@@ -173,7 +194,7 @@ namespace Network.Player
 
                 if (interactable.Transform == transform) continue;
 
-                float sqrDistance = 
+                float sqrDistance =
                     (interactable.Transform.position - transform.position).sqrMagnitude;
 
                 if (sqrDistance < minSqrDistance)
