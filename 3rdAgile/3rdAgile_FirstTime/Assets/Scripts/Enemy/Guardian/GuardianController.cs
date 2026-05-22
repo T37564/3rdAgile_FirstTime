@@ -6,18 +6,35 @@ public class GuardianController : NetworkBehaviour
 {
     [SerializeField] private NavMeshAgent navMeshAgent;
 
-    [Header("追従する対象のTransform")]
-    [SerializeField] Transform[] players;
+    private Transform players;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
-        
+        // Playerタグのオブジェクトを探す
+        GameObject target = GameObject.FindWithTag("Player");
+
+        if (target != null)
+        {
+            players = target.transform;
+        }
     }
 
     // Update is called once per frame
     private void Update()
     {
-        navMeshAgent.SetDestination(transform.position);
+        navMeshAgent.SetDestination(players.position);
+    }
+
+    private void FindNearestPlauer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        float shortestDistance = Mathf.Infinity;
+        Transform nearestPlayer = null;
+
+        foreach(GameObject playerObject in players)
+        {
+
+        }
     }
 }
