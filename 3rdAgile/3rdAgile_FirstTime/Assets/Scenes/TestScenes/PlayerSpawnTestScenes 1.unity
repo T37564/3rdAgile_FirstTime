@@ -326,8 +326,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0a4719dc48d5e4a8dd8ed55ec9554e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
-  totalTime: 8
-  phaseLength: 2
+  totalTime: 360
+  phaseLength: 120
   _CurrentPhase: 0
   gamePhaseTimes:
   - phase: 0
@@ -393,7 +393,7 @@ Transform:
   m_GameObject: {fileID: 487970199}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -27.86304, y: -11.19375, z: -20.30104}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -469,7 +469,7 @@ Transform:
   m_GameObject: {fileID: 710648397}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2360.428, y: 2709.3264, z: 1306.6372}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -524,7 +524,7 @@ Transform:
   m_GameObject: {fileID: 790305687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.09989, y: 0, z: 11.75366}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -906,7 +906,7 @@ Transform:
   m_GameObject: {fileID: 1287500633}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2360.428, y: 2709.3264, z: 1306.6372}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1335,5 +1335,5 @@ SceneRoots:
   - {fileID: 1287500635}
   - {fileID: 487970201}
   - {fileID: 710648399}
-  - {fileID: 1822162578}
   - {fileID: 972300165}
+  - {fileID: 1822162578}
