@@ -38,7 +38,7 @@ public class DeliveryLocation : NetworkBehaviour
         tag = TagName.DELIVERY_BOX;
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!Object.HasInputAuthority) return;
 

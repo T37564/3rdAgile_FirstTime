@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
   - component: {fileID: -2097476786741794674}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SmallChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.8, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1397100366237517205
 MonoBehaviour:
@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 2532101396945171947}
   - component: {fileID: 2840679288179414659}
   - component: {fileID: 2992208190125722888}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
