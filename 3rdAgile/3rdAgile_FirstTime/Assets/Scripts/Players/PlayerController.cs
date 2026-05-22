@@ -40,6 +40,8 @@ namespace Network.Player
 
         private bool prevHoldingItem;
 
+        private ItemInteractable holdingItem;
+
         public Transform Transform => transform;
 
 
@@ -65,6 +67,7 @@ namespace Network.Player
             {
                 IsAlive = true;
                 IsHoldingItem = false;
+                interactLayerMask = LayerMask.GetMask("Item");
             }
 
             prevAlive = IsAlive;
@@ -86,12 +89,11 @@ namespace Network.Player
                 UpdateAnimation(input.move);
             }
 
-            if (Object.HasStateAuthority)
+            if (!Object.HasStateAuthority) return;
+
+            if (IsAlive)
             {
-                if (IsAlive)
-                {
-                    Move(input.move);
-                }
+                Move(input.move);
 
                 if (input.tryInteract)
                 {
@@ -140,12 +142,17 @@ namespace Network.Player
 
         private void TryInteract()
         {
+            Debug.Log("Trying to interact...");
             IInteractable target = FindNearestInteractable();
+            Debug.Log($"Nearest interactable: {target}");
 
             if (target == null) return;
+            Debug.Log($"Found interactable: {target}");
             if (!target.CanInteract(this)) return;
+            Debug.Log($"Can interact with: {target}");
 
             target.Interact(this);
+            Debug.Log($"Interacted with: {target}");
         }
 
         private IInteractable FindNearestInteractable()
@@ -159,10 +166,16 @@ namespace Network.Player
             {
                 if (hit.transform == transform) continue;
 
-                IInteractable interactable = hit.GetComponent<IInteractable>();
+                Debug.Log($"Hit: {hit.gameObject.name}");
+
+                IInteractable interactable = hit.GetComponentInParent<IInteractable>();
                 if (interactable == null) continue;
 
-                float sqrDistance = (interactable.Transform.position - transform.position).sqrMagnitude;
+                if (interactable.Transform == transform) continue;
+
+                float sqrDistance = 
+                    (interactable.Transform.position - transform.position).sqrMagnitude;
+
                 if (sqrDistance < minSqrDistance)
                 {
                     minSqrDistance = sqrDistance;
@@ -170,7 +183,22 @@ namespace Network.Player
                 }
             }
 
+            Debug.Log($"{nearest}");
             return nearest;
+        }
+
+        public void SetHoldingItem(ItemInteractable item)
+        {
+            if (!Object.HasStateAuthority) return;
+            holdingItem = item;
+            IsHoldingItem = true;
+        }
+        public void ClearHoldingItem(ItemInteractable item)
+        {
+            if (!Object.HasStateAuthority) return;
+            if (holdingItem != item) return;
+            holdingItem = null;
+            IsHoldingItem = false;
         }
 
         /// <summary>
@@ -206,6 +234,14 @@ namespace Network.Player
             if (!IsAlive) return;
 
             IsAlive = false;
+
+            if (holdingItem != null)
+            {
+                holdingItem.Release(this);
+                holdingItem = null;
+            }
+
+            IsHoldingItem = false;
         }
 
         public void Revive()

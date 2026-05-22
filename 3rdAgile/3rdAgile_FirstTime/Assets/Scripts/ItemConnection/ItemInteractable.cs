@@ -17,13 +17,13 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     public ItemDataStorage itemDataStorage;
 
     [SerializeField] private float followSpeed = 8.0f;
-    [SerializeField] private Vector3 carryOffset = new Vector3(0, 0.5f, 0);
+    [SerializeField] private Vector3 carryOffset = Vector3.zero;
 
     private bool isCarrying = false;
 
-    private void Awake()
+    public override void Spawned()
     {
-        Debug.Log("ItemInteractable Awake");
+        Debug.Log("ItemInteractable Spawned");
         itemDataStorage = GetComponent<ItemDataStorage>();
 
         // アイテムの必要人数を取得
@@ -62,6 +62,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         // プレイヤーを運び手リストに追加
         carriers.Add(player);
 
+        player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
 
         if (CanCarry())
@@ -82,7 +83,23 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     private void StartCarry()
     {
         isCarrying = true;
+
+        Vector3 center = GetCarriersCenter();
+        carryOffset = transform.position - center;
+
         Debug.Log("アイテムを運び始める");
+    }
+
+    private Vector3 GetCarriersCenter()
+    {
+        Vector3 center = Vector3.zero;
+        foreach (var carrier in carriers)
+        {
+            center += carrier.Transform.position;
+        }
+        center /= carriers.Count;
+
+        return center;
     }
 
     public override void FixedUpdateNetwork()
@@ -122,6 +139,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         if(!carriers.Contains(player)) return;
 
         carriers.Remove(player);
+        player.ClearHoldingItem(this);
 
         if (carriers.Count < RequiredPeople)
         {

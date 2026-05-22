@@ -95,7 +95,7 @@ namespace Network.Player
         {
             // ’·‰Ÿ‚µ¬—§ƒtƒ‰ƒO‚ğ—§‚Ä‚é
             holdCompleted = true;
-
+            Debug.Log("’·‰Ÿ‚µ“ü—Í‚ª¬—§‚µ‚Ü‚µ‚½");
         }
 
         /// <summary>
