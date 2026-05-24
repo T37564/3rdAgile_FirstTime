@@ -2,11 +2,12 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
+
 public class GuardianController : NetworkBehaviour
 {
     [SerializeField] private NavMeshAgent navMeshAgent;
 
-    private Transform players;
+    public Transform players;
 
     private void Start()
     {
@@ -25,6 +26,9 @@ public class GuardianController : NetworkBehaviour
         navMeshAgent.SetDestination(players.position);
     }
 
+    /// <summary>
+    /// プレイヤーの中で一番近いプレイヤーを追いかけるメソッド
+    /// </summary>
     private void FindNearestPlauer()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
