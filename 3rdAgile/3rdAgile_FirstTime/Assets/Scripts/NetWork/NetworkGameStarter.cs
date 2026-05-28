@@ -228,7 +228,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
     /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
+    {
+        Debug.Log("ルーム生成完全完了");
+    }
 
     /// <summary>
     /// プレイヤーがセッションから離脱した時に自動で呼ばれるコールバック。
