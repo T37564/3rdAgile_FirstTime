@@ -13,11 +13,8 @@ GameObject:
   - component: {fileID: 5623862541680664465}
   - component: {fileID: 2289765937748641168}
   - component: {fileID: 801435640108941138}
-  - component: {fileID: 1724417950432964472}
-  - component: {fileID: 4930447065291460364}
+  - component: {fileID: 577375914382016332}
   - component: {fileID: 5144837309392015295}
-  - component: {fileID: 5492422984110217760}
-  - component: {fileID: 8970258298669122756}
   m_Layer: 0
   m_Name: Guardian
   m_TagString: Untagged
@@ -134,20 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GuardianController
   navMeshAgent: {fileID: 5144837309392015295}
   players: {fileID: 0}
---- !u!114 &1724417950432964472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3966210800863259364}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e43a067f242e3544d9bc5c44804ee467, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LoiteringArea
-  navMeshAgent: {fileID: 5144837309392015295}
---- !u!114 &4930447065291460364
+--- !u!114 &577375914382016332
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,41 +170,3 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &5492422984110217760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3966210800863259364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 670062247
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 801435640108941138}
-  - {fileID: 4930447065291460364}
-  - {fileID: 8970258298669122756}
-  ForceRemoteRenderTimeframe: 0
---- !u!114 &8970258298669122756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3966210800863259364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
