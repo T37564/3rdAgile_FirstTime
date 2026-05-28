@@ -17,7 +17,7 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] Transform[] spawnTransform;
 
-    [SerializeField] private NetworkRunner runner;
+    //[SerializeField] private NetworkRunner runner;
 
     //private void Start()
     //{
@@ -27,14 +27,14 @@ public class EnemySpawner : MonoBehaviour
     //    GenerateEnemy();
     //}
 
-    private IEnumerator Start()
+    private void Start()
     {
         // Runnerが起動するまで待機
-        yield return new WaitUntil(() => runner.IsRunning);
+        //yield return new WaitUntil(() => runner.IsRunning);
 
         Debug.Log("Runner Start");
         // Host/Serverだけ生成
-        if (!runner.IsServer) yield break;
+        //if (!runner.IsServer) yield break;
 
         GenerateEnemy();
     }
@@ -43,14 +43,13 @@ public class EnemySpawner : MonoBehaviour
 
     private void GenerateEnemy()
     {
-        Debug.Log(runner);
         Debug.Log(generateEnemys[0].enemyObject);
         Debug.Log(spawnTransform.Length);
 
         for (int i = 0; i < generateCount; i++)
         {
             Debug.Log(spawnTransform[i]);
-            runner.Spawn(generateEnemys[i].enemyObject, 
+            Instantiate(generateEnemys[i].enemyObject, 
                 spawnTransform[i].position, spawnTransform[i].rotation);
         }
     }

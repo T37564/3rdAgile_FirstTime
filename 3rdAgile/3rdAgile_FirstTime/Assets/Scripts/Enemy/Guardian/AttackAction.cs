@@ -11,7 +11,7 @@ public enum EnemyState
     attack,//攻撃中
     moveCoolDown // 敵が攻撃後の硬直状態
 }
-public class AttackAction : NetworkBehaviour
+public class AttackAction : MonoBehaviour
 {
     [SerializeField] private GuardianController guardianController;
 
@@ -26,41 +26,43 @@ public class AttackAction : NetworkBehaviour
     [Header("攻撃後硬直")]
     [SerializeField] private float cooldownTime = 0.0f;
 
+    private float timer = 0.0f;
+
     private EnemyState enemyState;
 
-    [Networked] private TickTimer attackTimer { get; set; }
+    //[Networked] private TickTimer attackTimer { get; set; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public override void Spawned()
+    private void Start()
     {
-        attackTimer = TickTimer.CreateFromSeconds(Runner, 5.0f);
+        enemyState = EnemyState.move;
     }
 
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
-        Debug.Log(attackTimer);
-        if (attackTimer.Expired(Runner))
-        {
-            enemyState = EnemyState.attack;
-        }
-        //switch (enemyState)
+        //Debug.Log(attackTimer);
+        //if (attackTimer.Expired(Runner))
         //{
-        //    case EnemyState.move:
-        //        MoveState();
-        //        break;
-
-        //    case EnemyState.attackReady:
-        //        AttackReadyState();
-        //        break;
-
-        //    case EnemyState.attack:
-        //        AttackState();
-        //        break;
-
-        //    case EnemyState.moveCoolDown:
-        //        CooldownState();
-        //        break;
+        //    enemyState = EnemyState.attack;
         //}
+        switch (enemyState)
+        {
+            case EnemyState.move:
+                MoveState();
+                break;
+
+            case EnemyState.attackReady:
+                AttackReadyState();
+                break;
+
+            case EnemyState.attack:
+                AttackState();
+                break;
+
+            case EnemyState.moveCoolDown:
+                CooldownState();
+                break;
+        }
     }
 
     private void MoveState()
@@ -73,26 +75,29 @@ public class AttackAction : NetworkBehaviour
         float distance =
         Vector3.Distance(transform.position, guardianController.players.position);
 
+        Debug.Log("距離: " + distance);
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (distance <= attackDistance)
         {
+            Debug.Log("攻撃準備");
             enemyState = EnemyState.attackReady;
-            attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
+            timer = attackReadyTime;
+            navMeshAgent.isStopped = true;
         }
-        navMeshAgent.isStopped = true;
+        
     }
 
     private void AttackReadyState()
     {
-        attackTimer = TickTimer.CreateFromSeconds(Runner, 5.0f);
+        timer -= Time.deltaTime;
 
         transform.LookAt(guardianController.players);
 
         // 予備動作時間が経過したら攻撃状態に移行
-        if (attackTimer.Expired(Runner))
+        if (timer <= 0)
         {
             enemyState = EnemyState.attack;
-            attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
+            //attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
         }
     }
 
@@ -100,18 +105,27 @@ public class AttackAction : NetworkBehaviour
     {
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
-        if (attackTimer.Expired(Runner))
-        {
-            enemyState = EnemyState.moveCoolDown;
-            attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
-        }
+        //if (attackTimer.Expired(Runner))
+        //{
+        //    enemyState = EnemyState.moveCoolDown;
+        //    attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
+        //}
+        //Debug.Log("攻撃");
+        enemyState = EnemyState.moveCoolDown;
+        timer = cooldownTime;
     }
 
     private void CooldownState()
     {
         // クールダウンの実装
         // クールダウンが完了したら移動状態に移行
-        if (attackTimer.Expired(Runner))
+        //if (attackTimer.Expired(Runner))
+        //{
+        //    enemyState = EnemyState.move;
+        //}
+
+        //Debug.Log("攻撃終了クールダウン");
+        if (timer <= 0)
         {
             enemyState = EnemyState.move;
         }
