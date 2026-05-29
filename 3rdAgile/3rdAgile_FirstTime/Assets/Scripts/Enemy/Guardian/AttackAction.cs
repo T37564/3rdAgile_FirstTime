@@ -75,7 +75,7 @@ public class AttackAction : MonoBehaviour
         float distance =
         Vector3.Distance(transform.position, guardianController.players.position);
 
-        Debug.Log("距離: " + distance);
+        //Debug.Log("距離: " + distance);
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (distance <= attackDistance)
         {
@@ -90,7 +90,7 @@ public class AttackAction : MonoBehaviour
     private void AttackReadyState()
     {
         timer -= Time.deltaTime;
-
+        Debug.Log("攻撃予備動作: " + timer);
         transform.LookAt(guardianController.players);
 
         // 予備動作時間が経過したら攻撃状態に移行
@@ -110,7 +110,7 @@ public class AttackAction : MonoBehaviour
         //    enemyState = EnemyState.moveCoolDown;
         //    attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
         //}
-        //Debug.Log("攻撃");
+        Debug.Log("攻撃");
         enemyState = EnemyState.moveCoolDown;
         timer = cooldownTime;
     }
@@ -124,7 +124,7 @@ public class AttackAction : MonoBehaviour
         //    enemyState = EnemyState.move;
         //}
 
-        //Debug.Log("攻撃終了クールダウン");
+        Debug.Log("攻撃終了クールダウン");
         if (timer <= 0)
         {
             enemyState = EnemyState.move;
