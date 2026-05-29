@@ -59,6 +59,9 @@ namespace Network.Player
 
             playerInput.actions["ItemPicked"].performed += OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled += OnInteractCanceled;
+
+            playerInput.actions["ItemDroped"].performed += OnItemDropedPerformed;
+            playerInput.actions["ItemDroped"].canceled += OnItemDropedCanceled;
         }
 
         /// <summary>
@@ -73,6 +76,9 @@ namespace Network.Player
 
             playerInput.actions["ItemPicked"].performed -= OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled -= OnInteractCanceled;
+
+            playerInput.actions["ItemDroped"].performed -= OnItemDropedPerformed;
+            playerInput.actions["ItemDroped"].canceled -= OnItemDropedCanceled;
         }
         #endregion
 
@@ -129,7 +135,7 @@ namespace Network.Player
         public void OnItemDropedCanceled(InputAction.CallbackContext context)
         {
             if (!holdCompleted) return;
-            picked = false;
+            interactTriggered = false;
             holdCompleted = false;
         }
         #endregion
