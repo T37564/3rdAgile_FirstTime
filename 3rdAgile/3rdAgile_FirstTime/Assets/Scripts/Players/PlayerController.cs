@@ -9,6 +9,9 @@ namespace Network.Player
         void TakeDamage();
     }
 
+    /// <summary>
+    /// プレイヤーの移動、アイテムの持ち運び、ダメージ処理、インタラクト処理を担当するクラス
+    /// </summary>
     [RequireComponent(typeof(PlayerInputHandler))]
     public class PlayerController : NetworkBehaviour, IDamage, IInteractable
     {
@@ -29,6 +32,9 @@ namespace Network.Player
 
         [Header("インタラクト対象レイヤー")]
         [SerializeField] private LayerMask interactLayerMask;
+
+        [Header("アイテムを持っているときの最大距離")]
+        [SerializeField] private float maxCarryDistance = 2.0f;
 
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
@@ -65,10 +71,12 @@ namespace Network.Player
         /// </summary>
         public override void Spawned()
         {
+            // ローカルプレイヤーだけがPlayerInputHandlerを持つことになる
             inputHandler = GetComponent<PlayerInputHandler>();
 
             if (Object.HasInputAuthority)
             {
+                // ローカルプレイヤーのPlayerInputHandlerをPlayerInputGetterに登録
                 PlayerInputGetter inputGetter = FindAnyObjectByType<PlayerInputGetter>();
                 if (inputGetter != null)
                 {
@@ -94,6 +102,7 @@ namespace Network.Player
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            // 入力を取得
             if (!GetInput<PlayerInputData>(out var input))
                 return;
 
@@ -104,10 +113,13 @@ namespace Network.Player
 
             if (!Object.HasStateAuthority) return;
 
+            // 死亡中は移動やインタラクトを受け付けない
             if (IsAlive)
             {
+                // 移動処理
                 Move(input.move);
 
+                // インタラクト処理
                 if (input.tryInteract)
                 {
                     TryInteract();
@@ -143,55 +155,104 @@ namespace Network.Player
                 move.Normalize();
             }
 
-            // 移動
-            transform.position += move * moveSpeed * Runner.DeltaTime;
+            // アイテムの所持状態に応じて移動速度を変更
+            float speed = IsHoldingItem ? maxCarryDistance : moveSpeed;
 
-            // 入力があるときだけ回転
-            if (move.sqrMagnitude > 0.01f)
+            // 移動量を計算
+            Vector3 nextPosition = transform.position + move * speed * Runner.DeltaTime;
+
+            // アイテムを持っているときは、アイテムとの距離がmaxCarryDistanceを超えないように制限
+            if (IsHoldingItem && holdingItem != null)
             {
-                // アイテムを持っているときはアイテムの方向に回転
-                if (IsHoldingItem)
+                // アイテムの位置を取得
+                Vector3 itemPosition = holdingItem.Transform.position;
+
+                // プレイヤーとアイテムの距離を計算
+                Vector3 diff = nextPosition - itemPosition;
+                diff.y = 0f; // 水平方向のみに制限
+
+                // 距離がmaxCarryDistanceを超える場合は、距離をmaxCarryDistanceに制限
+                if (diff.magnitude > maxCarryDistance)
                 {
-                    // プレイヤーの回転をアイテムの方向に固定
-                    Vector3 direction = (holdingItem.Transform.position - transform.position);
-                    direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
-
-                    if (direction.sqrMagnitude > 0.01f)
-                    {
-                        currentAngle = Quaternion.LookRotation(direction);
-
-                        transform.rotation = currentAngle;
-                    }
+                    // 距離をmaxCarryDistanceに制限した位置を計算
+                    diff = diff.normalized * maxCarryDistance;
+                    // プレイヤーの次の位置を、アイテムからmaxCarryDistanceの位置に修正
+                    nextPosition = itemPosition + diff;
+                    // Y座標は変えない
+                    nextPosition.y = transform.position.y;
                 }
-                // アイテムを持っていないときは移動方向に回転
-                else
-                {
-                    float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+                // プレイヤーの回転をアイテムの方向に固定
+                Vector3 direction = (holdingItem.Transform.position - transform.position);
+                direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
 
-                    currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
+                // 入力があるときだけ回転
+                if (direction.sqrMagnitude > 0.01f)
+                {
+                    // アイテムの方向に回転
+                    currentAngle = Quaternion.LookRotation(direction);
 
                     transform.rotation = currentAngle;
                 }
             }
+            // アイテムを持っていないときは移動方向に回転
+            else
+            {
+                float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+
+                currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
+
+                transform.rotation = currentAngle;
+            }
+
+            // プレイヤーの位置を更新
+            transform.position = nextPosition;
+
+            //// 入力があるときだけ回転
+            //if (move.sqrMagnitude > 0.01f)
+            //{
+            //    // アイテムを持っているときはアイテムの方向に回転
+            //    if (IsHoldingItem)
+            //    {
+            //        // プレイヤーの回転をアイテムの方向に固定
+            //        Vector3 direction = (holdingItem.Transform.position - transform.position);
+            //        direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
+
+            //        if (direction.sqrMagnitude > 0.01f)
+            //        {
+            //            currentAngle = Quaternion.LookRotation(direction);
+
+            //            transform.rotation = currentAngle;
+            //        }
+            //    }
+            //    // アイテムを持っていないときは移動方向に回転
+            //    else
+            //    {
+            //        float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+
+            //        currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
+
+            //        transform.rotation = currentAngle;
+            //    }
+            //}
 
 
             // アニメーション制御
             UpdateAnimation(moveInput);
         }
 
+        /// <summary>
+        /// インタラクト処理
+        /// </summary>
         private void TryInteract()
         {
-            Debug.Log("Trying to interact...");
+            // プレイヤーの周囲にあるインタラクト可能なオブジェクトを探す
             IInteractable target = FindNearestInteractable();
-            Debug.Log($"Nearest interactable: {target}");
 
+            // インタラクト可能なオブジェクトが見つかった場合は、インタラクト処理を実行
             if (target == null) return;
-            Debug.Log($"Found interactable: {target}");
             if (!target.CanInteract(this)) return;
-            Debug.Log($"Can interact with: {target}");
 
             target.Interact(this);
-            Debug.Log($"Interacted with: {target}");
         }
 
         private IInteractable FindNearestInteractable()
@@ -205,7 +266,6 @@ namespace Network.Player
             {
                 if (hit.transform == transform) continue;
 
-                Debug.Log($"Hit: {hit.gameObject.name}");
 
                 IInteractable interactable = hit.GetComponentInParent<IInteractable>();
                 if (interactable == null) continue;
@@ -222,7 +282,6 @@ namespace Network.Player
                 }
             }
 
-            Debug.Log($"{nearest}");
             return nearest;
         }
 
