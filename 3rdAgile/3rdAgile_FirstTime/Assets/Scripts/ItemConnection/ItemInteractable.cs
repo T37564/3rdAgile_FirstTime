@@ -23,13 +23,13 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
     public override void Spawned()
     {
-        Debug.Log("ItemInteractable Spawned");
+        //Debug.Log("ItemInteractable Spawned");
         itemDataStorage = GetComponent<ItemDataStorage>();
 
         // アイテムの必要人数を取得
         // 必要人数の情報が書かれていなかった場合の保険として1人に設定する（無くてもいい）
         RequiredPeople = itemDataStorage.itemData.GetInt("RequiredPeople", 1);
-        Debug.Log("必要人数: " + RequiredPeople);
+        //Debug.Log("必要人数: " + RequiredPeople);
     }
 
     public bool CanInteract(PlayerController player)

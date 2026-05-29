@@ -4854,6 +4854,7 @@ GameObject:
   - component: {fileID: 2142278982236377383}
   - component: {fileID: -5405382398450028345}
   - component: {fileID: 2503834546525113366}
+  - component: {fileID: 2812675938977088477}
   m_Layer: 6
   m_Name: ExpensivePot
   m_TagString: Untagged
@@ -5070,3 +5071,20 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &2812675938977088477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c420175ba4e496840bf321ce9dbfc794, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemGroundChecker
+  deliveryOfMaterialsArea:
+    serializedVersion: 2
+    m_Bits: 128
+  rayLength: 1
+  boxSize: {x: 1, y: 1, z: 1}
