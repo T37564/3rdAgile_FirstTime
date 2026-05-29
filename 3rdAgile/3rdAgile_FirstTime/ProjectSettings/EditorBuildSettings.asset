@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestScenes/ModelAnimationTest.unity
     guid: fd167b6fad9f08545b8489c748cd5082
+  - enabled: 1
+    path: Assets/Scenes/MainScenes/MainTitleScenes.unity
+    guid: b58d0e79bf9ec9f41a2886d45029cd0b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

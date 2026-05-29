@@ -8,10 +8,13 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
 {
+    private LobbyUI lobbyUI = null;
+
     #region Player
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -39,12 +42,26 @@ public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary>
     /// ルームに参加しているプレイヤーテキストの人数を更新する処理
     /// </summary>
-    private void UpdateCount(NetworkRunner runner)
+    public void UpdateCount(NetworkRunner runner)
     {
         // 現在参加しているプレイヤー数を取得
         int count = runner.ActivePlayers.Count();
 
         // プレイヤー人数表示を更新
+        lobbyUI.playerCount.text = $"参加人数：{count}/4";
+    }
+
+    public void DisplayPINNumber(NetworkRunner runner, LobbyUI lobbyUI)
+    {
+        this.lobbyUI = lobbyUI;
+
+        if (runner.IsServer)
+        {
+            // ルームの暗証番号を表示
+            lobbyUI.roomPIN.text = $"ルーム暗証番号：{runner.SessionInfo.Name}";
+        }
+
+        UpdateCount(runner);
     }
 
     #region Input

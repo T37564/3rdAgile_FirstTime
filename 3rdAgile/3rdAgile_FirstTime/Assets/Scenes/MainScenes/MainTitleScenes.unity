@@ -479,6 +479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkGameStarter
   networkRunner: {fileID: 0}
+  networkLobbyUI: {fileID: 0}
 --- !u!4 &1027388666
 Transform:
   m_ObjectHideFlags: 0

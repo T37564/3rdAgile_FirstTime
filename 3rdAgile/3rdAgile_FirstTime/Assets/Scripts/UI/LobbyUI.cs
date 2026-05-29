@@ -12,7 +12,17 @@ public class LobbyUI : MonoBehaviour
     [Header("タイトルボタン参照用")]
     [SerializeField] private TitleButtonController titleButtonController = null;
 
+
+
+
     private Button gameStartButton = null;
+
+    public Label playerCount = null;
+
+    public Label roomPIN = null;
+
+    private NetworkGameStarter networkGameStarter = null;
+
 
     private void OnEnable()
     {
@@ -23,9 +33,15 @@ public class LobbyUI : MonoBehaviour
         VisualElement root = uiDocument.rootVisualElement;
 
         gameStartButton = root.Q<Button>("StartButton");
+        playerCount = root.Q<Label>("CountText");
+        roomPIN = root.Q<Label>("PINText");
 
         // イベント登録
         gameStartButton.clicked += titleButtonController.ClickStartButton;
+
+        networkGameStarter = NetworkGameStarter.Instance;
+
+        networkGameStarter.networkLobbyUI.DisplayPINNumber(networkGameStarter.networkRunner, this);
     }
 
     /// <summary>
