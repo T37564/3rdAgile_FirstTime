@@ -36,6 +36,7 @@ public class DeliveryLocation : NetworkBehaviour
     private void Awake()
     {
         tag = TagName.DELIVERY_BOX;
+        layerMask = LayerMask.GetMask("Item");
     }
 
     public override void FixedUpdateNetwork()
