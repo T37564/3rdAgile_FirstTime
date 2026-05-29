@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// プレイヤー参加人数などのロビーUIを更新するクラス
+// ロビーのプレイヤー人数表示を更新するためのコールバック実装クラス
 // NetworkUIChange.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -45,7 +45,6 @@ public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
         int count = runner.ActivePlayers.Count();
 
         // プレイヤー人数表示を更新
-        TitleCanvasDisplaySettings.Instance.playerCountDisplayText.text = $"Player : {count} / 4 ";
     }
 
     #region Input

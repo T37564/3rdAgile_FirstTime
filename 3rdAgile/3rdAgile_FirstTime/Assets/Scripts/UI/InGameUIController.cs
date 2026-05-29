@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class UIController : MonoBehaviour
+public class InGameUIController : MonoBehaviour
 {
+    [Header("スコアを表示するクラス")]
     [SerializeField] private ScoreUI scoreUI = null;
 
     /// <summary>

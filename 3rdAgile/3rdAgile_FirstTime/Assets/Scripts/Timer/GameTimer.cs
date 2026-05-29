@@ -88,7 +88,7 @@ public class GameTimer : NetworkBehaviour
         {
             CurrentPhase = GamePhase.Finished;
 
-            UIController uiController = FindAnyObjectByType<UIController>();
+            InGameUIController uiController = FindAnyObjectByType<InGameUIController>();
 
             if (uiController != null)
             {
