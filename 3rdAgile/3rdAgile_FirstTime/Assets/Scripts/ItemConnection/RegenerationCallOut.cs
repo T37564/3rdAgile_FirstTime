@@ -30,15 +30,15 @@ public class RegenerationCallOut : NetworkBehaviour
         {
             return;
         }
+        
 
         //アイテムのY座標が一定以下でなおかつ地面についていないとき
-        if(transform.position.y <= -10 && !IsGround())
+        if (transform.position.y <= -10 && !IsGround())
         {
             if (isGenerateRequest) return;
-
             isGenerateRequest = true;
-            //Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
-
+            
+            Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
             //RegenerationCallOutクラスにイベントを通知する
             //？があることで登録されているメソッドが無ければ呼び出さないようにする
             OnNeedRegenerate?.Invoke(this);
