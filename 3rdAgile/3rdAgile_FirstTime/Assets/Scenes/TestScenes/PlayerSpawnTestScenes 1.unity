@@ -768,7 +768,7 @@ GameObject:
   - component: {fileID: 855676015}
   - component: {fileID: 855676014}
   - component: {fileID: 855676013}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1307,7 +1307,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1818772957934936320, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.06
+      value: 18.2
       objectReference: {fileID: 0}
     - target: {fileID: 1818772957934936320, guid: 7980e79bce4326b44848c7f9e0b4bc85, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1461,6 +1461,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1463889637}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1820058534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1820058535}
+  - component: {fileID: 1820058536}
+  m_Layer: 0
+  m_Name: MoneyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1820058535
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820058534}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.88959, y: 1, z: -38.38416}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1820058536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820058534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f580ecb5987d5c347ac9240894473e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoneyManager
+  currentMoney: 0
 --- !u!1 &1822162573
 GameObject:
   m_ObjectHideFlags: 0
@@ -1627,3 +1672,4 @@ SceneRoots:
   - {fileID: 29091127}
   - {fileID: 274029345}
   - {fileID: 1440365097}
+  - {fileID: 1820058535}

@@ -12,7 +12,7 @@ public enum RandomDataType
 /// </summary>
 public class ItemDataStorage : NetworkBehaviour
 {
-    [SerializeField] private SampleMasterData sampleMasterData;
+    [SerializeField] public SampleMasterData sampleMasterData;
 
     [Header("スポーン時に設定するデータをランダムに決めるかを判断するフラグ")]
     public bool useRandomData = false;

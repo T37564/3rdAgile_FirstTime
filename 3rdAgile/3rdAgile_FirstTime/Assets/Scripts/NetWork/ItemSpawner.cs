@@ -84,15 +84,16 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             // ネットワークを使ったアイテム生成
             runner.Spawn(prefab, randomPosition, Quaternion.identity,
                 null,
-                (runner, prefab) =>
+                (runner, spawnedObject) =>
                 {
-                    SetupItem(prefab);
+                    SetupItem(spawnedObject);
 
-                    RegenerationCallOut regenerationCallOut = prefab.GetComponent<RegenerationCallOut>();
+                    RegenerationCallOut regenerationCallOut = spawnedObject.GetComponent<RegenerationCallOut>();
 
                     // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                     if (regenerationCallOut != null)
                     {
+                        Debug.Log("再配置を要求");
                         regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
                     }
                 });
@@ -105,7 +106,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void HandleNeedRegenerate(RegenerationCallOut regen)
     {
-        Debug.Log("再配置要求を受信");
         if (!regen.Object.HasStateAuthority)
             return;
 
@@ -114,12 +114,26 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         // 生成する際のランダムな位置を取得
         Vector3 newPos = itemObjectPlace.GetRandomPosition();
+        Debug.Log(itemObjectPlace);
+
+        Rigidbody rigidbody = regen.GetComponent<Rigidbody>();
+
+        // rigidbodyを使って違う座標に再配置する
+        if (rigidbody != null)
+        {
+            rigidbody.linearVelocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+
+            rigidbody.position = newPos;
+        }
 
         //regen.Object.transform.position = newPos;
-        regen.RegeneratePosition(newPos);
+        //regen.RegeneratePosition(newPos);
+        //regen.gameObject.SetActive(false);
 
         // アイテムの位置を新しいランダムな位置に変更する
         //obj.transform.position = newPos;
+        //obj.gameObject.SetActive(false);
         
         // 再配置要求フラグをリセット
         regen.isGenerateRequest = false;
@@ -179,6 +193,15 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             runner.Spawn(prefab, generatePosition, Quaternion.identity, null, (runner, obj) =>
             {
                 SetupItem(obj);
+
+                RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
+
+                // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
+                if (regenerationCallOut != null)
+                {
+                    Debug.Log("再配置を要求");
+                    regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
+                }
             });
         }
     }

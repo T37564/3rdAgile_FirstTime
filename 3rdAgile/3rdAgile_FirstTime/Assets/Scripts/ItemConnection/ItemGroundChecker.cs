@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ItemGroundChecker : MonoBehaviour
@@ -8,12 +9,24 @@ public class ItemGroundChecker : MonoBehaviour
 
     [SerializeField] private Vector3 boxSize = new Vector3(1.0f, 1.0f, 1.0f);
 
-    
+    public static Action<int> OnGroundedStateChanged;
+
+    private ItemDataStorage itemDataStorage;
+
+    private void Start()
+    {
+        itemDataStorage = GetComponent<ItemDataStorage>();
+    }
+
     private void Update()
     {
         if(IsFullyGrounded())
         {
             Debug.Log("アイテムが完全に納品エリアに接地しています。");
+
+            OnGroundedStateChanged?.Invoke(itemDataStorage.sampleMasterData.GetInt("Amount"));
+            Debug.Log("アイテムのAmount: " + itemDataStorage.sampleMasterData.GetInt("Amount"));
+            gameObject.SetActive(false);
         }
     }
 
