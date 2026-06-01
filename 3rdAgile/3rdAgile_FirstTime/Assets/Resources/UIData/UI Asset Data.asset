@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec125b2fe66a4024eb58dd666875b5ec, type: 3}
+  m_Name: UI Asset Data
+  m_EditorClassIdentifier: Assembly-CSharp::UIAssetData
+  titleUI: {fileID: 9197481963319205126, guid: 28fbfccb685e4624f9afbcd1a28e7e4e, type: 3}
+  VirtualKeyboardUI: {fileID: 9197481963319205126, guid: 8c1bfbb637d3f894a8960ba08e3064f5, type: 3}
+  lobbyUI: {fileID: 9197481963319205126, guid: 77ec3db0736112d468bf43b8d60a6a88, type: 3}
+  mainGameScenesUI: {fileID: 9197481963319205126, guid: 45461275c660147489f9ac10634ff2ce, type: 3}
+  scoreUI: {fileID: 9197481963319205126, guid: 3fc1ff9bba4eeb5409ab06a8c01edbd7, type: 3}

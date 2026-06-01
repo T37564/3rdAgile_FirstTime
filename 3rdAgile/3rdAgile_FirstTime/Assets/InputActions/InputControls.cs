@@ -414,6 +414,15 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""d5e1bbdd-4a5e-46d3-944d-a2c6e8fe4b47"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -823,6 +832,28 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""action"": ""NumberAssignment"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""50427b61-058a-4098-9c2e-9d2fdea17a22"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f27fb5a2-42b6-4cad-910f-61517f634116"",
+                    ""path"": ""<Pen>/tip"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -846,6 +877,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         m_UI_NumberUI = m_UI.FindAction("NumberUI", throwIfNotFound: true);
         m_UI_MoveSelectNumber = m_UI.FindAction("MoveSelectNumber", throwIfNotFound: true);
         m_UI_NumberAssignment = m_UI.FindAction("NumberAssignment", throwIfNotFound: true);
+        m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
     }
 
     ~@InputControls()
@@ -1095,6 +1127,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_NumberUI;
     private readonly InputAction m_UI_MoveSelectNumber;
     private readonly InputAction m_UI_NumberAssignment;
+    private readonly InputAction m_UI_Click;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1130,6 +1163,10 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/NumberAssignment".
         /// </summary>
         public InputAction @NumberAssignment => m_Wrapper.m_UI_NumberAssignment;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/Click".
+        /// </summary>
+        public InputAction @Click => m_Wrapper.m_UI_Click;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1174,6 +1211,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @NumberAssignment.started += instance.OnNumberAssignment;
             @NumberAssignment.performed += instance.OnNumberAssignment;
             @NumberAssignment.canceled += instance.OnNumberAssignment;
+            @Click.started += instance.OnClick;
+            @Click.performed += instance.OnClick;
+            @Click.canceled += instance.OnClick;
         }
 
         /// <summary>
@@ -1203,6 +1243,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @NumberAssignment.started -= instance.OnNumberAssignment;
             @NumberAssignment.performed -= instance.OnNumberAssignment;
             @NumberAssignment.canceled -= instance.OnNumberAssignment;
+            @Click.started -= instance.OnClick;
+            @Click.performed -= instance.OnClick;
+            @Click.canceled -= instance.OnClick;
         }
 
         /// <summary>
@@ -1342,5 +1385,12 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnNumberAssignment(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Click" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnClick(InputAction.CallbackContext context);
     }
 }

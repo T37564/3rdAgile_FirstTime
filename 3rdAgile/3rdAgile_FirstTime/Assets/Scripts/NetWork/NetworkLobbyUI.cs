@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// プレイヤー参加人数などのロビーUIを更新するクラス
+// ロビーのプレイヤー人数表示を更新するためのコールバック実装クラス
 // NetworkUIChange.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -9,9 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
 {
+    // LobbyUIクラスの参照用変数 
+    private LobbyUI lobbyUI = null;
+
     #region Player
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -39,13 +43,31 @@ public class NetworkUIChange : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary>
     /// ルームに参加しているプレイヤーテキストの人数を更新する処理
     /// </summary>
-    private void UpdateCount(NetworkRunner runner)
+    public void UpdateCount(NetworkRunner runner)
     {
         // 現在参加しているプレイヤー数を取得
         int count = runner.ActivePlayers.Count();
 
         // プレイヤー人数表示を更新
-        TitleCanvasDisplaySettings.Instance.playerCountDisplayText.text = $"Player : {count} / 4 ";
+        lobbyUI.playerCount.text = $"参加人数：{count}/4";
+    }
+
+    /// <summary>
+    /// ホスト側のみ必要なUI(PIN, ゲーム開始ボタン)を表示するための処理
+    /// </summary>
+    public void DisplayHostUI(NetworkRunner runner, LobbyUI lobbyUI)
+    {
+        this.lobbyUI = lobbyUI;
+
+        if (runner.IsServer)
+        {
+            // ルームの暗証番号を表示
+            lobbyUI.roomPIN.text = $"ルーム暗証番号：{runner.SessionInfo.Name}";
+
+            lobbyUI.gameStartButton.style.display = DisplayStyle.Flex;
+        }
+
+        UpdateCount(runner);
     }
 
     #region Input

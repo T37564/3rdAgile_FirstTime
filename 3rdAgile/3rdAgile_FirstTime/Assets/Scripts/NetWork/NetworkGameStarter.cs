@@ -7,6 +7,7 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,128 +22,212 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     // NetworkRunner をアタッチするためのオブジェクト
     private GameObject networkRunnerObject = null;
 
+    private System.Random random = new System.Random();
+
+    public NetworkLobbyUI networkLobbyUI = null;
+
+    // ランキング時に使用するチーム名
+    public string TeamName { get; private set; } = "";
+
+    // ルーム暗証番号
+    public string PIN { get; private set; } = "";
+
+    public static NetworkGameStarter Instance
+    {
+        get;
+        private set;
+    }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     /// <summary>
     /// ホストとしてルームを作成する
     /// async をつけているので、ネットワーク処理の完了を待ってもゲームが止まらない
     /// </summary>
     public async void CreateHostRoom(string sessionName)
     {
+        // チーム名を保存
+        TeamName = sessionName;
+
         // ローディング画面を表示
-        TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(true);
+        UIReferences.Instance.LoadingUI.SetActive(true);
 
         SetupNetworkRunner();
 
-        // Photon Cloudへ接続し、Hostとしてルームを作成する
-        await networkRunner.StartGame(new StartGameArgs()
+        // ルーム暗証番号が被る可能性があるため、成功するまでループして再生成する
+        while (true)
         {
-            // Hostモードでルームを作成する
-            GameMode = GameMode.Host,
-            // ルーム名
-            SessionName = sessionName,
-            // 最大マッチング人数
-            PlayerCount = MAX_PLAYER_COUNT,
-            // Fusionのシーン同期・シーン移動管理に使用
-            SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
-        });
+            // 仮部屋番号を生成
+            string pin = RandomPIN();
 
-        // タイトルUIを閉じ、ロビーUIを表示する
-        TitleCanvasDisplaySettings.Instance.titleCanvas.SetActive(false);
-        TitleCanvasDisplaySettings.Instance.lobbyCanvas.SetActive(true);
-        TitleCanvasDisplaySettings.Instance.gameStartButton.SetActive(true);
+            // Photon Cloudへ接続し、Hostとしてルームを作成する
+            var result = await networkRunner.StartGame(new StartGameArgs()
+            {
+                // Hostモードでルームを作成する
+                GameMode = GameMode.Host,
+                // ルーム暗証番号
+                SessionName = pin,
+                // 最大マッチング人数
+                PlayerCount = MAX_PLAYER_COUNT,
+                // Fusionのシーン同期・シーン移動管理に使用
+                SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
+            });
 
-        Debug.Log("ホスト側接続完了");
+
+            // 成功したらループを抜ける
+            if (result.Ok)
+            {
+                // ローディング画面を非表示
+                UIReferences.Instance.LoadingUI.SetActive(false);
+                // ロビーUIを表示
+                UIReferences.Instance.LobbyUI.SetActive(true);
+
+                Debug.Log("ホスト側接続完了");
+
+                // 正式に部屋番号を記録する
+                PIN = pin;
+
+                break;
+            }
+
+            // PIN被り
+            if (result.ShutdownReason == ShutdownReason.GameIdAlreadyExists)
+            {
+                Debug.Log("PINが被ったため再生成");
+            }
+            else
+            {
+                Debug.Log($"別の原因で失敗 : {result.ShutdownReason}");
+                return;
+            }
+        }
+
+
+    }
+
+    /// <summary>
+    /// ランダムな6桁の暗証番号を生成する
+    /// </summary>
+    private string RandomPIN()
+    {
+        // 6桁のランダムな数字を生成
+        return random.Next(100000, 999999).ToString();
     }
 
 
     /// <summary>
     /// ルームへ参加する処理（クライアント）
     /// </summary>
-    public async void JoinHostRoom(string sessionName)
+    public async void JoinHostRoom(string pin)
     {
         // ローディング画面を表示
-        TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(true);
+        UIReferences.Instance.LoadingUI.SetActive(true);
 
         // 例外が発生する可能性のある処理
         try
         {
-            SetupNetworkRunner();
+            bool success = false;
 
-            // Photon Cloudへ接続し、Clientとしてルームに入る
-            var result = await networkRunner.StartGame(new StartGameArgs()
-            {
-                // Clientとしてルームに入る
-                GameMode = GameMode.Client,
-                // セッションルーム名
-                SessionName = sessionName,
-                // 指定したルームが存在しない場合、自動作成しない
-                EnableClientSessionCreation = false,
-                // Fusionのシーン同期・シーン移動管理に使用
-                SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
-            });
+            StartGameResult result = default;
 
-            if (result.Ok)
+            for (int i = 0; i < 5; i++)
             {
-                // 表示するキャンバスの変更
-                TitleCanvasDisplaySettings.Instance.titleCanvas.SetActive(false);
-                TitleCanvasDisplaySettings.Instance.lobbyCanvas.SetActive(true);
+                SetupNetworkRunner();
+
+                result = await networkRunner.StartGame(
+                    new StartGameArgs()
+                    {
+                        GameMode = GameMode.Client,
+
+                        SessionName = pin.Trim(),
+
+                        EnableClientSessionCreation = false,
+
+                        SceneManager =
+                            networkRunnerObject
+                            .AddComponent<NetworkSceneManagerDefault>()
+                    });
+
+                // 接続成功
+                if (result.Ok)
+                {
+                    success = true;
+
+                    break;
+                }
+
+                // Runner終了
+                await networkRunner.Shutdown();
+
+                // Runner削除
+                if (networkRunner != null &&
+                    networkRunner.gameObject != null)
+                {
+                    Destroy(networkRunner.gameObject);
+                }
+
+                networkRunner = null;
+
+                Debug.Log("3秒待機");
+
+                await Task.Delay(3000);
+            }
+
+
+            // 接続成功時
+            if (success)
+            {
+                UIReferences.Instance.LoadingUI.SetActive(false);
+                UIReferences.Instance.LobbyUI.SetActive(true);
 
                 Debug.Log("ゲスト側接続完了");
             }
             else
             {
+                UIReferences.Instance.TitleUI.SetActive(true);
+                UIReferences.Instance.LoadingUI.SetActive(false);
+                Debug.LogError("接続失敗");
+
                 if (networkRunner != null)
                 {
-                    // Runnerを終了
                     await networkRunner.Shutdown();
 
-                    // Runnerを破棄
-                    if (networkRunner != null && networkRunner.gameObject != null)
+                    if (networkRunner.gameObject != null)
                     {
                         Destroy(networkRunner.gameObject);
                     }
 
                     networkRunner = null;
                 }
-
-                // エラーメッセージを表示
-                CoroutineRunner.Instance.StartCoroutine(
-                    TitleCanvasDisplaySettings.Instance
-                    .ShowErrorMessage(true, "The room does not exist", 1));
-
-                // UIを戻す
-                TitleCanvasDisplaySettings.Instance.ResetTitleUI();
-                TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
             }
         }
-        catch (Exception error)// エラー時処理
+        catch (Exception error)
         {
+            UIReferences.Instance.TitleUI.SetActive(true);
+            UIReferences.Instance.LoadingUI.SetActive(false);
             Debug.LogException(error);
 
             if (networkRunner != null)
             {
-                // Runnerを終了
                 await networkRunner.Shutdown();
 
-                // Runnerを破棄
-                if (networkRunner != null && networkRunner.gameObject != null)
+                if (networkRunner.gameObject != null)
                 {
                     Destroy(networkRunner.gameObject);
                 }
-                   
+
                 networkRunner = null;
             }
-
-            // エラーメッセージを表示
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ShowErrorMessage(true, "An unexpected error has occurred. Please try again.", 1));
-
-            // UIの状態を戻す処理
-            TitleCanvasDisplaySettings.Instance.ResetTitleUI();
-            TitleCanvasDisplaySettings.Instance.ResetLobbyUI();
-        }
-        finally // 最後に必ず実行
-        {
-            // ロード画面を消す
-            TitleCanvasDisplaySettings.Instance.nowLoadingImage.SetActive(false);
         }
     }
 
@@ -151,6 +236,11 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void SetupNetworkRunner()
     {
+        Debug.Log(
+       "作成前 Runner数 : " +
+       FindObjectsByType<NetworkRunner>(
+           FindObjectsSortMode.None).Length);
+
         // NetworkRunner用オブジェクトを作成
         networkRunnerObject = new GameObject("NetworkRunner");
         // シーン移動してもRunnerが破棄されないようにする
@@ -163,9 +253,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         networkRunner.ProvideInput = true;
 
         // UIイベント管理スクリプトをRunnerObjectへ追加
-        var uiChange = networkRunnerObject.AddComponent<NetworkUIChange>();
+        var lobbyUI = networkRunnerObject.AddComponent<NetworkLobbyUI>();
         // Fusion callbackへ登録
-        networkRunner.AddCallbacks(uiChange);
+        networkRunner.AddCallbacks(lobbyUI);
+        networkLobbyUI = lobbyUI;
 
         // PlayerSpawnerをRunnerObjectへ追加
         var playerSpawner = networkRunnerObject.AddComponent<PlayerSpawner>();
@@ -189,6 +280,11 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
         // INetworkRunnerCallbacks を受け取るため自分自身を登録
         networkRunner.AddCallbacks(this);
+
+        Debug.Log(
+      "作成後 Runner数 : " +
+      FindObjectsByType<NetworkRunner>(
+          FindObjectsSortMode.None).Length);
     }
 
 
@@ -228,7 +324,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
     /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log("ルーム生成完全完了");
+    }
 
     /// <summary>
     /// プレイヤーがセッションから離脱した時に自動で呼ばれるコールバック。
@@ -262,17 +361,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-    {
-        // DontDestroyOnLoadされたRunnerを破棄する
-        if (runner != null)
-        {
-            Destroy(runner.gameObject);
-        }
-
-        // マッチング画面へ戻る
-        SceneManager.LoadScene("MatchingTestScenes");
-    }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
 
     /// <summary>
     /// クライアントがサーバー（ホスト）への接続に成功した時に呼ばれるコールバック。

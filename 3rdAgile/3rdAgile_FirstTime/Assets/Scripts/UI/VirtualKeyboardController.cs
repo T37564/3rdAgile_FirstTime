@@ -3,8 +3,9 @@
 // VirtualKeyboardController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using System.Collections;
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -33,12 +34,24 @@ public class VirtualKeyboardController : MonoBehaviour
     // スティックの傾き度合い
     private readonly float INPUT_THRESHOLD = 0.5f;
 
+    // 桁数制限テキスト
+    private readonly string INSUFFICIENT_NUMBER_OF_DIGITS = "桁数が不足しています";
+    private readonly string EXCESSIVE_NUMBER_OF_DIGITS = "これ以上追加することはできません！";
+
+
+
+
     [Header("PlayerInput 参照")]
     [SerializeField] private PlayerInput playerInput = null;
 
     [Header("UI Toolkit のルート要素を参照するための UIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
+    [Header("TitleButtonController 参照")]
+    [SerializeField] private TitleButtonController titleButtonController = null;
+
+    [Header("UI Asset Data 参照")]
+    [SerializeField] private UIAssetData uiAssetData = null;
 
     // UXML の root
     private VisualElement root = null;
@@ -67,12 +80,18 @@ public class VirtualKeyboardController : MonoBehaviour
     // 入力中の暗証番号
     private string matchingNumbers = "";
 
+    // 連続で決定ボタンを押さないようにするフラグ
+    private bool isDuplicateMonitoring = false;
 
     /// <summary>
     /// オブジェクト有効化時にUI要素と入力イベントを登録する
     /// </summary>
     private void OnEnable()
     {
+        // 暗証番号入力UIに変更
+        uiDocument.rootVisualElement.Clear();
+        uiAssetData.VirtualKeyboardUI.CloneTree(uiDocument.rootVisualElement);
+
         // 仮想キーボードのVisualElementを探す
         root = uiDocument.rootVisualElement;
 
@@ -82,6 +101,7 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // UXML 内で Label "Restriction" を見つけて入れる
         restrictionText = root.Q<Label>("Restriction");
+
         // 桁数制限テキストを非表示にする
         restrictionText.style.display = DisplayStyle.None;
 
@@ -112,6 +132,10 @@ public class VirtualKeyboardController : MonoBehaviour
             // キーを選択状態にする
             GamepadHighlight(0);
         }
+
+        // 入力状態を初期化
+        matchingNumbers = "";
+        isDuplicateMonitoring = false;
     }
 
     /// <summary>
@@ -119,6 +143,9 @@ public class VirtualKeyboardController : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
+        if (uiDocument.rootVisualElement == null) return;
+        uiDocument.rootVisualElement.Clear();
+
         // 入力イベントを解除
         playerInput.actions["NumberUI"].performed -= OnNumberUI;
         playerInput.actions["MoveSelectNumber"].performed -= OnMoveNumberUI;
@@ -329,11 +356,16 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // 暗証番号の最大桁数より小さいとき
         if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+        {
             // 入力した数字を追加する
             matchingNumbers += index.ToString();
+        }
         else
+        {
             // 桁数制限テキストを表示する
+            restrictionText.text = EXCESSIVE_NUMBER_OF_DIGITS;
             restrictionText.style.display = DisplayStyle.Flex;
+        }
 
         // 暗証番号の数値が書かれたUIの更新
         MatchingNumbersTextChange();
@@ -347,7 +379,29 @@ public class VirtualKeyboardController : MonoBehaviour
     {
         // selectedクラスを追加
         StartCoroutine(Highlight(DECISION_BUTTON_INDEX));
-        Debug.Log("決定処理を実行");
+
+        // 暗証番号が入力されているとき
+        if (6 == matchingNumbers.Length)
+        {
+            if (isDuplicateMonitoring) return;
+
+            // 二重押し防止のフラグを立てる
+            isDuplicateMonitoring = true;
+
+            // 仮想キーボードを非表示にする
+            gameObject.SetActive(false);
+
+            // 入力された暗証番号を使ってルームに入る
+            titleButtonController.GuestModeStartButton(matchingNumbers);
+
+            isDuplicateMonitoring = false;
+        }
+        else
+        {
+            // 桁数が少ないことを知らせるテキストを表示する
+            restrictionText.text = INSUFFICIENT_NUMBER_OF_DIGITS;
+            restrictionText.style.display = DisplayStyle.Flex;
+        }
     }
 
 
@@ -438,11 +492,16 @@ public class VirtualKeyboardController : MonoBehaviour
         {
             // 暗証番号の最大桁数より小さいとき
             if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+            {
                 // 入力した数字を追加する
                 matchingNumbers += keys[currentIndex].text;
+            }
             else
+            {
                 // 桁数制限テキストを表示する
+                restrictionText.text = EXCESSIVE_NUMBER_OF_DIGITS;
                 restrictionText.style.display = DisplayStyle.Flex;
+            }
         }
 
         // 暗証番号表示UIを更新
