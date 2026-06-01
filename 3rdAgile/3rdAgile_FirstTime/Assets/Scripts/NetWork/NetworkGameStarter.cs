@@ -166,16 +166,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                     break;
                 }
 
-                Debug.Log(result.ShutdownReason);
-
-                // GameNotFound以外なら
-                // retryしない
-                if (result.ShutdownReason !=
-                    ShutdownReason.GameNotFound)
-                {
-                    break;
-                }
-
                 // Runner終了
                 await networkRunner.Shutdown();
 
@@ -193,15 +183,19 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                 await Task.Delay(3000);
             }
 
+
             // 接続成功時
             if (success)
             {
+                UIReferences.Instance.LoadingUI.SetActive(false);
                 UIReferences.Instance.LobbyUI.SetActive(true);
 
                 Debug.Log("ゲスト側接続完了");
             }
             else
             {
+                UIReferences.Instance.TitleUI.SetActive(true);
+                UIReferences.Instance.LoadingUI.SetActive(false);
                 Debug.LogError("接続失敗");
 
                 if (networkRunner != null)
@@ -215,12 +209,12 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
                     networkRunner = null;
                 }
-
-                UIReferences.Instance.TitleUI.SetActive(true);
             }
         }
         catch (Exception error)
         {
+            UIReferences.Instance.TitleUI.SetActive(true);
+            UIReferences.Instance.LoadingUI.SetActive(false);
             Debug.LogException(error);
 
             if (networkRunner != null)
@@ -234,12 +228,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
                 networkRunner = null;
             }
-
-            UIReferences.Instance.TitleUI.SetActive(true);
-        }
-        finally
-        {
-            UIReferences.Instance.LoadingUI.SetActive(false);
         }
     }
 
@@ -373,17 +361,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-    {
-        // DontDestroyOnLoadされたRunnerを破棄する
-        if (runner != null)
-        {
-            Destroy(runner.gameObject);
-        }
-
-        // マッチング画面へ戻る
-        SceneManager.LoadScene("MainTitleScenes");
-    }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
 
     /// <summary>
     /// クライアントがサーバー（ホスト）への接続に成功した時に呼ばれるコールバック。

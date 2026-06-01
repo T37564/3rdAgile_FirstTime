@@ -72,7 +72,10 @@ public class TitleButtonController : MonoBehaviour
         if (playerCount < MINIMUM_NUMBER_OF_PEOPLE)
         {
             // 人数不足エラーを表示
-            CoroutineRunner.Instance.StartCoroutine(TitleCanvasDisplaySettings.Instance.ShowErrorMessage(false, "We don't have enough people.", 2));
+            LobbyUI lobbyUI = UIReferences.Instance.LobbyUI.GetComponent<LobbyUI>();
+
+            StartCoroutine(lobbyUI.ActiveLackOfPersonnel());
+
             return;
         }
 

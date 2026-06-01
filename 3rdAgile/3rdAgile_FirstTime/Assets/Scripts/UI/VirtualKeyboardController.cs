@@ -3,8 +3,9 @@
 // VirtualKeyboardController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using System.Collections;
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -32,6 +33,10 @@ public class VirtualKeyboardController : MonoBehaviour
 
     // スティックの傾き度合い
     private readonly float INPUT_THRESHOLD = 0.5f;
+
+    // 桁数制限テキスト
+    private readonly string INSUFFICIENT_NUMBER_OF_DIGITS = "桁数が不足しています";
+    private readonly string EXCESSIVE_NUMBER_OF_DIGITS = "これ以上追加することはできません！";
 
 
 
@@ -128,6 +133,9 @@ public class VirtualKeyboardController : MonoBehaviour
             GamepadHighlight(0);
         }
 
+        // 入力状態を初期化
+        matchingNumbers = "";
+        isDuplicateMonitoring = false;
     }
 
     /// <summary>
@@ -348,11 +356,16 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // 暗証番号の最大桁数より小さいとき
         if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+        {
             // 入力した数字を追加する
             matchingNumbers += index.ToString();
+        }
         else
+        {
             // 桁数制限テキストを表示する
+            restrictionText.text = EXCESSIVE_NUMBER_OF_DIGITS;
             restrictionText.style.display = DisplayStyle.Flex;
+        }
 
         // 暗証番号の数値が書かれたUIの更新
         MatchingNumbersTextChange();
@@ -381,11 +394,13 @@ public class VirtualKeyboardController : MonoBehaviour
             // 入力された暗証番号を使ってルームに入る
             titleButtonController.GuestModeStartButton(matchingNumbers);
 
+            isDuplicateMonitoring = false;
         }
         else
         {
-            // 6桁入力されていないときは、桁数制限テキストを表示する
-            Debug.Log("暗証番号は6桁で入力してください");
+            // 桁数が少ないことを知らせるテキストを表示する
+            restrictionText.text = INSUFFICIENT_NUMBER_OF_DIGITS;
+            restrictionText.style.display = DisplayStyle.Flex;
         }
     }
 
@@ -477,11 +492,16 @@ public class VirtualKeyboardController : MonoBehaviour
         {
             // 暗証番号の最大桁数より小さいとき
             if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
+            {
                 // 入力した数字を追加する
                 matchingNumbers += keys[currentIndex].text;
+            }
             else
+            {
                 // 桁数制限テキストを表示する
+                restrictionText.text = EXCESSIVE_NUMBER_OF_DIGITS;
                 restrictionText.style.display = DisplayStyle.Flex;
+            }
         }
 
         // 暗証番号表示UIを更新

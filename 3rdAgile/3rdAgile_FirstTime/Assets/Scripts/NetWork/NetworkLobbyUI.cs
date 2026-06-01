@@ -8,11 +8,12 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
 {
+    // LobbyUIクラスの参照用変数 
     private LobbyUI lobbyUI = null;
 
     #region Player
@@ -51,7 +52,10 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
         lobbyUI.playerCount.text = $"参加人数：{count}/4";
     }
 
-    public void DisplayPINNumber(NetworkRunner runner, LobbyUI lobbyUI)
+    /// <summary>
+    /// ホスト側のみ必要なUI(PIN, ゲーム開始ボタン)を表示するための処理
+    /// </summary>
+    public void DisplayHostUI(NetworkRunner runner, LobbyUI lobbyUI)
     {
         this.lobbyUI = lobbyUI;
 
@@ -59,6 +63,8 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
         {
             // ルームの暗証番号を表示
             lobbyUI.roomPIN.text = $"ルーム暗証番号：{runner.SessionInfo.Name}";
+
+            lobbyUI.gameStartButton.style.display = DisplayStyle.Flex;
         }
 
         UpdateCount(runner);
