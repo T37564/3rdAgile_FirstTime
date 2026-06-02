@@ -93,7 +93,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                     // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                     if (regenerationCallOut != null)
                     {
-                        Debug.Log("再配置を要求");
+                        //Debug.Log("再配置を要求");
                         regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
                     }
                 });
@@ -114,7 +114,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         // 生成する際のランダムな位置を取得
         Vector3 newPos = itemObjectPlace.GetRandomPosition();
-        Debug.Log(itemObjectPlace);
+        //Debug.Log(itemObjectPlace);
 
         Rigidbody rigidbody = regen.GetComponent<Rigidbody>();
 
@@ -199,7 +199,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                 if (regenerationCallOut != null)
                 {
-                    Debug.Log("再配置を要求");
+                    //Debug.Log("再配置を要求");
                     regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
                 }
             });

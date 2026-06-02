@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using Fusion;
 
-public class ItemGroundChecker : MonoBehaviour
+public class ItemGroundChecker : NetworkBehaviour
 {
     [SerializeField] private LayerMask deliveryOfMaterialsArea;
 
@@ -13,20 +14,34 @@ public class ItemGroundChecker : MonoBehaviour
 
     private ItemDataStorage itemDataStorage;
 
-    private void Start()
+    private bool isSold = false;
+
+    public override void Spawned()
     {
         itemDataStorage = GetComponent<ItemDataStorage>();
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
-        if(IsFullyGrounded())
+        if (!Object.HasStateAuthority) return;
+
+        if (isSold) return;
+
+        if (IsFullyGrounded())
         {
+            Debug.Log("アイテムが完全に納品エリアに接地していることを確認");
+            isSold = true;
+
+            int amount = itemDataStorage.sampleMasterData.GetInt("Amount");
+
             Debug.Log("アイテムが完全に納品エリアに接地しています。");
 
-            OnGroundedStateChanged?.Invoke(itemDataStorage.sampleMasterData.GetInt("Amount"));
-            Debug.Log("アイテムのAmount: " + itemDataStorage.sampleMasterData.GetInt("Amount"));
-            gameObject.SetActive(false);
+            //OnGroundedStateChanged?.Invoke(itemDataStorage.sampleMasterData.GetInt("Amount"));
+            //Debug.Log("アイテムのAmount: " + itemDataStorage.sampleMasterData.GetInt("Amount"));
+            OnGroundedStateChanged?.Invoke(amount);
+            Debug.Log("アイテムのAmount: " + amount);
+            //gameObject.SetActive(false);
+            Runner.Despawn(Object);
         }
     }
 
@@ -49,7 +64,7 @@ public class ItemGroundChecker : MonoBehaviour
             center + new Vector3(-halfX,-halfY, -halfZ) // 後左
         };
 
-        foreach(Vector3 point in checkPoints)
+        foreach (Vector3 point in checkPoints)
         {
             bool isHit = Physics.Raycast(point, Vector3.down, rayLength, deliveryOfMaterialsArea);
 
