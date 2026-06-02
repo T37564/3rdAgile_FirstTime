@@ -1,10 +1,12 @@
+using Fusion;
 using TMPro;
 using UnityEngine;
 
-public class MoneyManager : MonoBehaviour
+public class MoneyManager : NetworkBehaviour
 {
-    [SerializeField] public int currentMoney = 0;
+    //[SerializeField] public int currentMoney = 0;
 
+    [Networked] public int totalMoney { get; set; }
     //[SerializeField] public TextMeshPro moneyText;
 
     private void OnEnable()
@@ -20,8 +22,10 @@ public class MoneyManager : MonoBehaviour
 
     private void AddAmount(int amount)
     {
-        currentMoney += amount;
-        Debug.Log("現在の所持金: " + currentMoney);
+        if(!Object.HasStateAuthority) return;
+
+        totalMoney += amount;
+        Debug.Log("現在の所持金: " + totalMoney);
     }
 
 }

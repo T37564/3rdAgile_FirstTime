@@ -20,10 +20,10 @@ public class ScoreUI : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        // ScoreManagerを取得
-        ScoreManager scoreManager = FindAnyObjectByType<ScoreManager>();
+        // MoneyManagerを取得
+        MoneyManager moneyManager = FindAnyObjectByType<MoneyManager>();
 
-        if (scoreManager == null) return;
+        if (moneyManager == null) return;
 
         // UIの変更
         uiDocument.rootVisualElement.Clear();
@@ -39,7 +39,7 @@ public class ScoreUI : MonoBehaviour
         if (scoreLabel == null) return;
 
         // ScoreManagerにある合計ポイントをUIに表示する
-        scoreLabel.text = scoreManager.totalPoint.ToString();
+        scoreLabel.text = moneyManager.totalMoney.ToString();
 
         StartCoroutine(DisplayScore());
     }   
