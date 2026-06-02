@@ -56,8 +56,6 @@ public class LobbyUI : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        UIReferences.Instance.TitleUI.SetActive(true);
-
         if (gameStartButton != null)
         {
             gameStartButton.clicked -= titleButtonController.ClickStartButton;

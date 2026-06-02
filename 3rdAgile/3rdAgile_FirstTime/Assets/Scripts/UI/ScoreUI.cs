@@ -3,6 +3,7 @@
 // ScoreUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -39,5 +40,17 @@ public class ScoreUI : MonoBehaviour
 
         // ScoreManagerにある合計ポイントをUIに表示する
         scoreLabel.text = scoreManager.totalPoint.ToString();
+
+        StartCoroutine(DisplayScore());
+    }   
+
+    /// <summary>
+    /// スコア画面を５秒間表示後接続を終了させる処理
+    /// </summary>
+    private IEnumerator DisplayScore()
+    {
+        yield return new WaitForSeconds(5.0f);
+
+        NetworkGameStarter.Instance.ShutdownRunner();
     }
 }
