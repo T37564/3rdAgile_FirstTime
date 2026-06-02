@@ -298,24 +298,43 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// 現在はHost切断時にセッションを終了する処理
-    /// 将来的にはHostMigrationでゲーム継続予定。
+    /// Host切断時やゲーム終了時に
+    /// NetworkRunnerを終了・破棄し、
+    /// タイトルシーンへ戻る処理。
+    /// 将来的にはHostMigration対応予定。
     /// </summary>
     public async void ShutdownRunner()
     {
-        if (networkRunner != null)
+        if (networkRunner != null && networkRunner.IsServer)
         {
-            // セッション終了
-            await networkRunner.Shutdown();
-
-            // Runnerを破棄
-            if (networkRunner != null && networkRunner.gameObject != null)
-            {
-                Destroy(networkRunner.gameObject);
-            }
-
-            networkRunner = null;
+            // ホストを最後に切断させるため
+            await Task.Delay(3000);
         }
+
+        if (networkRunner == null)
+        {
+            return;
+        }
+
+        // GameObject退避
+        GameObject runnerObject = networkRunner.gameObject;
+
+        // Shutdown
+        await networkRunner.Shutdown();
+
+        // 破棄
+        if (runnerObject != null)
+        {
+            Destroy(runnerObject);
+        }
+
+        networkRunner = null;
+
+        networkRunnerObject = null;
+
+        Debug.Log("Runner破棄完了");
+
+        SceneManager.LoadScene("MainTitleScenes");
     }
 
 

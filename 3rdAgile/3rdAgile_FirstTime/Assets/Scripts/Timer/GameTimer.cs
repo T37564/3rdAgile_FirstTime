@@ -47,6 +47,9 @@ public class GameTimer : NetworkBehaviour
     [Networked]
     private NetworkBool isStartedTimer { get; set; }
 
+    // スコアUI表示するためのフラグ
+    private bool isShowScore = false;
+
     /// <summary>
     /// 残り時間を秒で返すプロパティ。
     /// タイマーが終了しているか、まだ開始されていない場合は0を返す。
@@ -78,6 +81,27 @@ public class GameTimer : NetworkBehaviour
         previousPhase = CurrentPhase;
     }
 
+
+    /// <summary>
+    /// スコアUIを表示するための処理。ゲームが終了している場合はスコアUIを表示する。
+    /// </summary>
+    private void Update()
+    {
+        if (isShowScore) return;
+
+        if (CurrentPhase == GamePhase.Finished)
+        {
+            isShowScore = true;
+
+            InGameUIController uiController = FindAnyObjectByType<InGameUIController>();
+
+            if (uiController != null)
+            {
+                uiController.ShowScoreUI();
+            }
+        }
+    }
+
     public override void FixedUpdateNetwork()
     {
         // StateAuthorityを持っているクライアントがタイマーの更新を行う
@@ -87,13 +111,6 @@ public class GameTimer : NetworkBehaviour
         if (isStartedTimer && GameTimerTick.Expired(Runner))
         {
             CurrentPhase = GamePhase.Finished;
-
-            InGameUIController uiController = FindAnyObjectByType<InGameUIController>();
-
-            if (uiController != null)
-            {
-                uiController.ShowScoreUI();
-            }
 
             return;
         }
