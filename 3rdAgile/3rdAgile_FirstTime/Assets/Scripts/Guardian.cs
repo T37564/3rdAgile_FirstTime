@@ -40,7 +40,7 @@ public class Guardian : NetworkBehaviour
             if (player != null)
             {
                 // ここでプレイヤーのダメージ(死亡)処理を呼び出す。
-                player.TakeDamage();
+                //player.TakeDamage();
             }
         }
     }

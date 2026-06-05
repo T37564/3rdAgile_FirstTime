@@ -127,14 +127,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             rigidbody.position = newPos;
         }
 
-        //regen.Object.transform.position = newPos;
-        //regen.RegeneratePosition(newPos);
-        //regen.gameObject.SetActive(false);
-
-        // アイテムの位置を新しいランダムな位置に変更する
-        //obj.transform.position = newPos;
-        //obj.gameObject.SetActive(false);
-        
         // 再配置要求フラグをリセット
         regen.isGenerateRequest = false;
     }
@@ -149,7 +141,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (!runner.IsServer) return;
 
         // タイマーがある時は、ゲームタイマーを取得して登録する
-       GameTimer timer = FindAnyObjectByType<GameTimer>();
+        GameTimer timer = FindAnyObjectByType<GameTimer>();
         RegisterGameTimer(timer);
 
         // フェーズが変わるたびにアイテムをスポーンするようにイベント登録

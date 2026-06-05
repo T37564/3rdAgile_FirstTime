@@ -6,7 +6,7 @@ namespace Network.Player
 {
     public interface IDamage
     {
-        void TakeDamage();
+        void TakeDamage(int damage);
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ namespace Network.Player
         /// <summary>
         /// モンスターからダメージを受けたときに実行される関数
         /// </summary>
-        public void TakeDamage()
+        public void TakeDamage(int damage)
         {
             if (!Object.HasStateAuthority) return;
             if (!IsAlive) return;
