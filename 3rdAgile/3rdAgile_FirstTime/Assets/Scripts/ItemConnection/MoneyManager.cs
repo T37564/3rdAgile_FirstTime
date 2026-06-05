@@ -2,7 +2,7 @@ using Fusion;
 using TMPro;
 using UnityEngine;
 
-public class MoneyManager : NetworkBehaviour
+public class MoneyManager : SingletonNetworkBehaviour<MoneyManager>
 {
     //[SerializeField] public int currentMoney = 0;
 
@@ -25,7 +25,7 @@ public class MoneyManager : NetworkBehaviour
     /// <summary>
     /// アイテムを納品した合計の売却値を更新するメソッド
     /// </summary>
-    private void AddAmount(int amount)
+    public void AddAmount(int amount)
     {
         if(!Object.HasStateAuthority) return;
 

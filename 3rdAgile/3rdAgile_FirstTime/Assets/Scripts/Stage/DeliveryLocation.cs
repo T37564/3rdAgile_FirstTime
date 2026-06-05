@@ -175,7 +175,8 @@ public class DeliveryLocation : NetworkBehaviour
 
         int score = currentItemStorage.itemData.GetInt("Amount");
 
-        ScoreManager.Instance.AddScore(score);
+        //ScoreManager.Instance.AddScore(score);
+        MoneyManager.Instance.AddAmount(score);
 
         Runner.Despawn(currentItemNetworkObject);
 
