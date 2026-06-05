@@ -4857,7 +4857,7 @@ GameObject:
   - component: {fileID: 5136145421806941526}
   m_Layer: 6
   m_Name: AncientPot
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

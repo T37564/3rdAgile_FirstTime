@@ -1541,7 +1541,7 @@ GameObject:
   - component: {fileID: 1822162574}
   - component: {fileID: 1822162579}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: DeliveryBox
   m_TagString: DeliveryBox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1560,6 +1560,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeliveryLocation
   searchRadius: 3
+  scanInterval: 0.1
+  itemLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  maxItemCount: 16
+  maxPlayerCount: 16
 --- !u!65 &1822162575
 BoxCollider:
   m_ObjectHideFlags: 0
