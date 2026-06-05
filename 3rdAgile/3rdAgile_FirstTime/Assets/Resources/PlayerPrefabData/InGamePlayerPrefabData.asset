@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55ca160df19f3a041a4357830358af39, type: 3}
+  m_Name: InGamePlayerPrefabData
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerPrefabData
+  playerPrefabs:
+  - {fileID: 636633377995965450, guid: 536d279296d55554aac5f38c1b3096e0, type: 3}
+  - {fileID: 636633377995965450, guid: 76e47355c788d1e4ba055c8bdb8d3acb, type: 3}
+  - {fileID: 636633377995965450, guid: 2985125c0d4dc6c4fb2bc48a50fb65b7, type: 3}
+  - {fileID: 636633377995965450, guid: e030dd1864633ef4a954636c4f956d00, type: 3}
+  playerSpawnPositions:
+  - {x: 0.8, y: 0.5, z: -4}
+  - {x: -1.2, y: 0.5, z: -4}
+  - {x: -1.2, y: 0.5, z: -2}
+  - {x: 0.8, y: 0.5, z: -2}
+  playerSpawnRotations:
+  - {x: 0, y: 1, z: 0, w: -0.00000004371139}

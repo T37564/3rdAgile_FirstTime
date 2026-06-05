@@ -27,45 +27,15 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // ホストのみ実行
         if (!runner.IsServer) return;
 
-        // スポーン位置管理用オブジェクトを取得
-        Transform spawnPoint = GameObject.Find("SpawnPoint").transform;
+        // プレイヤーのプレハブやスポーン位置・回転をまとめた ScriptableObject をロード
+        PlayerPrefabData inGamePlayerPrefab = Resources.Load<PlayerPrefabData>("PlayerPrefabData/InGamePlayerPrefabData");
 
-        // 配列へ子オブジェクトを格納
-        Transform[] spawnPosition = new Transform[spawnPoint.childCount];
-
-        // 配列に子オブジェクトの位置情報を入れる
-        for (int i = 0; i < spawnPoint.childCount; i++)
-        {
-            spawnPosition[i] = spawnPoint.GetChild(i);
-        }
-
-        // プレイヤーPrefabを取得
-        GameObject prefabObj = Resources.Load<GameObject>("TestPlayerObject");
-
-        // 見つからなかったとき
-        if (prefabObj == null)
-        {
-            Debug.LogError("PlayerPrefab が見つからない");
-            return;
-        }
-
-        // NetworkObjectがついているか確認する
-        NetworkObject networkPlayerObject = prefabObj.GetComponent<NetworkObject>();
-
-        // 見つからなかったとき
-        if (networkPlayerObject == null)
-        {
-            Debug.LogError("NetworkObject が付いてない");
-            return;
-        }
-
-        // 参加したすべてのプレイヤーを Spawn する
         for (int i = 0; i < players.Count; i++)
         {
             // オブジェクトスポーン
-            NetworkObject spawnedPlayerObject = runner.Spawn(networkPlayerObject,
-                         spawnPosition[i].position,
-                         Quaternion.identity,
+            NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i],
+                        inGamePlayerPrefab.playerSpawnPositions[i],
+                         inGamePlayerPrefab.playerSpawnRotations[0],
                          players[i]
                          );
 
