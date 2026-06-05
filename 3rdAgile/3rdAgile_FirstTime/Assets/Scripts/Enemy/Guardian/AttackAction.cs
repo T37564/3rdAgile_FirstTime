@@ -26,6 +26,9 @@ public class AttackAction : MonoBehaviour
     [Header("攻撃後硬直")]
     [SerializeField] private float cooldownTime = 0.0f;
 
+    [Header("プレイヤーに与えるダメージ")]
+    [SerializeField] private int attackDamage = 0;
+
     private float timer = 0.0f;
 
     private EnemyState enemyState;

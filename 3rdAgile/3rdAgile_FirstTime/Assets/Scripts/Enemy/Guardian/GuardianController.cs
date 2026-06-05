@@ -12,19 +12,19 @@ public class GuardianController : MonoBehaviour
     private void Start()
     {
         // Playerタグのオブジェクトを探す
-        //GameObject target = GameObject.FindWithTag("Player");
+        GameObject target = GameObject.FindWithTag("Player");
 
-        //if (target != null)
-        //{
-        //    navMeshAgent.SetDestination(players.position);
+        if (target != null)
+        {
+            navMeshAgent.SetDestination(players.position);
 
-        //    players = target.transform;
-        //}
-        //else if(target == null)
-        //{
-        //    target = GameObject.FindWithTag("Player");
-        //    //Debug.LogError("Playerタグのオブジェクトが見つかりませんでした。");
-        //}
+            players = target.transform;
+        }
+        else if (target == null)
+        {
+            target = GameObject.FindWithTag("Player");
+            //Debug.LogError("Playerタグのオブジェクトが見つかりませんでした。");
+        }
     }
 
     // Update is called once per frame
