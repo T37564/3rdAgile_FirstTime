@@ -90,12 +90,13 @@ public class AttackAction : MonoBehaviour
     private void AttackReadyState()
     {
         timer -= Time.deltaTime;
-        Debug.Log("攻撃予備動作: " + timer);
+        //Debug.Log("攻撃予備動作: " + timer);
         transform.LookAt(guardianController.players);
 
         // 予備動作時間が経過したら攻撃状態に移行
         if (timer <= 0)
         {
+            Debug.Log("攻撃実行");
             enemyState = EnemyState.attack;
             //attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
         }
@@ -111,6 +112,14 @@ public class AttackAction : MonoBehaviour
         //    attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
         //}
         Debug.Log("攻撃");
+
+        SimplePlayer simplePlayer = guardianController.players.GetComponent<SimplePlayer>();
+
+        if (simplePlayer != null)
+        {
+            simplePlayer.TakeDamage(attackDamage);
+            Debug.Log("ぶった");
+        }
         enemyState = EnemyState.moveCoolDown;
         timer = cooldownTime;
     }
@@ -124,9 +133,11 @@ public class AttackAction : MonoBehaviour
         //    enemyState = EnemyState.move;
         //}
 
-        Debug.Log("攻撃終了クールダウン");
+        timer -= Time.deltaTime;
+        //Debug.Log("攻撃終了クールダウン");
         if (timer <= 0)
         {
+            Debug.Log("徘徊に移行");
             enemyState = EnemyState.move;
         }
     }

@@ -148,6 +148,7 @@ MonoBehaviour:
   attackDistance: 2
   attackReadyTime: 2
   cooldownTime: 2
+  attackDamage: 2
 --- !u!195 &5144837309392015295
 NavMeshAgent:
   m_ObjectHideFlags: 0
