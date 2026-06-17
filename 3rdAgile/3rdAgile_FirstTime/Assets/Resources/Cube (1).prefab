@@ -316,6 +316,10 @@ MonoBehaviour:
   interactLayerMask:
     serializedVersion: 2
     m_Bits: 0
+  maxCarryDistance: 2
+  _IsHoldingItem:
+    _value: 0
+  playerHp: 100
 --- !u!114 &797298429775292460
 MonoBehaviour:
   m_ObjectHideFlags: 0

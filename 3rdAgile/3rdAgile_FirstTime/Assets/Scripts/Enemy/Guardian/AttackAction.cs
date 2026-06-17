@@ -1,5 +1,7 @@
+using Network.Player;
 using UnityEngine;
 using UnityEngine.AI;
+using Fusion;
 
 public enum EnemyState
 {
@@ -8,7 +10,7 @@ public enum EnemyState
     attack,//攻撃中
     moveCoolDown // 敵が攻撃後の硬直状態
 }
-public class AttackAction : MonoBehaviour
+public class AttackAction : NetworkBehaviour
 {
     [SerializeField] private GuardianController guardianController;
 
@@ -33,18 +35,20 @@ public class AttackAction : MonoBehaviour
     //[Networked] private TickTimer attackTimer { get; set; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Start()
+    public override void Spawned()
     {
         enemyState = EnemyState.move;
     }
 
     private void Update()
     {
-        //Debug.Log(attackTimer);
-        //if (attackTimer.Expired(Runner))
-        //{
-        //    enemyState = EnemyState.attack;
-        //}
+        if (Object == null) return;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority) return;
+
         switch (enemyState)
         {
             case EnemyState.move:
@@ -69,29 +73,28 @@ public class AttackAction : MonoBehaviour
     {
         navMeshAgent.isStopped = false;
 
-        navMeshAgent.SetDestination(guardianController.players.position);
+        //navMeshAgent.SetDestination(guardianController.players.position);
 
         // プレイヤーとの距離を計算
-        float distance =
-        Vector3.Distance(transform.position, guardianController.players.position);
+        //float distance = Vector3.Distance(transform.position, guardianController.players.position);
 
         //Debug.Log("距離: " + distance);
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
-        if (distance <= attackDistance)
+        if (guardianController.currentDistance <= attackDistance)
         {
             Debug.Log("攻撃準備");
             enemyState = EnemyState.attackReady;
             timer = attackReadyTime;
             navMeshAgent.isStopped = true;
         }
-        
+
     }
 
     private void AttackReadyState()
     {
         timer -= Time.deltaTime;
-        //Debug.Log("攻撃予備動作: " + timer);
-        transform.LookAt(guardianController.players);
+        Debug.Log("攻撃予備動作: " + timer);
+        transform.LookAt(guardianController.currentPlayer);
 
         // 予備動作時間が経過したら攻撃状態に移行
         if (timer <= 0)
@@ -113,11 +116,11 @@ public class AttackAction : MonoBehaviour
         //}
         Debug.Log("攻撃");
 
-        SimplePlayer simplePlayer = guardianController.players.GetComponent<SimplePlayer>();
+        PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
-        if (simplePlayer != null)
+        if (playerController != null)
         {
-            simplePlayer.TakeDamage(attackDamage);
+            playerController.TakeDamage(attackDamage);
             Debug.Log("ぶった");
         }
         enemyState = EnemyState.moveCoolDown;
