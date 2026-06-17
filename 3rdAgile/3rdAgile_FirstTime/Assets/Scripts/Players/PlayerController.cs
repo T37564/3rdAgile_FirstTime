@@ -63,6 +63,9 @@ namespace Network.Player
         // IInteractableインターフェースの実装
         public Transform Transform => transform;
 
+        [Header("プレイヤーのHP")]
+        [SerializeField] private int playerHp = 0;
+
 
         /// <summary>
         /// ネットワーク上でオブジェクトが確定したときに呼び出されるコールバック関数
@@ -332,6 +335,9 @@ namespace Network.Player
             if (!IsAlive) return;
 
             IsAlive = false;
+
+            playerHp -= damage;
+            Debug.Log("ダメージを受けた");
 
             if (holdingItem != null)
             {
