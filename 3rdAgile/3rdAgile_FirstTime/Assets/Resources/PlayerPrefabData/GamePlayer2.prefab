@@ -374,6 +374,7 @@ MonoBehaviour:
   maxCarryDistance: 1.5
   _IsHoldingItem:
     _value: 0
+  playerHp: 100
 --- !u!114 &636633377995965450
 MonoBehaviour:
   m_ObjectHideFlags: 0
