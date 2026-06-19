@@ -32,9 +32,15 @@ public class AttackAction : NetworkBehaviour
 
     private EnemyState enemyState;
 
+    [SerializeField] private GuardianWanderingArea guardianWanderingArea;
+
+    private Transform currentWanderingPoint;
+
+    // 徘徊する場所に到着したかの判定
+    public bool isArrival = false;
+
     //[Networked] private TickTimer attackTimer { get; set; }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Spawned()
     {
         enemyState = EnemyState.move;
@@ -69,16 +75,28 @@ public class AttackAction : NetworkBehaviour
         }
     }
 
+    private void Wandering()
+    {
+        if (guardianWanderingArea != null)
+        {
+            currentWanderingPoint = guardianWanderingArea.GetRandomPoint();
+            navMeshAgent.SetDestination(currentWanderingPoint.position);
+        }
+
+        // 現在地から目的地までの距離が一定以下の場合
+        if(!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= 0.3f)
+        {
+            currentWanderingPoint = guardianWanderingArea.GetRandomPoint();
+            navMeshAgent.SetDestination(currentWanderingPoint.position);
+        }
+    }
+
     private void MoveState()
     {
         navMeshAgent.isStopped = false;
 
-        //navMeshAgent.SetDestination(guardianController.players.position);
+        Wandering();
 
-        // プレイヤーとの距離を計算
-        //float distance = Vector3.Distance(transform.position, guardianController.players.position);
-
-        //Debug.Log("距離: " + distance);
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
         {
@@ -129,13 +147,6 @@ public class AttackAction : NetworkBehaviour
 
     private void CooldownState()
     {
-        // クールダウンの実装
-        // クールダウンが完了したら移動状態に移行
-        //if (attackTimer.Expired(Runner))
-        //{
-        //    enemyState = EnemyState.move;
-        //}
-
         timer -= Time.deltaTime;
         //Debug.Log("攻撃終了クールダウン");
         if (timer <= 0)
