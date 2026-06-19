@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &517443122168522709
+--- !u!1 &1178107802274094138
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,21 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9146919802180696039}
+  - component: {fileID: 9120429280658539132}
+  - component: {fileID: 859560483467723007}
   m_Layer: 0
-  m_Name: ConnectionPosition_East
+  m_Name: RightConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9146919802180696039
+--- !u!4 &9120429280658539132
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 517443122168522709}
+  m_GameObject: {fileID: 1178107802274094138}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
@@ -31,7 +32,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7658295776624313127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2671374535521321177
+--- !u!114 &859560483467723007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178107802274094138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 1
+--- !u!1 &2918717438499514721
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,21 +53,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1599670965140791314}
+  - component: {fileID: 7110830050926758207}
+  - component: {fileID: 683116987222278248}
   m_Layer: 0
-  m_Name: ConnectionPosition_South
+  m_Name: BackConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1599670965140791314
+--- !u!4 &7110830050926758207
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2671374535521321177}
+  m_GameObject: {fileID: 2918717438499514721}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: -0.5}
@@ -62,7 +77,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7658295776624313127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6125590312817829919
+--- !u!114 &683116987222278248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2918717438499514721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 2
+--- !u!1 &6455426266360858204
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -70,21 +98,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3216123027581039559}
+  - component: {fileID: 6097828399544095630}
+  - component: {fileID: 4854696600443682375}
   m_Layer: 0
-  m_Name: ConnectionPosition_West
+  m_Name: LeftConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3216123027581039559
+--- !u!4 &6097828399544095630
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6125590312817829919}
+  m_GameObject: {fileID: 6455426266360858204}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0.5, z: 0}
@@ -93,6 +122,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7658295776624313127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4854696600443682375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6455426266360858204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 3
 --- !u!1 &8125285459053750638
 GameObject:
   m_ObjectHideFlags: 0
@@ -106,7 +148,7 @@ GameObject:
   - component: {fileID: 6318088098611262031}
   - component: {fileID: 1254402773794257899}
   - component: {fileID: 2059099469994473305}
-  - component: {fileID: 5216366968272036308}
+  - component: {fileID: 3687366153995666920}
   m_Layer: 0
   m_Name: Room
   m_TagString: Untagged
@@ -128,9 +170,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4205816516570795123}
-  - {fileID: 1599670965140791314}
-  - {fileID: 9146919802180696039}
-  - {fileID: 3216123027581039559}
+  - {fileID: 7110830050926758207}
+  - {fileID: 9120429280658539132}
+  - {fileID: 6097828399544095630}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1203894513637334031
@@ -229,7 +271,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours: []
   ForceRemoteRenderTimeframe: 0
---- !u!114 &5216366968272036308
+--- !u!114 &3687366153995666920
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -238,14 +280,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8125285459053750638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a04c6c864e5a2ae4b8b88be1127e5d73, type: 3}
+  m_Script: {fileID: 11500000, guid: 890cdf97ad6378c4fb5ba8b335d7ab82, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CorridorSpawnPoints
-  roomSpawnPoints:
-  - {fileID: 4205816516570795123}
-  - {fileID: 1599670965140791314}
-  - {fileID: 9146919802180696039}
-  - {fileID: 3216123027581039559}
+  m_EditorClassIdentifier: Assembly-CSharp::StagePiece
+  occupiedCells:
+  - {x: 0, y: 0}
+  connectors: []
 --- !u!1 &8495567664885212603
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,8 +295,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4205816516570795123}
+  - component: {fileID: 7714842238704554542}
   m_Layer: 0
-  m_Name: ConnectionPosition_North
+  m_Name: ForwardConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,3 +318,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7658295776624313127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7714842238704554542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8495567664885212603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 0

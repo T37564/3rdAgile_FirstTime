@@ -11,14 +11,10 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     #region ステージパス
 
-    private readonly string[] CORRIDOR_PATHS =
-    {
-        "Stages/Corridor1",
-        "Stages/Corridor2",
-        "Stages/Corridor3"
-    };
-
-    private readonly string AISLE_PATH = "Stages/Aisle";
+    private readonly string START_ROOM_PATH = "Stages/Start";
+    private readonly string STRAIGHT_CORRIDOR_PATH = "Stages/StraightCorridor";
+    private readonly string T_CORRIDOR_PATH = "Stages/TCorridor";
+    private readonly string CROSS_CORRIDOR_PATH = "Stages/CrossCorridor";
     private readonly string ROOM_PATH = "Stages/Room";
     private readonly string DEAD_END_PATH = "Stages/DeadEnd";
 
@@ -46,6 +42,15 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private int createPartCount = 0;
 
     private StageGrid? stageGrid;
+
+    private void Awake()
+    {
+        startRoomPrefab = Resources.Load<NetworkObject>(START_ROOM_PATH);
+        straightCorridorPrefab = Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
+        tCorridorPrefab = Resources.Load<NetworkObject>(T_CORRIDOR_PATH);
+        crossCorridorPrefab = Resources.Load<NetworkObject>(CROSS_CORRIDOR_PATH);
+        
+    }
 
     /// <summary>
     /// シーンロード完了時
@@ -145,7 +150,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             foreach (StageConnector connector in stagePiece.Connectors)
             {
                 GridDirection worldDirection =
-                    RotateDirectio(connector.Direction, openConnector.Direction);
+                    RotateDirection(connector.Direction, openConnector.Direction);
 
                 if (worldDirection == openConnector.Direction.Opposite()) continue;
 
@@ -198,54 +203,54 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return (GridDirection)result;
     }
 
-    /// <summary>
-    /// ランダムな廊下パス取得
-    /// </summary>
-    private string GetRandomCorridorPath()
-    {
-        int index =
-            UnityEngine.Random.Range(0, CORRIDOR_PATHS.Length);
+    ///// <summary>
+    ///// ランダムな廊下パス取得
+    ///// </summary>
+    //private string GetRandomCorridorPath()
+    //{
+    //    int index =
+    //        UnityEngine.Random.Range(0, CORRIDOR_PATHS.Length);
 
-        return CORRIDOR_PATHS[index];
-    }
+    //    return CORRIDOR_PATHS[index];
+    //}
 
-    /// <summary>
-    /// ステージパーツ生成
-    /// </summary>
-    private NetworkObject? StageInstantiate(
-        string stagePath,
-        NetworkRunner runner,
-        Vector3? position = null,
-        Quaternion? rotation = null)
-    {
-        GameObject? prefabObj =
-            Resources.Load<GameObject>(stagePath);
+    ///// <summary>
+    ///// ステージパーツ生成
+    ///// </summary>
+    //private NetworkObject? StageInstantiate(
+    //    string stagePath,
+    //    NetworkRunner runner,
+    //    Vector3? position = null,
+    //    Quaternion? rotation = null)
+    //{
+    //    GameObject? prefabObj =
+    //        Resources.Load<GameObject>(stagePath);
 
-        if (prefabObj == null)
-        {
-            Debug.LogError(
-                $"Prefab が見つからない : {stagePath}");
+    //    if (prefabObj == null)
+    //    {
+    //        Debug.LogError(
+    //            $"Prefab が見つからない : {stagePath}");
 
-            return null;
-        }
+    //        return null;
+    //    }
 
-        if (!prefabObj.TryGetComponent(
-                out NetworkObject networkObject))
-        {
-            Debug.LogError(
-                $"NetworkObject が付いてない : {stagePath}");
+    //    if (!prefabObj.TryGetComponent(
+    //            out NetworkObject networkObject))
+    //    {
+    //        Debug.LogError(
+    //            $"NetworkObject が付いてない : {stagePath}");
 
-            return null;
-        }
+    //        return null;
+    //    }
 
-        NetworkObject obj = runner.Spawn(
-            networkObject,
-            position ?? Vector3.zero,
-            rotation ?? Quaternion.identity
-        );
+    //    NetworkObject obj = runner.Spawn(
+    //        networkObject,
+    //        position ?? Vector3.zero,
+    //        rotation ?? Quaternion.identity
+    //    );
 
-        return obj;
-    }
+    //    return obj;
+    //}
 
     #region 未使用コールバック
 
