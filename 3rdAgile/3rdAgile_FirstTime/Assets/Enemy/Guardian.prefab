@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2289765937748641168}
   - component: {fileID: 801435640108941138}
   - component: {fileID: 577375914382016332}
+  - component: {fileID: 2482790271233591212}
   - component: {fileID: 5144837309392015295}
   - component: {fileID: -1977406020987954072}
   - component: {fileID: -8485677753646545901}
@@ -151,6 +152,21 @@ MonoBehaviour:
   attackReadyTime: 2
   cooldownTime: 2
   attackDamage: 2
+  guardianWanderingArea: {fileID: 2482790271233591212}
+  isArrival: 0
+--- !u!114 &2482790271233591212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3966210800863259364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a25946c69c20d4f45a3f998567a658f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuardianWanderingArea
+  wanderingPosition: []
 --- !u!195 &5144837309392015295
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -192,6 +208,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 801435640108941138}
   - {fileID: 577375914382016332}
+  - {fileID: 2482790271233591212}
   - {fileID: -8485677753646545901}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-8485677753646545901
