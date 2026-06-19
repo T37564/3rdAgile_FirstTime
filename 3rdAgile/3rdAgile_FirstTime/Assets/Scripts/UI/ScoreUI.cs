@@ -3,7 +3,6 @@
 // ScoreUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,6 +13,9 @@ public class ScoreUI : MonoBehaviour
 
     [Header("ScoreUI の Source Asset")]
     [SerializeField] private VisualTreeAsset scoreUI = null;
+
+    public Button hostReturnTitle = null;
+    public Button clientReturnTitle = null;
 
     /// <summary>
     /// スコアを取得してUIへ表示する
@@ -36,21 +38,16 @@ public class ScoreUI : MonoBehaviour
         // Scoreという名前のLabelを取得
         Label scoreLabel = root.Q<Label>("Score");
 
+        // HostReturnButtonという名前のButtonを取得
+        hostReturnTitle = root.Q<Button>("HostReturnButton");
+        // ClientReturnButtonという名前のButtonを取得
+        clientReturnTitle = root.Q<Button>("ClientReturnButton");
+
         if (scoreLabel == null) return;
 
         // ScoreManagerにある合計ポイントをUIに表示する
         scoreLabel.text = moneyManager.totalMoney.ToString();
 
-        StartCoroutine(DisplayScore());
+        //ここでネットワーク処理できるボタン処理を追加
     }   
-
-    /// <summary>
-    /// スコア画面を５秒間表示後接続を終了させる処理
-    /// </summary>
-    private IEnumerator DisplayScore()
-    {
-        yield return new WaitForSeconds(5.0f);
-
-        NetworkGameStarter.Instance.ShutdownRunner();
-    }
 }

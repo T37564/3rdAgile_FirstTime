@@ -16,7 +16,7 @@ public class VirtualKeyboardController : MonoBehaviour
     private readonly int KEYBOARD_COLUMN_COUNT = 3;
 
     // 暗証番号の最大入力桁数
-    private readonly int MAXIMUM_NUMBER_OF_DIGITS = 6;
+    private readonly int MAXIMUM_NUMBER_OF_DIGITS = 4;
 
     // 消 ボタンの番号
     private readonly int DELETE_BUTTON_INDEX = 9;
@@ -381,7 +381,7 @@ public class VirtualKeyboardController : MonoBehaviour
         StartCoroutine(Highlight(DECISION_BUTTON_INDEX));
 
         // 暗証番号が入力されているとき
-        if (6 == matchingNumbers.Length)
+        if (MAXIMUM_NUMBER_OF_DIGITS == matchingNumbers.Length)
         {
             if (isDuplicateMonitoring) return;
 
