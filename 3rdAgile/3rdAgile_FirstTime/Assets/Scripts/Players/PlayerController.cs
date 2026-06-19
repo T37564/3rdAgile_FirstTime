@@ -337,7 +337,7 @@ namespace Network.Player
             IsAlive = false;
 
             playerHp -= damage;
-            Debug.Log("ƒ_ƒ[ƒW‚ğó‚¯‚½");
+            Debug.Log(playerHp);
 
             if (holdingItem != null)
             {
