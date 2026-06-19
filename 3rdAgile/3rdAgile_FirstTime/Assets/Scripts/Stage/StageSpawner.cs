@@ -5,6 +5,7 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -31,6 +32,21 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private int roomCreateCount = 0;
 
+    private readonly Queue<OpenConnector> openConnectors = new();
+
+    [SerializeField] private float cellSize = 20.0f;
+    [SerializeField] private NetworkObject startRoomPrefab;
+    [Header("--- í òHprefab ---")]
+    [SerializeField] private NetworkObject straightCorridorPrefab;
+    [SerializeField] private NetworkObject tCorridorPrefab;
+    [SerializeField] private NetworkObject crossCorridorPrefab;
+
+    [SerializeField] private int maxPartCount = 30;
+
+    private int createPartCount = 0;
+
+    private StageGrid? stageGrid;
+
     /// <summary>
     /// ÉVÅ[ÉìÉçÅ[ÉhäÆóπéû
     /// </summary>
@@ -38,120 +54,148 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!runner.IsServer) return;
 
-        // ç≈èâÇÃòLâ∫ê∂ê¨
-        NetworkObject? corridorObj = StageInstantiate(
-            GetRandomCorridorPath(),
-            runner
+        stageGrid = new StageGrid(cellSize);
+
+        CreateStartRoom(runner);
+
+        CreateStageParts(runner);
+    }
+
+    private void CreateStartRoom(NetworkRunner runner)
+    {
+        if (stageGrid == null)
+        {
+            Debug.LogError("StageGridÇ™èâä˙âªÇ≥ÇÍÇƒÇ¢Ç»Ç¢");
+            return;
+        }
+
+        Vector2Int startGrid = Vector2Int.zero;
+        Vector3 startWorldPosition = stageGrid.GridToWorld(startGrid);
+
+        NetworkObject startobj = runner.Spawn(
+            startRoomPrefab,
+            startWorldPosition,
+            Quaternion.identity
         );
 
-        if (corridorObj == null)
+        stageGrid.Register(startGrid);
+
+        StagePiece? stagePiece = startobj.GetComponent<StagePiece>();
+
+        if (stagePiece == null)
         {
-            Debug.LogError("ç≈èâÇÃòLâ∫ê∂ê¨Ç…é∏îs");
+            Debug.LogError("StartRoomÇ…StagePieceÇ™Ç¬Ç¢ÇƒÇ¢Ç»Ç¢");
             return;
         }
 
-        // ConnectoréÊìæ
-        CorridorSpawnPoints? spawnPoints =
-            corridorObj.GetComponent<CorridorSpawnPoints>();
-
-        if (spawnPoints == null)
+        foreach (StageConnector connector in stagePiece.Connectors)
         {
-            Debug.LogError("CorridorSpawnPoints Ç™å©Ç¬Ç©ÇÁÇ»Ç¢");
-            return;
-        }
-
-        // äeê⁄ë±ì_Ç©ÇÁê∂ê¨
-        foreach (Transform point in spawnPoints.RoomSpawnPoints)
-        {
-            CreateNextPart(point, runner);
+            openConnectors.Enqueue(
+                new OpenConnector(
+                    startGrid,
+                    connector.Direction
+                )
+            );
         }
     }
 
-    /// <summary>
-    /// éüÇÃÉpÅ[Écê∂ê¨
-    /// </summary>
-    private void CreateNextPart(
-        Transform spawnPoint,
-        NetworkRunner runner)
+    private void CreateStageParts(NetworkRunner runner)
     {
-        // ïîâÆêîÇ™è„å¿Ç»ÇÁçsÇ´é~Ç‹ÇËê∂ê¨
-        if (roomCreateCount >= maxRoomCount)
+        if (stageGrid == null)
         {
-            StageInstantiate(
-                DEAD_END_PATH,
-                runner,
-                spawnPoint.position,
-                spawnPoint.rotation
-            );
-
+            Debug.LogError("StageGridÇ™èâä˙âªÇ≥ÇÍÇƒÇ¢Ç»Ç¢");
             return;
         }
 
-        // ê∂ê¨Ç∑ÇÈÇ©íäëI
-        bool createFlag = BoolRandomUtility.RandomBool();
-
-        if (!createFlag)
+        while (openConnectors.Count > 0)
         {
-            StageInstantiate(
-                DEAD_END_PATH,
-                runner,
-                spawnPoint.position,
-                spawnPoint.rotation
+            if (createPartCount >= maxPartCount) break;
+
+            OpenConnector openConnector = openConnectors.Dequeue();
+
+            Vector2Int nextGrid =
+                openConnector.GridPosition + openConnector.Direction.ToVector();
+
+            if (stageGrid.IsUsed(nextGrid)) continue;
+
+            NetworkObject corridorPrefab = GetRandomCorridorPrefab();
+
+            Vector3 worldPosition = stageGrid.GridToWorld(nextGrid);
+
+            Quaternion rotation =
+                GetRotationFromDirection(openConnector.Direction);
+
+            NetworkObject corridorObj = runner.Spawn(
+                corridorPrefab,
+                worldPosition,
+                rotation
             );
 
-            return;
+            stageGrid.Register(nextGrid);
+            createPartCount++;
+
+            StagePiece? stagePiece = corridorObj.GetComponent<StagePiece>();
+
+            if (stagePiece == null)
+            {
+                Debug.LogError("í òHÇ…StagePieceÇ™Ç¬Ç¢ÇƒÇ¢Ç»Ç¢");
+                continue;
+            }
+
+            foreach (StageConnector connector in stagePiece.Connectors)
+            {
+                GridDirection worldDirection =
+                    RotateDirectio(connector.Direction, openConnector.Direction);
+
+                if (worldDirection == openConnector.Direction.Opposite()) continue;
+
+                openConnectors.Enqueue(
+                    new OpenConnector(
+                        nextGrid,
+                        worldDirection
+                    )
+                );
+            }
         }
+    }
 
-        // ïîâÆÇ©í òHÇ©íäëI
-        bool createRoomFlag = BoolRandomUtility.RandomBool();
+    private NetworkObject GetRandomCorridorPrefab()
+    {
+        int index = Random.Range(0, 3);
 
-        switch (createRoomFlag)
+        return index switch
         {
-            // ïîâÆê∂ê¨
-            case true:
+            0 => straightCorridorPrefab,
+            1 => tCorridorPrefab,
+            2 => crossCorridorPrefab,
+            _ => straightCorridorPrefab
+        };
+    }
 
-                StageInstantiate(
-                    ROOM_PATH,
-                    runner,
-                    spawnPoint.position,
-                    spawnPoint.rotation
-                );
+    private Quaternion GetRotationFromDirection(GridDirection direction)
+    {
+        float y = direction switch
+        {
+            GridDirection.Forward => 0.0f,
+            GridDirection.Right => 90.0f,
+            GridDirection.Back => 180.0f,
+            GridDirection.Left => 270.0f,
+            _ => 0.0f
+        };
 
-                roomCreateCount++;
+        return Quaternion.Euler(0.0f, y, 0.0f); 
+    }
 
-                break;
+    private GridDirection RotateDirection(
+        GridDirection localDirection, 
+        GridDirection baseDirection)
+    {
+        int local = (int)localDirection;
+        int baseDir = (int)baseDirection;
 
-            // í òHê∂ê¨
-            case false:
+        int result = (local + baseDir) % 4;
 
-                NetworkObject? aisleObj = StageInstantiate(
-                    AISLE_PATH,
-                    runner,
-                    spawnPoint.position,
-                    spawnPoint.rotation
-                );
-
-                if (aisleObj == null)
-                {
-                    return;
-                }
-
-                CorridorSpawnPoints? nextSpawnPoints =
-                    aisleObj.GetComponent<CorridorSpawnPoints>();
-
-                if (nextSpawnPoints == null)
-                {
-                    return;
-                }
-
-                // í òHÇÃê⁄ë±ì_Ç©ÇÁÇ≥ÇÁÇ…ê∂ê¨
-                foreach (Transform nextPoint in nextSpawnPoints.RoomSpawnPoints)
-                {
-                    CreateNextPart(nextPoint, runner);
-                }
-
-                break;
-        }
+        return (GridDirection)result;
     }
 
     /// <summary>
