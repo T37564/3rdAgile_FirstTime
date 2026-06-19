@@ -1078,6 +1078,7 @@ GameObject:
   - component: {fileID: 1604728056}
   - component: {fileID: 1604728055}
   - component: {fileID: 1604728054}
+  - component: {fileID: 1604728057}
   m_Layer: 5
   m_Name: LoadingUI
   m_TagString: Untagged
@@ -1169,6 +1170,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1604728057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604728052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 252609b2c0b02da48a28c7f6d17bf9f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NowLoadingUIController
+  loadingText: {fileID: 1391307623}
 --- !u!1 &2009124982
 GameObject:
   m_ObjectHideFlags: 0

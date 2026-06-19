@@ -120,8 +120,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private string RandomPIN()
     {
-        // 6桁のランダムな数字を生成
-        return random.Next(100000, 999999).ToString();
+        // 4桁のランダムな数字を生成
+        return random.Next(1000, 9999).ToString();
     }
 
 
