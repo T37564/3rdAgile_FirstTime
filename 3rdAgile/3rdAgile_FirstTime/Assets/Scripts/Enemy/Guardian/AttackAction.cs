@@ -34,7 +34,7 @@ public class AttackAction : NetworkBehaviour
 
     [SerializeField] private GuardianWanderingArea guardianWanderingArea;
 
-    private Transform currentWanderingPoint;
+    private Vector3 WanderingPoint;
 
     // 徘徊する場所に到着したかの判定
     public bool isArrival = false;
@@ -44,6 +44,8 @@ public class AttackAction : NetworkBehaviour
     public override void Spawned()
     {
         enemyState = EnemyState.move;
+
+        guardianWanderingArea.FindWanderingGround();
     }
 
     private void Update()
@@ -79,15 +81,16 @@ public class AttackAction : NetworkBehaviour
     {
         if (guardianWanderingArea != null)
         {
-            currentWanderingPoint = guardianWanderingArea.GetRandomPoint();
-            navMeshAgent.SetDestination(currentWanderingPoint.position);
+            WanderingPoint = guardianWanderingArea.GetRandomPoint();
+            navMeshAgent.SetDestination(WanderingPoint);
         }
 
         // 現在地から目的地までの距離が一定以下の場合
-        if(!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= 0.3f)
+        if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= 0.3f)
         {
-            currentWanderingPoint = guardianWanderingArea.GetRandomPoint();
-            navMeshAgent.SetDestination(currentWanderingPoint.position);
+            // 新しい座標を取得してその座標に向かう
+            WanderingPoint = guardianWanderingArea.GetRandomPoint();
+            navMeshAgent.SetDestination(WanderingPoint);
         }
     }
 
