@@ -1,17 +1,57 @@
 using UnityEngine;
 using Fusion;
+using UnityEngine.AI;
 
 public class GuardianWanderingArea : NetworkBehaviour
 {
+    private float shortestDistance = 0.0f;
 
-    [Header("徘徊する際の向かう座標")]
-    [SerializeField] private Transform[] wanderingPosition;
+    // 徘徊する際の向かう座標
+    private Transform wanderingGroundPosition;
 
-    
-    public Transform GetRandomPoint()
+    public void FindWanderingGround()
     {
-        int index = Random.Range(0, wanderingPosition.Length);
+        // Groundタグが付いているオブジェクトを取得
+        GameObject[] groundObjects = GameObject.FindGameObjectsWithTag("Ground");
+        
+        // 最小値
+        shortestDistance = Mathf.Infinity;
 
-        return wanderingPosition[index];
+        // Groundタブのオブジェクトで一番近いのを取得する
+        foreach (GameObject ground in groundObjects)
+        {
+            float distance = Vector3.Distance(transform.position,
+                ground.transform.position);
+
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                wanderingGroundPosition = ground.transform;
+            }
+        }
+    }
+
+
+
+    public Vector3 GetRandomPoint()
+    {
+        //Renderer renderer = wanderingGroundPosition.GetComponent<Renderer>();
+        //Bounds bounds = renderer.bounds;
+
+        Bounds bounds = wanderingGroundPosition.GetComponent<Renderer>().bounds;
+
+        float randomX = Random.Range(bounds.min.x, bounds.max.z);
+        float randomZ = Random.Range(bounds.min.z, bounds.max.z);
+
+        Vector3 randomPoint = new Vector3(randomX, transform.position.y, randomZ);
+        Debug.Log(randomPoint);
+        NavMeshHit hit;
+
+        if(NavMesh.SamplePosition(randomPoint,out hit, 2f, NavMesh.AllAreas))
+        {
+            return hit.position;
+        }
+
+        return transform.position;
     }
 }
