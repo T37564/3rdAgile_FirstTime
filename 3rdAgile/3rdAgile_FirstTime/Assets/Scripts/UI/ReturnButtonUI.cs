@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ReturnButtonUI : MonoBehaviour
+public class ReturnButtonUI : NetworkBehaviour
 {
     [Header("ローディング時に表示するUI")]
     [SerializeField] private GameObject loadingCnavas = null;
@@ -19,7 +19,13 @@ public class ReturnButtonUI : MonoBehaviour
     {
         runner = NetworkGameStarter.Instance.networkRunner;
 
-        if (runner == null) return;
+        if (runner == null)
+        {
+
+            Debug.Log("None");
+            return;
+
+        }
 
         // ホストのみ
         if (runner.IsServer)
@@ -43,19 +49,37 @@ public class ReturnButtonUI : MonoBehaviour
         clientButton.clicked -= ClientClickedRooDisbanded;
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_DisbandRoom()
+    {
+        int waitTime = 0;
+
+        // ホストのみ
+        if (runner.IsServer)
+        {
+            waitTime = 4000;
+        }
+        else// ゲストのみ
+        {
+            waitTime = 2000;
+        }
+        _ = DisbandRoom(waitTime);
+    }
+
+    private async Task DisbandRoom(int waitTime)
+    {
+        loadingCnavas.SetActive(true);
+
+        await Task.Delay(waitTime);
+
+        NetworkGameStarter.Instance.ShutdownRunner();
+    }
     /// <summary>
     /// ホストがチーム解散ボタンを押した際に発動
     /// </summary>
-    private async void HostClickedRooDisbanded()
+    private void HostClickedRooDisbanded()
     {
-
-
-        // ローディングUIを表示する
-        loadingCnavas.SetActive(true);
-
-        await Task.Delay(5000);
-
-        NetworkGameStarter.Instance.ShutdownRunner();
+        RPC_DisbandRoom();
     }
 
     /// <summary>
@@ -63,6 +87,6 @@ public class ReturnButtonUI : MonoBehaviour
     /// </summary>
     private void ClientClickedRooDisbanded()
     {
-        NetworkGameStarter.Instance.ShutdownRunner();
+        DisbandRoom(2000);
     }
 }

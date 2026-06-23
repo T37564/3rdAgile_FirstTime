@@ -14,6 +14,8 @@ public class ScoreUI : MonoBehaviour
     [Header("ScoreUI の Source Asset")]
     [SerializeField] private VisualTreeAsset scoreUI = null;
 
+    [SerializeField] private GameObject returnButtonUI = null;
+
     public Button hostReturnTitle = null;
     public Button clientReturnTitle = null;
 
@@ -48,6 +50,9 @@ public class ScoreUI : MonoBehaviour
         // ScoreManagerにある合計ポイントをUIに表示する
         scoreLabel.text = moneyManager.totalMoney.ToString();
 
-        //ここでネットワーク処理できるボタン処理を追加
+        ReturnButtonUI button=returnButtonUI.GetComponent<ReturnButtonUI>();    
+        button.hostButton= hostReturnTitle;
+        button.clientButton= clientReturnTitle;
+        returnButtonUI.SetActive(true);
     }   
 }
