@@ -196,7 +196,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             {
                 UIReferences.Instance.TitleUI.SetActive(true);
                 UIReferences.Instance.LoadingUI.SetActive(false);
-                Debug.LogError("接続失敗");
+
+                //接続が失敗したことを知らせるメッセージログの表示
+                TitleUI titleUI = UIReferences.Instance.TitleUI.GetComponent<TitleUI>();
+                StartCoroutine(titleUI.MessageLogDisplay());
 
                 if (networkRunner != null)
                 {

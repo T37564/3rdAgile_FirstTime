@@ -16,9 +16,6 @@ public class ScoreUI : MonoBehaviour
 
     [SerializeField] private GameObject returnButtonUI = null;
 
-    public Button hostReturnTitle = null;
-    public Button clientReturnTitle = null;
-
     /// <summary>
     /// スコアを取得してUIへ表示する
     /// </summary>
@@ -40,19 +37,23 @@ public class ScoreUI : MonoBehaviour
         // Scoreという名前のLabelを取得
         Label scoreLabel = root.Q<Label>("Score");
 
-        // HostReturnButtonという名前のButtonを取得
-        hostReturnTitle = root.Q<Button>("HostReturnButton");
-        // ClientReturnButtonという名前のButtonを取得
-        clientReturnTitle = root.Q<Button>("ClientReturnButton");
 
         if (scoreLabel == null) return;
-
         // ScoreManagerにある合計ポイントをUIに表示する
         scoreLabel.text = moneyManager.totalMoney.ToString();
 
-        ReturnButtonUI button=returnButtonUI.GetComponent<ReturnButtonUI>();    
-        button.hostButton= hostReturnTitle;
-        button.clientButton= clientReturnTitle;
+        // HostReturnButtonという名前のButtonを取得
+        Button hostReturnTitle = root.Q<Button>("HostReturnButton");
+        // ClientReturnButtonという名前のButtonを取得
+        Button clientReturnTitle = root.Q<Button>("ClientReturnButton");
+        // MessageLogという名前のVisualElementを取得
+        VisualElement visualElement = root.Q<VisualElement>("MessageLog");
+
+        ReturnButtonUI button = returnButtonUI.GetComponent<ReturnButtonUI>();
+        button.hostButton = hostReturnTitle;
+        button.clientButton = clientReturnTitle;
+        button.messageLog = visualElement;
+
         returnButtonUI.SetActive(true);
-    }   
+    }
 }

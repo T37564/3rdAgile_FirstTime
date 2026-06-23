@@ -3,11 +3,14 @@
 // ScoreUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class TitleUI : MonoBehaviour
 {
+    private readonly float MESSAGELOG_DISPLAY_TIME = 3.0f;
+
     [Header("タイトルのUIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
@@ -20,6 +23,8 @@ public class TitleUI : MonoBehaviour
     private Button createRoom = null;
     private Button enterRoom = null;
 
+    private VisualElement messageLog = null;
+
     private void OnEnable()
     {
         // タイトルのUIに切り替える
@@ -31,6 +36,9 @@ public class TitleUI : MonoBehaviour
         // CreateRoomボタンとEnterRoomボタンを取得
         createRoom = root.Q<Button>("CreateRoom");
         enterRoom = root.Q<Button>("EnterRoom");
+
+        // MessageLogを取得
+        messageLog=root.Q<VisualElement>("MessageLog");
 
         // イベント登録
         createRoom.clicked += titleButtonController.OnClickCreateRoomButton;
@@ -53,5 +61,17 @@ public class TitleUI : MonoBehaviour
         {
             enterRoom.clicked -= titleButtonController.OnClickEnterRoomButton;
         }
+    }
+
+    /// <summary>
+    /// 接続失敗時のメッセージを数秒間表示させる処理
+    /// </summary>
+    public IEnumerator MessageLogDisplay()
+    {
+        messageLog.style.display = DisplayStyle.Flex;
+
+        yield return new WaitForSeconds(MESSAGELOG_DISPLAY_TIME);
+
+        messageLog.style.display = DisplayStyle.None;
     }
 }
