@@ -15,17 +15,13 @@ public class ReturnButtonUI : NetworkBehaviour
     public Button hostButton = null;
     public Button clientButton = null;
 
+    public VisualElement messageLog = null;
+
     private void OnEnable()
     {
         runner = NetworkGameStarter.Instance.networkRunner;
 
-        if (runner == null)
-        {
-
-            Debug.Log("None");
-            return;
-
-        }
+        if (runner == null) return;
 
         // ホストのみ
         if (runner.IsServer)
@@ -52,28 +48,42 @@ public class ReturnButtonUI : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_DisbandRoom()
     {
-        int waitTime = 0;
+        _ = DisbandRoom();
+    }
 
+    private async Task DisbandRoom()
+    {
         // ホストのみ
         if (runner.IsServer)
         {
-            waitTime = 4000;
+            loadingCnavas.SetActive(true);
+
+            await Task.Delay(5000);
         }
         else// ゲストのみ
         {
-            waitTime = 2000;
+            messageLog.style.display = DisplayStyle.Flex;
+
+            await Task.Delay(2000);
+
+            loadingCnavas.SetActive(true);
+
+            await Task.Delay(2000);
         }
-        _ = DisbandRoom(waitTime);
-    }
-
-    private async Task DisbandRoom(int waitTime)
-    {
-        loadingCnavas.SetActive(true);
-
-        await Task.Delay(waitTime);
 
         NetworkGameStarter.Instance.ShutdownRunner();
     }
+
+    private async Task DisbandRoomClient()
+    {
+        loadingCnavas.SetActive(true);
+
+        await Task.Delay(2000);
+
+        NetworkGameStarter.Instance.ShutdownRunner();
+    }
+
+
     /// <summary>
     /// ホストがチーム解散ボタンを押した際に発動
     /// </summary>
@@ -87,6 +97,6 @@ public class ReturnButtonUI : NetworkBehaviour
     /// </summary>
     private void ClientClickedRooDisbanded()
     {
-        DisbandRoom(2000);
+        DisbandRoomClient();
     }
 }
