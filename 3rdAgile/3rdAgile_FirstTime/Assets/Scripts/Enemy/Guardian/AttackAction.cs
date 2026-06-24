@@ -79,11 +79,7 @@ public class AttackAction : NetworkBehaviour
 
     private void Wandering()
     {
-        if (guardianWanderingArea != null)
-        {
-            WanderingPoint = guardianWanderingArea.GetRandomPoint();
-            navMeshAgent.SetDestination(WanderingPoint);
-        }
+        if (guardianWanderingArea == null) return;
 
         // 現在地から目的地までの距離が一定以下の場合
         if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= 0.3f)
@@ -116,6 +112,12 @@ public class AttackAction : NetworkBehaviour
         timer -= Time.deltaTime;
         Debug.Log("攻撃予備動作: " + timer);
         transform.LookAt(guardianController.currentPlayer);
+
+        if(guardianController.currentDistance >= attackDistance)
+        {
+            navMeshAgent.isStopped = false;
+            enemyState = EnemyState.move;
+        }
 
         // 予備動作時間が経過したら攻撃状態に移行
         if (timer <= 0)
