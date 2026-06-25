@@ -1,0 +1,130 @@
+// -----------------------------------------------------------------------------------
+// プレイヤーがアイテムを拾える状況で表示する行動UIの制御クラス
+// PlayerActionUI.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using TMPro;
+using Network.Player;
+
+public class PlayerActionUI : MonoBehaviour
+{
+    // UI表示時に使用する文字
+    private readonly string TO_PICK_UP = "拾う";
+
+    [Header("実行可能なアクションを表示するテキスト")]
+    [SerializeField] private TextMeshProUGUI actionText = null;
+
+    [Header("ゲームパッド用のボタンUI")]
+    [SerializeField] private Image actionImageGamepad = null;
+    [Header("キーボード・マウス用のボタンUI")]
+    [SerializeField] private Image actionImageMouce = null;
+
+    // 現在触れているアイテムを保持する
+    private Collider currentItem = null;
+
+    // プレイヤーコントローラー参照用
+    private PlayerController playerController = null;
+
+    /// <summary>
+    /// 参照用プレイヤーコントローラー取得、UIの初期化
+    /// </summary>
+    private void Start()
+    {
+        playerController = GetComponentInParent<PlayerController>();
+
+        // 最初はUIを非表示
+        ActionUIDisplay(false);
+
+        // PlayerController が取得できなかった場合は処理を終了
+        if (playerController == null) return;
+
+        // 自分が操作していないプレイヤーのUIは無効化する
+        if (!playerController.HasInputAuthority)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// アイテムに触れたときにUIを表示する
+    /// </summary>
+    private void OnTriggerEnter(Collider other)
+    {
+        if (playerController == null || !playerController.HasInputAuthority) return;
+
+        // "Item"に触れているときUI表示
+        if (other.CompareTag("Item"))
+        {
+            currentItem = other;
+            ActionUIDisplay(true);
+        }
+    }
+
+    /// <summary>
+    /// アイテムが離れたときにUIを非表示
+    /// </summary>
+    private void OnTriggerExit(Collider other)
+    {
+        if (playerController == null || !playerController.HasInputAuthority) return;
+
+        // 触れていたアイテムに離れたときUI非表示
+        if (other == currentItem)
+        {
+            currentItem = null;
+            ActionUIDisplay(false);
+        }
+    }
+
+    /// <summary>
+    /// 行動UIの表示状態を更新する
+    /// </summary>
+    private void Update()
+    {
+        if (playerController == null || !playerController.HasInputAuthority) return;
+
+        // アイテムを持っているならUIを非表示
+        if (playerController.IsHoldingItem)
+        {
+            ActionUIDisplay(false);
+            return;
+        }
+
+        // 触れていたアイテムが消えたらUIを非表示
+        if (currentItem == null)
+        {
+            ActionUIDisplay(false);
+        }
+    }
+
+    /// <summary>
+    /// 行動UIの表示・非表示を切り替え、入力デバイスに応じたボタン画像切り替え
+    /// </summary>
+    private void ActionUIDisplay(bool display)
+    {
+        // 「拾う」テキストを表示、非表示にする
+        actionText.text = display ? TO_PICK_UP : "";
+
+        // ボタンのUI画像を非表示にする
+        actionImageGamepad.enabled = false;
+        actionImageMouce.enabled = false;
+
+        // UI非表示時は処理を終了する
+        if (!display) return;
+
+        // 使用中の入力デバイスに応じてボタンUIを表示する
+        if (Gamepad.current != null)
+        {
+            // ゲームパッド版UIの表示
+            actionImageGamepad.enabled = true;
+        }
+        else
+        {
+            // キーボード・マウス用UIを表示
+            actionImageMouce.enabled = true;
+        }
+    }
+}

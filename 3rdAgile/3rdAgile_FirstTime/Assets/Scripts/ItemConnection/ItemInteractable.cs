@@ -136,7 +136,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
     public void Release(PlayerController player)
     {
-        if(!carriers.Contains(player)) return;
+        if (!carriers.Contains(player)) return;
 
         carriers.Remove(player);
         player.ClearHoldingItem(this);
@@ -146,5 +146,26 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
             isCarrying = false;
             Debug.Log("人数不足でアイテムの運搬を中止");
         }
+    }
+
+    /// <summary>
+    /// このアイテムを運んでいるプレイヤーを全員解除する処理
+    /// </summary>
+    public void ReleaseAll()
+    {
+        //　アイテムを持っていない状態に戻す処理
+        foreach (var carrier in carriers)
+        {
+            if (carrier != null)
+            {
+                carrier.ClearHoldingItem(this);
+            }
+        }
+
+        // 運び手リストを空にする
+        carriers.Clear();
+
+        // 運搬状態を終了する
+        isCarrying = false;
     }
 }

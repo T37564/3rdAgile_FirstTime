@@ -4,10 +4,9 @@
 // 製作者：スズキ
 //===========================================================================================
 
+using Fusion;
 using Network.Player;
 using UnityEngine;
-using Fusion;
-using System.Collections.Generic;
 
 /// <summary>
 /// 納品場所のクラス
@@ -177,6 +176,9 @@ public class DeliveryLocation : NetworkBehaviour
 
         //ScoreManager.Instance.AddScore(score);
         MoneyManager.Instance.AddAmount(score);
+
+        // アイテムを運んでいるプレイヤーを解除する処理
+        currentItem.ReleaseAll(); 
 
         Runner.Despawn(currentItemNetworkObject);
 
