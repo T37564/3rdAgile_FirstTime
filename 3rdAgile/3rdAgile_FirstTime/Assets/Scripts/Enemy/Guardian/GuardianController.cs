@@ -35,7 +35,6 @@ public class GuardianController : NetworkBehaviour
         Debug.Log($"Playerêî:{players.Length}");
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (Object == null) return;
@@ -63,8 +62,6 @@ public class GuardianController : NetworkBehaviour
                 navMeshAgent.SetDestination(targetPos);
 
             }
-
-            //Debug.Log(currentDistance);
         }
     }
 
