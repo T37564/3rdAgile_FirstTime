@@ -1,8 +1,14 @@
-using Network.Player;
+// -----------------------------------------------------------------------------------
+// 指定したタグを持つオブジェクトを検索し、その方向を示す矢印UIを制御するクラス
+// DirectionArrowUI.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using UnityEngine;
 
 public class DirectionArrowUI : MonoBehaviour
 {
+    private readonly float DISTANCE_TO_HIDE_ARROW = 1.0f;
+
     [Header("追跡する対象タグ")]
     [SerializeField] private string targetTag = "";
 
@@ -12,17 +18,8 @@ public class DirectionArrowUI : MonoBehaviour
     [Header("矢印を中心からどれだけ離して表示するか")]
     [SerializeField] private float radius = 120.0f;
 
-    [Header("同じタグの対象が複数ある場合、一番近いものを向くか")]
-    [SerializeField] private bool useNearestTarget = true;
-
-    [Header("味方プレイヤー用の矢印などで自分自身を除外するか")]
-    [SerializeField] private bool ignoreSelf = false;
-
     // この矢印UIの基準となる、自分が操作しているプレイヤー
     private Transform player = null;
-
-    // 現在追跡している対象
-    private Transform currentTarget = null;
 
     /// <summary>
     /// 矢印の基準となるプレイヤーを外部から設定する
@@ -47,14 +44,14 @@ public class DirectionArrowUI : MonoBehaviour
     private void UpdateArrow()
     {
         // プレイヤー、矢印UI、中心位置のどれかが未設定なら表示しない
-        if (player == null || arrowRect == null )
+        if (player == null || arrowRect == null)
         {
             SetArrowVisible(false);
             return;
         }
 
         // 現在向くべき対象を探す
-        currentTarget = FindTarget();
+        Transform currentTarget = FindTarget();
 
         // 対象が見つからなければ矢印を非表示
         if (currentTarget == null)
@@ -69,8 +66,8 @@ public class DirectionArrowUI : MonoBehaviour
         // 高さ方向は無視して、XZ平面上の方向だけを見る
         direction.y = 0.0f;
 
-        // プレイヤーと対象がほぼ同じ位置なら矢印を表示しない
-        if (direction.sqrMagnitude <= 0.001f)
+        // 対象に一定距離近づいたとき矢印を非表示にする
+        if (direction.sqrMagnitude <= DISTANCE_TO_HIDE_ARROW)
         {
             SetArrowVisible(false);
             return;
@@ -98,44 +95,17 @@ public class DirectionArrowUI : MonoBehaviour
     /// </summary>
     private Transform FindTarget()
     {
-        // タグが設定されていなければ対象を探せない
+        // タグが設定されていなければ対象を探さない
         if (string.IsNullOrEmpty(targetTag)) return null;
 
-        // 指定タグを持つオブジェクトをすべて取得
-        GameObject[] targets = GameObject.FindGameObjectsWithTag(targetTag);
+        // 指定タグを持つオブジェクトを取得
+        GameObject targets = GameObject.FindGameObjectWithTag(targetTag);
 
-        // 対象が1つも無ければ終了
-        if (targets == null || targets.Length == 0) return null;
+        // 対象が見つからなければ終了
+        if (targets == null) return null;
 
-        Transform result = null;
-        float minSqrDistance = float.MaxValue;
-
-        foreach (GameObject obj in targets)
-        {
-            if (obj == null) continue;
-
-            // 自分自身を除外したい場合はスキップ
-            if (ignoreSelf && player != null && obj.transform == player) continue;
-
-            // 一番近いものを使わない場合は、最初に見つかった対象をそのまま返す
-            if (!useNearestTarget)
-            {
-                return obj.transform;
-            }
-
-            // プレイヤーから対象までの距離を計算
-            float sqrDistance = (obj.transform.position - player.position).sqrMagnitude;
-
-            // これまでで一番近い対象なら更新
-            if (sqrDistance < minSqrDistance)
-            {
-                minSqrDistance = sqrDistance;
-                result = obj.transform;
-            }
-        }
-
-        // 最終的に見つかった対象を返す
-        return result;
+        // 見つかったオブジェクトのTransformを返す
+        return targets.transform;
     }
 
     /// <summary>
@@ -143,6 +113,7 @@ public class DirectionArrowUI : MonoBehaviour
     /// </summary>
     private void SetArrowVisible(bool visible)
     {
+        // 矢印の参照が外れている場合実行しない
         if (arrowRect == null) return;
 
         // 現在の表示状態と違う場合のみ切り替える

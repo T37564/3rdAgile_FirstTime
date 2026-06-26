@@ -1,8 +1,12 @@
-using Fusion;
+// -----------------------------------------------------------------------------------
+// 矢印UIへローカルプレイヤーを設定するクラス
+// ArrowUIManager.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using Network.Player;
 using UnityEngine;
 
-public class ArrowUIManager : MonoBehaviour
+public class ArrowUIInitializer : MonoBehaviour
 {
     [Header("シーン上に配置している矢印UI一覧")]
     [SerializeField] private DirectionArrowUI[] arrowUIs = null;
@@ -28,8 +32,7 @@ public class ArrowUIManager : MonoBehaviour
     private void FindLocalPlayer()
     {
         // 現在シーン上に存在しているPlayerControllerをすべて取得
-        PlayerController[] players =
-            FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 
         foreach (PlayerController player in players)
         {
