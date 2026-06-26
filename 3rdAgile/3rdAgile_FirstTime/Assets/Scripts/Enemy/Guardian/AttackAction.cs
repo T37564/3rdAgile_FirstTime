@@ -43,6 +43,8 @@ public class AttackAction : NetworkBehaviour
 
     [Networked] private bool isMoveNetworked { get; set; } = false;
 
+    [Networked] private bool isAttackNetworked { get; set; } = false;
+
     //[Networked] private TickTimer attackTimer { get; set; }
 
     public override void Spawned()
@@ -61,6 +63,8 @@ public class AttackAction : NetworkBehaviour
 
         // isMoveNetworked=trueのとき同期して全クライアントにアニメーションを実行する
         animator.SetBool("IsMove", isMoveNetworked);
+
+        animator.SetBool("IsAttack",isAttackNetworked);
     }
 
     public override void FixedUpdateNetwork()
@@ -169,9 +173,15 @@ public class AttackAction : NetworkBehaviour
 
         if (playerController != null)
         {
-            // プレイヤーにダメージを与える
-            playerController.TakeDamage(attackDamage);
-            Debug.Log("ぶった");
+            isAttackNetworked = guardianController.currentDistance >= attackDistance;
+
+            if (guardianController.currentDistance <= attackDistance)
+            {
+                // プレイヤーにダメージを与える
+                playerController.TakeDamage(attackDamage);
+                Debug.Log("ぶった");
+            }
+                
         }
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
