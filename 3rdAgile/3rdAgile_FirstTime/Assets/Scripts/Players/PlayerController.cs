@@ -55,7 +55,7 @@ namespace Network.Player
         #endregion
 
         // プレイヤーが現在持っているアイテム（持っていないときはnull）
-        private ItemInteractable holdingItem;
+        public ItemInteractable holdingItem;
 
         // プレイヤーの現在の回転角度
         private Quaternion currentAngle = Quaternion.identity;
