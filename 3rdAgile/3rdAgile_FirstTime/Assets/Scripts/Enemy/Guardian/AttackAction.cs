@@ -43,6 +43,8 @@ public class AttackAction : NetworkBehaviour
 
     [Networked] private bool isMoveNetworked { get; set; } = false;
 
+    [Networked] private bool isAttackNetworked { get; set; } = false;
+
     //[Networked] private TickTimer attackTimer { get; set; }
 
     public override void Spawned()
@@ -87,6 +89,12 @@ public class AttackAction : NetworkBehaviour
         }
     }
 
+    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
+    private void RpcGuardianAttackAnimation()
+    {
+        animator.SetTrigger("IsAttack");
+    }
+
     /// <summary>
     /// 敵の徘徊する目的地を渡すメソッド
     /// </summary>
@@ -115,6 +123,8 @@ public class AttackAction : NetworkBehaviour
 
         // 0.1f以上の速さで移動していたらisMoveNetworkedはtrueになる
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
+        
+        Debug.Log(guardianController.currentDistance);
 
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
@@ -132,6 +142,7 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void AttackReadyState()
     {
+        navMeshAgent.isStopped = true;
         timer -= Time.deltaTime;
         Debug.Log("攻撃予備動作: " + timer);
 
@@ -164,7 +175,8 @@ public class AttackAction : NetworkBehaviour
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
         Debug.Log("攻撃");
-
+        RpcGuardianAttackAnimation();
+        
         PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
         if (playerController != null)
@@ -172,6 +184,12 @@ public class AttackAction : NetworkBehaviour
             // プレイヤーにダメージを与える
             playerController.TakeDamage(attackDamage);
             Debug.Log("ぶった");
+
+            //if (guardianController.currentDistance <= attackDistance)
+            //{
+                
+            //}
+                
         }
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
@@ -183,6 +201,8 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void CooldownState()
     {
+        isAttackNetworked = false;
+
         timer -= Time.deltaTime;
         //Debug.Log("攻撃終了クールダウン");
         if (timer <= 0)

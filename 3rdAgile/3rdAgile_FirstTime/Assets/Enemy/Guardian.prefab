@@ -150,8 +150,8 @@ MonoBehaviour:
   guardianController: {fileID: 801435640108941138}
   navMeshAgent: {fileID: 5144837309392015295}
   animator: {fileID: 3642214065220583639}
-  attackDistance: 2
-  attackReadyTime: 2
+  attackDistance: 4
+  attackReadyTime: 1
   cooldownTime: 2
   attackDamage: 2
   guardianWanderingArea: {fileID: 2482790271233591212}

@@ -35,12 +35,7 @@ public class GuardianWanderingArea : NetworkBehaviour
 
     public Vector3 GetRandomPoint()
     {
-        //Renderer renderer = wanderingGroundPosition.GetComponent<Renderer>();
-        //Bounds bounds = renderer.bounds;
-
         Bounds bounds = wanderingGroundPosition.GetComponent<Renderer>().bounds;
-        Debug.Log(bounds.max.x);
-        Debug.Log(bounds.max.z);
 
         float randomX = Random.Range(bounds.min.x, bounds.max.z);
         float randomZ = Random.Range(bounds.min.z, bounds.max.z);
