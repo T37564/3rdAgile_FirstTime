@@ -8,6 +8,7 @@ TagManager:
   - Item
   - Ground
   - GreenArrow
+  - LegendaryTreasure
   layers:
   - Default
   - TransparentFX
