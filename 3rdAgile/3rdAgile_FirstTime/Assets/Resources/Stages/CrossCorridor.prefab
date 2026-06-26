@@ -238,4 +238,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StagePiece
   occupiedCells:
   - {x: 0, y: 0}
-  connectors: []
+  connectors:
+  - {fileID: 1226627716500298118}
+  - {fileID: 1892408608562409881}

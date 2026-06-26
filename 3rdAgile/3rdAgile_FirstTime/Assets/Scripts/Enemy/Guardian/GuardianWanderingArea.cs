@@ -41,7 +41,7 @@ public class GuardianWanderingArea : NetworkBehaviour
         float randomZ = Random.Range(bounds.min.z, bounds.max.z);
 
         Vector3 randomPoint = new Vector3(randomX, transform.position.y, randomZ);
-        Debug.Log(randomPoint);
+        //Debug.Log(randomPoint);
         NavMeshHit hit;
 
         if(NavMesh.SamplePosition(randomPoint,out hit, 2f, NavMesh.AllAreas))

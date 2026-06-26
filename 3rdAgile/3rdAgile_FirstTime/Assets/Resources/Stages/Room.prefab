@@ -285,7 +285,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StagePiece
   occupiedCells:
   - {x: 0, y: 0}
-  connectors: []
+  connectors:
+  - {fileID: 7714842238704554542}
+  - {fileID: 683116987222278248}
+  - {fileID: 859560483467723007}
+  - {fileID: 4854696600443682375}
 --- !u!1 &8495567664885212603
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,6 +50,7 @@ public class DeliveryLocation : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
+        //Debug.Log("ホストさんよろしくお願いします。");
 
         scanTimer -= Runner.DeltaTime;
 
@@ -60,10 +61,12 @@ public class DeliveryLocation : NetworkBehaviour
         UpdateCurrentItem();
 
         if (currentItem == null) return;
+        //Debug.Log("currentItemはnullじゃないよ～");
 
         int deliveryPlayerCount = CountDeliveryPlayers();
 
         if(deliveryPlayerCount < currentItem.RequiredPeople) return;
+        //Debug.Log("納品可能かな");
 
         DeliveryCurrentItem();
     }
@@ -71,6 +74,7 @@ public class DeliveryLocation : NetworkBehaviour
     private void UpdateCurrentItem()
     {
         if (IsCurrentItemValid()) return;
+        //Debug.Log("returnしません！");
 
         ClearItem();
 
@@ -80,6 +84,7 @@ public class DeliveryLocation : NetworkBehaviour
             itemHits,
             itemLayerMask
         );
+        //Debug.Log($"hitCount: {hitCount}");
 
         float nearestSqrDistance = float.MaxValue;
         GameObject nearestItem = null;
@@ -87,11 +92,11 @@ public class DeliveryLocation : NetworkBehaviour
         for (int i = 0; i < hitCount; i++)
         {
             Collider hit = itemHits[i];
-            Debug.Log("loop Start");
+            //Debug.Log("loop Start");
             if (hit == null) continue;
-            Debug.Log("Collider field in not null");
+            //Debug.Log("Collider field in not null");
             if (!hit.CompareTag(TagName.ITEM)) continue;
-            Debug.Log("Successfully! Get Tag");
+            //Debug.Log("Successfully! Get Tag");
 
             float sqrDistance = (hit.transform.position - transform.position).sqrMagnitude;
 
@@ -100,11 +105,12 @@ public class DeliveryLocation : NetworkBehaviour
                 nearestSqrDistance = sqrDistance;
                 nearestItem = hit.gameObject;
             }
-            Debug.Log("loop Count" + i);
+            //Debug.Log("loop Count" + i);
         }
+        //Debug.Log($"nearestItem: {nearestItem}");
         if (nearestItem != null)
         {
-            Debug.Log("アイテム取得できてるよ！");
+            //Debug.Log("アイテム取得できてるよ！");
             TrySetItem(nearestItem);
         }
     }
@@ -113,7 +119,7 @@ public class DeliveryLocation : NetworkBehaviour
     {
         if (currentItemObject == null) return false;
         if (currentItemNetworkObject == null) return false;
-        Debug.Log("currentItemObjectもcurrentItemNetworkObjectもnullじゃないよ");
+        //Debug.Log("currentItemObjectもcurrentItemNetworkObjectもnullじゃないよ");
 
         float sqrDistance = (currentItemObject.transform.position - transform.position).sqrMagnitude;
         return sqrDistance <= searchRadius * searchRadius;
@@ -124,7 +130,7 @@ public class DeliveryLocation : NetworkBehaviour
         if (!itemObject.TryGetComponent(out NetworkObject networkObject)) return;
         if (!itemObject.TryGetComponent(out ItemInteractable item)) return;
         if (!itemObject.TryGetComponent(out ItemDataStorage storage)) return;
-        Debug.Log("Component取得オールクリア！");
+        //Debug.Log("Component取得オールクリア！");
 
         currentItemObject = itemObject;
         currentItemNetworkObject = networkObject;
@@ -156,7 +162,7 @@ public class DeliveryLocation : NetworkBehaviour
             count++;
         }
 
-        Debug.Log($"count：{count}");
+        //Debug.Log($"count：{count}");
         return count;
     }
 
@@ -164,6 +170,7 @@ public class DeliveryLocation : NetworkBehaviour
     {
         if (currentItemStorage == null) return;
         if (currentItemNetworkObject == null) return;
+        //Debug.Log("カレントアイテムっ！！！");
 
         int score = currentItemStorage.itemData.GetInt("Amount");
 
@@ -184,7 +191,7 @@ public class DeliveryLocation : NetworkBehaviour
         currentItemNetworkObject = null;
         currentItem = null;
         currentItemStorage = null;
-        Debug.Log("クリア～");
+        //Debug.Log("クリア～");
     }
 
 #if UNITY_EDITOR

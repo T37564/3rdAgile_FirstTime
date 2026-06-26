@@ -16,6 +16,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private readonly string T_CORRIDOR_PATH = "Stages/TCorridor";
     private readonly string CROSS_CORRIDOR_PATH = "Stages/CrossCorridor";
     private readonly string ROOM_PATH = "Stages/Room";
+    private readonly string GUARDIAN_ROOM_PATH = "Stages/GuardianRoom";
     private readonly string DEAD_END_PATH = "Stages/DeadEnd";
 
     #endregion
@@ -30,12 +31,22 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private readonly Queue<OpenConnector> openConnectors = new();
 
-    [SerializeField] private float cellSize = 20.0f;
+    [SerializeField] private float cellSize = 5.0f;
     [SerializeField] private NetworkObject startRoomPrefab;
     [Header("--- 通路prefab ---")]
     [SerializeField] private NetworkObject straightCorridorPrefab;
     [SerializeField] private NetworkObject tCorridorPrefab;
     [SerializeField] private NetworkObject crossCorridorPrefab;
+    [SerializeField] private NetworkObject normalRoomPrefab;
+    [SerializeField] private NetworkObject guardianRoomPrefab;
+
+    [SerializeField] private float normalRoomRate = 0.25f;
+    [SerializeField] private float guardianRoomRate = 0.15f;
+    [SerializeField] private int maxNormalRoomCount = 8;
+    [SerializeField] private int maxGuardianRoomCount = 3;
+
+    private int normalRoomCount = 0;
+    private int guardianRoomCount = 0;
 
     [SerializeField] private int maxPartCount = 30;
 
@@ -49,7 +60,8 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         straightCorridorPrefab = Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
         tCorridorPrefab = Resources.Load<NetworkObject>(T_CORRIDOR_PATH);
         crossCorridorPrefab = Resources.Load<NetworkObject>(CROSS_CORRIDOR_PATH);
-        
+        normalRoomPrefab = Resources.Load<NetworkObject>(ROOM_PATH);
+        guardianRoomPrefab = Resources.Load<NetworkObject>(GUARDIAN_ROOM_PATH);
     }
 
     /// <summary>
@@ -58,6 +70,8 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         if (!runner.IsServer) return;
+
+        Debug.Log("べろべろばー");
 
         stageGrid = new StageGrid(cellSize);
 
@@ -74,6 +88,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
+        Debug.Log("a---ho");
         Vector2Int startGrid = Vector2Int.zero;
         Vector3 startWorldPosition = stageGrid.GridToWorld(startGrid);
 
@@ -85,14 +100,14 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         stageGrid.Register(startGrid);
 
-        StagePiece? stagePiece = startobj.GetComponent<StagePiece>();
+        StagePiece? stagePiece = startobj.GetComponentInChildren<StagePiece>();
 
         if (stagePiece == null)
         {
             Debug.LogError("StartRoomにStagePieceがついていない");
             return;
         }
-
+        Debug.Log("huzakennna");
         foreach (StageConnector connector in stagePiece.Connectors)
         {
             openConnectors.Enqueue(
@@ -101,7 +116,9 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
                     connector.Direction
                 )
             );
+            Debug.Log("majimuri");
         }
+        Debug.Log("kietai");
     }
 
     private void CreateStageParts(NetworkRunner runner)
@@ -123,7 +140,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
             if (stageGrid.IsUsed(nextGrid)) continue;
 
-            NetworkObject corridorPrefab = GetRandomCorridorPrefab();
+            NetworkObject corridorPrefab = GetRandomStagePrefab();
 
             Vector3 worldPosition = stageGrid.GridToWorld(nextGrid);
 
@@ -147,6 +164,8 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 continue;
             }
 
+            if (corridorPrefab == normalRoomPrefab || corridorPrefab == guardianRoomPrefab) continue;
+
             foreach (StageConnector connector in stagePiece.Connectors)
             {
                 GridDirection worldDirection =
@@ -162,6 +181,25 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 );
             }
         }
+    }
+
+    private NetworkObject GetRandomStagePrefab()
+    {
+        float randomValue = UnityEngine.Random.value;
+
+        if (guardianRoomCount < maxGuardianRoomCount && randomValue < guardianRoomRate)
+        {
+            guardianRoomCount++;
+            return guardianRoomPrefab;
+        }
+
+        if (normalRoomCount < maxNormalRoomCount && randomValue < guardianRoomRate + normalRoomRate)
+        {
+            normalRoomCount++;
+            return normalRoomPrefab;
+        }
+
+        return GetRandomCorridorPrefab();
     }
 
     private NetworkObject GetRandomCorridorPrefab()
@@ -188,11 +226,11 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             _ => 0.0f
         };
 
-        return Quaternion.Euler(0.0f, y, 0.0f); 
+        return Quaternion.Euler(0.0f, y, 0.0f);
     }
 
     private GridDirection RotateDirection(
-        GridDirection localDirection, 
+        GridDirection localDirection,
         GridDirection baseDirection)
     {
         int local = (int)localDirection;
@@ -203,54 +241,10 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return (GridDirection)result;
     }
 
-    ///// <summary>
-    ///// ランダムな廊下パス取得
-    ///// </summary>
-    //private string GetRandomCorridorPath()
-    //{
-    //    int index =
-    //        UnityEngine.Random.Range(0, CORRIDOR_PATHS.Length);
-
-    //    return CORRIDOR_PATHS[index];
-    //}
-
-    ///// <summary>
-    ///// ステージパーツ生成
-    ///// </summary>
-    //private NetworkObject? StageInstantiate(
-    //    string stagePath,
-    //    NetworkRunner runner,
-    //    Vector3? position = null,
-    //    Quaternion? rotation = null)
-    //{
-    //    GameObject? prefabObj =
-    //        Resources.Load<GameObject>(stagePath);
-
-    //    if (prefabObj == null)
-    //    {
-    //        Debug.LogError(
-    //            $"Prefab が見つからない : {stagePath}");
-
-    //        return null;
-    //    }
-
-    //    if (!prefabObj.TryGetComponent(
-    //            out NetworkObject networkObject))
-    //    {
-    //        Debug.LogError(
-    //            $"NetworkObject が付いてない : {stagePath}");
-
-    //        return null;
-    //    }
-
-    //    NetworkObject obj = runner.Spawn(
-    //        networkObject,
-    //        position ?? Vector3.zero,
-    //        rotation ?? Quaternion.identity
-    //    );
-
-    //    return obj;
-    //}
+    private bool IsGuardianRoom()
+    {
+        return UnityEngine.Random.value < 0.2f;
+    }
 
     #region 未使用コールバック
 
@@ -292,231 +286,3 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     #endregion
 }
-
-
-//# nullable enable
-//using Fusion;
-//using Fusion.Sockets;
-//using System;
-//using System.Collections.Generic;
-//using UnityEngine;
-
-//public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
-//{
-//    private readonly string[] CORRIDOR_PATH = { "Stages/Corridor1", "Stages/Corridor2", "Stages/Corridor3" };
-//    private readonly string AISLE_PATH = "Stages/Aisle";
-//    private readonly string ROOM_PATH = "Stages/Room";
-
-//    [Header("--- 部屋の生成に関する設定 ---")]
-//    [Header("生成する部屋の数")]
-//    [SerializeField] private int roomCreateCount = 0;
-
-//    /// <summary>
-//    /// シーンロードが完了したときに呼ばれる。
-//    /// ロード後の初期化処理を書く。
-//    /// </summary>
-//    public void OnSceneLoadDone(NetworkRunner runner)
-//    {
-//        if (!runner.IsServer) return;
-
-//        var spawnPoints = StageInstantiate(
-//                            GetRandomStagePath(), 
-//                            runner, 
-//                            Vector3.zero, 
-//                            Quaternion.identity)?.GetComponent<CorridorSpawnPoints>();
-//        if (spawnPoints == null)
-//        {
-//            Debug.LogError("CorridorSpawnPoints が見つからないわよ！");
-//            return;
-//        }
-
-//        // 部屋の生成処理
-//        // まず廊下からつながる部屋または通路を生成するか抽選する
-//        int isRoomCreateComplete = 0;
-//        while (isRoomCreateComplete < spawnPoints.RoomSpawnPoints.Length)
-//        {
-//            // 廊下から生成するかをランダムに決める
-//            bool createFlag = BoolRandomUtility.RandomBool();
-//            // createFlagがtrueのときは部屋または通路を生成する、falseのときは生成しない
-//            switch (createFlag)
-//            {
-//                // falseの時は生成しない
-//                case false:
-//                    break;
-//                // trueのときは部屋または通路を生成する
-//                case true:
-//                    bool createRoomOrAisleFlag = BoolRandomUtility.RandomBool();
-//                    // falseのときは部屋を生成する、trueのときは通路を生成する
-//                    switch (createRoomOrAisleFlag)
-//                    {
-//                        case false:
-//                            StageInstantiate(
-//                                ROOM_PATH, 
-//                                runner, 
-//                                spawnPoints.RoomSpawnPoints[isRoomCreateComplete].position,
-//                                Quaternion.identity);
-//                            roomCreateCount++;
-//                            break;
-//                        case true:
-//                            StageInstantiate(
-//                                AISLE_PATH, 
-//                                runner, 
-//                                spawnPoints.RoomSpawnPoints[isRoomCreateComplete].position, 
-//                                Quaternion.identity);
-//                            break;
-//                    }
-//                    break;
-//            }
-//            isRoomCreateComplete++;
-//        }
-//    }
-
-//    /// <summary>
-//    /// ステージをランダムに選んでロードするための関数。
-//    /// </summary>
-//    private string GetRandomStagePath()
-//    {
-//        int index = UnityEngine.Random.Range(0, CORRIDOR_PATH.Length);
-//        return CORRIDOR_PATH[index];
-//    }
-
-//    /// <summary>
-//    /// ステージの各パーツを生成するための関数。
-//    /// </summary>
-//    private NetworkObject? StageInstantiate(
-//        string stagePath,
-//        NetworkRunner runner,
-//        Vector3 position,
-//        Quaternion rotation)
-//    {
-//        GameObject prefabObj = Resources.Load<GameObject>(stagePath);
-//        if (prefabObj == null)
-//        {
-//            Debug.LogError("ステージPrefab が見つからないわよ！");
-//            return null;
-//        }
-//        if (!prefabObj.TryGetComponent(out NetworkObject networkObject))
-//        {
-//            Debug.LogError("ステージPrefab が見つからないわよ！");
-//            return null;
-//        }
-//        NetworkObject obj = runner.Spawn(
-//            networkObject,
-//            position,
-//            rotation
-//        );
-//        return obj;
-//    }
-
-
-//    #region このクラスでは使わないコールバック（空実装）
-//    /// <summary>
-//    /// 各Tickごとに入力データをRunnerへ渡すために呼ばれる。
-//    /// </summary>
-//    public void OnInput(NetworkRunner runner, NetworkInput input) { }
-
-//    /// <summary>
-//    /// プレイヤーがセッションに参加したときに呼ばれる。
-//    /// ホストでスポーン処理を書くことが多い。
-//    /// </summary>
-//    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-
-//    /// <summary>
-//    /// プレイヤーがセッションから退出したときに呼ばれる。
-//    /// プレイヤーオブジェクトの削除処理などを書く。
-//    /// </summary>
-//    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
-
-//    /// <summary>
-//    /// Runnerがシャットダウンされたときに呼ばれる。
-//    /// セッション終了や強制切断時の後処理に使う。
-//    /// </summary>
-//    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-
-//    /// <summary>
-//    /// サーバーとの接続が切断されたときに呼ばれる。
-//    /// 切断理由に応じたUI表示などを行う。
-//    /// </summary>
-//    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
-
-//    /// <summary>
-//    /// クライアントからの接続要求を受け取ったときに呼ばれる（Host側）。
-//    /// 接続を許可するかどうかを決める処理を書く。
-//    /// </summary>
-//    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
-//    /// <summary>
-//    /// 接続に失敗したときに呼ばれる（クライアント側）。
-//    /// エラーメッセージ表示などに使用。
-//    /// </summary>
-//    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-
-//    /// <summary>
-//    /// ユーザー定義のシミュレーションメッセージを受信したときに呼ばれる。
-//    /// 独自メッセージ通信を使う場合に使用。
-//    /// </summary>
-//    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
-
-//    /// <summary>
-//    /// 特定プレイヤーの入力が取得できなかったときに呼ばれる。
-//    /// 入力補間やデフォルト入力を設定する用途。
-//    /// </summary>
-//    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-
-//    /// <summary>
-//    /// サーバーへの接続が成功したときに呼ばれる。
-//    /// 接続完了後の初期処理を書く。
-//    /// </summary>
-//    public void OnConnectedToServer(NetworkRunner runner) { }
-
-//    /// <summary>
-//    /// セッション一覧が更新されたときに呼ばれる。
-//    /// ロビー画面の部屋リスト更新などに使用。
-//    /// </summary>
-//    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
-
-//    /// <summary>
-//    /// シーンロードが開始されたときに呼ばれる。
-//    /// ロード前の準備処理を書く。
-//    /// </summary>
-//    public void OnSceneLoadStart(NetworkRunner runner) { }
-
-//    /// <summary>
-//    /// カスタム認証のレスポンスを受け取ったときに呼ばれる。
-//    /// 外部認証を使用している場合に利用。
-//    /// </summary>
-//    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
-//    /// <summary>
-//    /// ホストマイグレーションが発生したときに呼ばれる。
-//    /// ホストが抜けた際の引き継ぎ処理を書く。
-//    /// </summary>
-//    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
-//    /// <summary>
-//    /// Reliable通信でデータを受信したときに呼ばれる。
-//    /// 大きめのデータ送信などで使用。
-//    /// </summary>
-//    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-
-//    /// <summary>
-//    /// Reliable通信の送受信進捗が更新されたときに呼ばれる。
-//    /// ダウンロード進行表示などに使用。
-//    /// </summary>
-//    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-//    /// <summary>
-//    /// AOI（Area of Interest）からNetworkObjectが外れたときに呼ばれる。
-//    /// 対象プレイヤーにそのオブジェクトが見えなくなるタイミング。
-//    /// </summary>
-//    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
-//    /// <summary>
-//    /// AOI（Area of Interest）にNetworkObjectが入ったときに呼ばれる。
-//    /// 対象プレイヤーにそのオブジェクトが見えるようになるタイミング。
-//    /// </summary>
-//    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-//    #endregion
-//}
-
