@@ -63,8 +63,6 @@ public class AttackAction : NetworkBehaviour
 
         // isMoveNetworked=trueのとき同期して全クライアントにアニメーションを実行する
         animator.SetBool("IsMove", isMoveNetworked);
-
-        animator.SetBool("IsAttack",isAttackNetworked);
     }
 
     public override void FixedUpdateNetwork()
@@ -89,6 +87,12 @@ public class AttackAction : NetworkBehaviour
                 CooldownState();
                 break;
         }
+    }
+
+    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
+    private void RpcGuardianAttackAnimation()
+    {
+        animator.SetTrigger("IsAttack");
     }
 
     /// <summary>
@@ -119,6 +123,8 @@ public class AttackAction : NetworkBehaviour
 
         // 0.1f以上の速さで移動していたらisMoveNetworkedはtrueになる
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
+        
+        Debug.Log(guardianController.currentDistance);
 
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
@@ -136,6 +142,7 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void AttackReadyState()
     {
+        navMeshAgent.isStopped = true;
         timer -= Time.deltaTime;
         Debug.Log("攻撃予備動作: " + timer);
 
@@ -168,19 +175,20 @@ public class AttackAction : NetworkBehaviour
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
         Debug.Log("攻撃");
-
+        RpcGuardianAttackAnimation();
+        
         PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
         if (playerController != null)
         {
-            isAttackNetworked = guardianController.currentDistance >= attackDistance;
+            // プレイヤーにダメージを与える
+            playerController.TakeDamage(attackDamage);
+            Debug.Log("ぶった");
 
-            if (guardianController.currentDistance <= attackDistance)
-            {
-                // プレイヤーにダメージを与える
-                playerController.TakeDamage(attackDamage);
-                Debug.Log("ぶった");
-            }
+            //if (guardianController.currentDistance <= attackDistance)
+            //{
+                
+            //}
                 
         }
         // 攻撃後一定時間攻撃できないようにする
@@ -193,6 +201,8 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void CooldownState()
     {
+        isAttackNetworked = false;
+
         timer -= Time.deltaTime;
         //Debug.Log("攻撃終了クールダウン");
         if (timer <= 0)
