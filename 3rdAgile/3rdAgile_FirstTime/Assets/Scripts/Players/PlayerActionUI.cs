@@ -14,6 +14,12 @@ public class PlayerActionUI : MonoBehaviour
     // UI表示時に使用する文字
     private readonly string TO_PICK_UP = "拾う";
 
+    // アイテム納品箱まで案内する矢印のタグ名
+    private readonly string GREEN_ARROW_TAG_NAME = "GreenArrow";
+
+    // アイテムのタグ名
+    private readonly string ITEM_TAG_NAME = "Item";
+
     [Header("実行可能なアクションを表示するテキスト")]
     [SerializeField] private TextMeshProUGUI actionText = null;
 
@@ -28,12 +34,17 @@ public class PlayerActionUI : MonoBehaviour
     // プレイヤーコントローラー参照用
     private PlayerController playerController = null;
 
+    // アイテム納品箱まで案内する矢印
+    private GameObject greenArrow = null;
+
     /// <summary>
     /// 参照用プレイヤーコントローラー取得、UIの初期化
     /// </summary>
     private void Start()
     {
         playerController = GetComponentInParent<PlayerController>();
+
+        greenArrow = GameObject.FindGameObjectWithTag(GREEN_ARROW_TAG_NAME);
 
         // 最初はUIを非表示
         ActionUIDisplay(false);
@@ -57,7 +68,7 @@ public class PlayerActionUI : MonoBehaviour
         if (playerController == null || !playerController.HasInputAuthority) return;
 
         // "Item"に触れているときUI表示
-        if (other.CompareTag("Item"))
+        if (other.CompareTag(ITEM_TAG_NAME))
         {
             currentItem = other;
             ActionUIDisplay(true);
@@ -90,6 +101,7 @@ public class PlayerActionUI : MonoBehaviour
         if (playerController.IsHoldingItem)
         {
             ActionUIDisplay(false);
+            SetVisible(true);
             return;
         }
 
@@ -97,6 +109,7 @@ public class PlayerActionUI : MonoBehaviour
         if (currentItem == null)
         {
             ActionUIDisplay(false);
+            SetVisible(false);
         }
     }
 
@@ -106,7 +119,14 @@ public class PlayerActionUI : MonoBehaviour
     private void ActionUIDisplay(bool display)
     {
         // 「拾う」テキストを表示、非表示にする
-        actionText.text = display ? TO_PICK_UP : "";
+        if (display)
+        {
+            actionText.text = TO_PICK_UP;
+        }
+        else
+        {
+            actionText.text = "";
+        }
 
         // ボタンのUI画像を非表示にする
         actionImageGamepad.enabled = false;
@@ -126,5 +146,13 @@ public class PlayerActionUI : MonoBehaviour
             // キーボード・マウス用UIを表示
             actionImageMouce.enabled = true;
         }
+    }
+
+    /// <summary>
+    /// 矢印の表示・非表示
+    /// </summary>
+    public void SetVisible(bool visible)
+    {
+        greenArrow.gameObject.SetActive(visible);
     }
 }

@@ -7,6 +7,7 @@ TagManager:
   - DeliveryBox
   - Item
   - Ground
+  - GreenArrow
   layers:
   - Default
   - TransparentFX
