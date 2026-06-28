@@ -150,9 +150,9 @@ MonoBehaviour:
   guardianController: {fileID: 801435640108941138}
   navMeshAgent: {fileID: 5144837309392015295}
   animator: {fileID: 3642214065220583639}
-  attackDistance: 4
-  attackReadyTime: 1
-  cooldownTime: 2
+  attackDistance: 6
+  attackReadyTime: 5
+  cooldownTime: 7
   attackDamage: 2
   guardianWanderingArea: {fileID: 2482790271233591212}
   isArrival: 0
@@ -178,7 +178,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 5
+  m_Speed: 3
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 500
@@ -292,7 +292,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: 0f2c5202b918687408ac5bc7429a03ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 855490041626121642}
   m_SourcePrefab: {fileID: 100100000, guid: 0f2c5202b918687408ac5bc7429a03ea, type: 3}
 --- !u!95 &3642214065220583639 stripped
 Animator:
@@ -304,3 +307,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 0f2c5202b918687408ac5bc7429a03ea, type: 3}
   m_PrefabInstance: {fileID: 3642214065230017975}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3642214065229984531 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100004, guid: 0f2c5202b918687408ac5bc7429a03ea, type: 3}
+  m_PrefabInstance: {fileID: 3642214065230017975}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &855490041626121642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3642214065229984531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42f1badb3d91b6f4d810d268021ea6ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationEventRelay
+  attackAction: {fileID: 577375914382016332}

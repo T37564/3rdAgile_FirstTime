@@ -39,11 +39,13 @@ public class AttackAction : NetworkBehaviour
     private Vector3 WanderingPoint;
 
     // 徘徊する場所に到着したかの判定
-    public bool isArrival = false;
+    public bool isArrival = false; 
+    
+    private bool attackStarted = false;
 
     [Networked] private bool isMoveNetworked { get; set; } = false;
 
-    [Networked] private bool isAttackNetworked { get; set; } = false;
+    [Networked] private bool isIdleNetworked { get; set; } = false;
 
     //[Networked] private TickTimer attackTimer { get; set; }
 
@@ -63,6 +65,8 @@ public class AttackAction : NetworkBehaviour
 
         // isMoveNetworked=trueのとき同期して全クライアントにアニメーションを実行する
         animator.SetBool("IsMove", isMoveNetworked);
+
+        animator.SetBool("IsIdle", isIdleNetworked);
     }
 
     public override void FixedUpdateNetwork()
@@ -120,6 +124,7 @@ public class AttackAction : NetworkBehaviour
         navMeshAgent.isStopped = false;
 
         Wandering();
+        isIdleNetworked = false;
 
         // 0.1f以上の速さで移動していたらisMoveNetworkedはtrueになる
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
@@ -149,7 +154,8 @@ public class AttackAction : NetworkBehaviour
         // 攻撃のターゲットにしているプレイヤーの方を見る
         transform.LookAt(guardianController.currentPlayer);
 
-        animator.SetBool("IsMove",false);
+        isMoveNetworked = false;
+        isIdleNetworked = true;
 
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
         if(guardianController.currentDistance >= attackDistance)
@@ -172,11 +178,14 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void AttackState()
     {
+        if (attackStarted) return;
+        attackStarted = true;
+
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
         Debug.Log("攻撃");
         RpcGuardianAttackAnimation();
-        
+
         PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
         if (playerController != null)
@@ -184,13 +193,15 @@ public class AttackAction : NetworkBehaviour
             // プレイヤーにダメージを与える
             playerController.TakeDamage(attackDamage);
             Debug.Log("ぶった");
-
-            //if (guardianController.currentDistance <= attackDistance)
-            //{
-                
-            //}
-                
         }
+    }
+
+    public void AttackAnimationFinished()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        attackStarted = false;
+        Debug.Log("攻撃終了");
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
         timer = cooldownTime;
@@ -201,10 +212,10 @@ public class AttackAction : NetworkBehaviour
     /// </summary>
     private void CooldownState()
     {
-        isAttackNetworked = false;
+        isIdleNetworked = true;
 
         timer -= Time.deltaTime;
-        //Debug.Log("攻撃終了クールダウン");
+        Debug.Log($"攻撃終了クールダウン "+ timer);
         if (timer <= 0)
         {
             Debug.Log("徘徊に移行");
