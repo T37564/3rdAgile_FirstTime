@@ -1,10 +1,17 @@
+// -----------------------------------------------------------------------------------
+// ロビーUIの制御クラス
+// LobbyUI.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class LobbyUI : MonoBehaviour
 {
-    private const float DISPLAY_COUNT = 1.0f;
+    // テキストを一定時間表示させるための時間
+    private const float DISPLAY_TIME = 1.0f;
+
     [Header("UIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
@@ -16,38 +23,49 @@ public class LobbyUI : MonoBehaviour
 
 
 
-
+    // ゲームスタートのボタン
     public Button gameStartButton = null;
 
+    // プレイヤーの人数を表示するラベル
     public Label playerCount = null;
 
+    // ルームのPINコードを表示するラベル
     public Label roomPIN = null;
 
+    // プレイヤーの人数不足を知らせるラベル
     public Label lackOfPersonnel = null;
 
+    // NetworkGameStarterの参照用
     private NetworkGameStarter networkGameStarter = null;
 
 
     private void OnEnable()
     {
-        // ロビーのUIに切り替える
+        // ロビーUIに変更
         uiDocument.rootVisualElement.Clear();
         uIAssetData.lobbyUI.CloneTree(uiDocument.rootVisualElement);
 
+        // ロビーUIのVisualElementを探す
         VisualElement root = uiDocument.rootVisualElement;
 
+        // UXML内からButton "StartButton" を取得
         gameStartButton = root.Q<Button>("StartButton");
+
+        // UXML内から各Labelを取得
         playerCount = root.Q<Label>("CountText");
         roomPIN = root.Q<Label>("PINText");
         lackOfPersonnel = root.Q<Label>("LackOfPersonnel");
 
+        // プレイヤー人数不足を知らせるラベルを非表示にする
         lackOfPersonnel.style.display = DisplayStyle.None;
 
-        // イベント登録
+        // スタートボタンが押されたときのイベント登録
         gameStartButton.clicked += titleButtonController.ClickStartButton;
 
+        // NetworkGameStarter のインスタンスを取得　
         networkGameStarter = NetworkGameStarter.Instance;
 
+        // ホスト用のロビーUI表示を更新する
         networkGameStarter.networkLobbyUI.DisplayHostUI(networkGameStarter.networkRunner, this);
     }
 
@@ -63,14 +81,13 @@ public class LobbyUI : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーが不足していることを一定時間表示させるコルーチン
+    /// プレイヤー人数不足のメッセージを一定時間表示するコルーチン
     /// </summary>
-    /// <returns></returns>
     public IEnumerator ActiveLackOfPersonnel()
     {
         lackOfPersonnel.style.display = DisplayStyle.Flex;
 
-        yield return new WaitForSecondsRealtime(DISPLAY_COUNT);
+        yield return new WaitForSecondsRealtime(DISPLAY_TIME);
 
         lackOfPersonnel.style.display = DisplayStyle.None;
     }

@@ -1,3 +1,8 @@
+// -----------------------------------------------------------------------------------
+// タイトル画面のボタンを制御するクラス
+// TitleButtonController.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using System.Linq;
 using UnityEngine;
 
@@ -6,22 +11,28 @@ public class TitleButtonController : MonoBehaviour
     // プレイヤー最低人数
     private readonly int MINIMUM_NUMBER_OF_PEOPLE = 2;
 
+    // ゲームシーン名
+    private readonly string GAME_SCENE_NAME = "PlayerSpawnTestScenes 1";
+
+    // 仮のチーム名
+    private const string DEFAULT_TEAM_NAME = "test";
+
     [Header("NetworkGameStarterの参照")]
     [SerializeField] private NetworkGameStarter networkGameStarter = null;
 
     /// <summary>
-    /// CreateRoomボタンが押された時に呼ばれる
+    ///  ホストとしてルームを作成する
     /// </summary>
     public void OnClickCreateRoomButton()
     {
         // タイトルUI非表示
         UIReferences.Instance.TitleUI.SetActive(false);
 
-        HostModeStartButton("test");
+        HostModeStartButton(DEFAULT_TEAM_NAME);
     }
 
     /// <summary>
-    /// EnterRoomボタンが押されたとき
+    /// 指定したPINでルームに参加する
     /// </summary>
     public void OnClickEnterRoomButton()
     {
@@ -31,12 +42,6 @@ public class TitleButtonController : MonoBehaviour
         // 暗証番号を入力させる
         UIReferences.Instance.VirtualKeyboardUI.SetActive(true);
     }
-
-
-
-
-
-
 
     /// <summary>
     /// CreateRoomボタン押下時に呼ばれる
@@ -71,48 +76,13 @@ public class TitleButtonController : MonoBehaviour
         // 2人未満の場合はゲーム開始できない
         if (playerCount < MINIMUM_NUMBER_OF_PEOPLE)
         {
-            // 人数不足エラーを表示
+            // 人数不足メッセージを表示
             LobbyUI lobbyUI = UIReferences.Instance.LobbyUI.GetComponent<LobbyUI>();
-
             StartCoroutine(lobbyUI.ActiveLackOfPersonnel());
-
             return;
         }
 
         // Fusionのシーン同期機能を使ってゲームシーンへ移動
-        networkGameStarter.networkRunner.LoadScene("PlayerSpawnTestScenes 1");
+        networkGameStarter.networkRunner.LoadScene(GAME_SCENE_NAME);
     }
-
-
-
-    //チーム名入力が欲しい場合使用
-
-    ///// <summary>
-    ///// InputFieldを表示し、Submitイベントを登録し直す
-    ///// </summary>
-    //public void OpenTeamNameInputUI()
-    //{
-    //    // チーム名入力UIを表示する
-    //    TitleCanvasDisplaySettings.Instance.roomNameInput.transform.parent.gameObject.SetActive(true);
-
-    //    // チーム名入力用InputFieldを取得
-    //    TMP_InputField input = TitleCanvasDisplaySettings.Instance.roomNameInput;
-    //    // 以前のリスナーを削除
-    //    input.onSubmit.RemoveAllListeners();
-
-    //    // Enterキー押下時にOnEnterPressedを呼ぶ
-    //    input.onSubmit.AddListener(OnTeamNameSubmitted);
-    //}
-
-
-    ///// <summary>
-    ///// Enterキー押下時に呼ばれる
-    ///// </summary>
-    //private void OnTeamNameSubmitted(string teamName)
-    //{
-    //    // 空白だけ、または何も入力されていない場合は何もしない
-    //    if (string.IsNullOrWhiteSpace(teamName)) return;
-
-    //    HostModeStartButton(teamName);
-    //}
 }

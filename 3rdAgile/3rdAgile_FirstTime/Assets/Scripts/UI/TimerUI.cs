@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// ゲームの残り時間をUIに表示するクラス。
+// ゲームの残り時間をUIに表示するクラス
 // TimerUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ public class TimerUI : MonoBehaviour
     private Label timerLabel = null;
 
     /// <summary>
-    /// UIDocument生成後にLabelを取得する
+    /// UIDocument生成後、タイマー表示用のLabelを取得する
     /// </summary>
     private void Start()
     {
@@ -30,7 +30,7 @@ public class TimerUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 毎フレーム残り時間を更新してUIに表示する。
+    /// 毎フレーム残り時間を更新してUIに表示する
     /// </summary>
     private void Update()
     {

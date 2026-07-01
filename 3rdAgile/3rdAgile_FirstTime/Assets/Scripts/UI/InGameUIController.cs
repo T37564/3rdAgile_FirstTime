@@ -1,8 +1,13 @@
+// -----------------------------------------------------------------------------------
+// ゲーム内のUIを管理するクラス
+// InGameUIController.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using UnityEngine;
 
 public class InGameUIController : MonoBehaviour
 {
-    [Header("スコアを表示するクラス")]
+    [Header("スコアUI")]
     [SerializeField] private ScoreUI scoreUI = null;
 
     /// <summary>

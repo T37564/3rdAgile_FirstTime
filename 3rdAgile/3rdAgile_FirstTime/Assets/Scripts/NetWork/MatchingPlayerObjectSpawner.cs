@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// ロビーに入った時 プレイヤーモデル表示
+// ロビー入室時にプレイヤーモデルを表示するクラス
 // MatchingPlayerObjectSpawner.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
     private PlayerPrefabData playerPrefabData = null;
 
     /// <summary>
-    /// ScriptableObjectからPrefab情報を取得する処理
+    /// ScriptableObjectからPrefab情報を取得
     /// </summary>
     private void Awake()
     {
@@ -70,11 +70,11 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
         }
         else // ゲストプレイヤー生成
         {
-            // プレイヤー参加順のIndexを取得
+            // プレイヤー参加順のインデックスを取得
             int index = player.AsIndex;
 
             runner.Spawn(
-                // ホスト分のIndexを調整
+                // ホスト分のインデックスを調整
                 playerPrefab[index - HOST_COUNT],
                 // ホスト分のIndexを調整
                 playerSpawnPosition[index - HOST_COUNT],

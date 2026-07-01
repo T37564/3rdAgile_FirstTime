@@ -1,10 +1,12 @@
+// -----------------------------------------------------------------------------------
+// NowLoading時のUIを管理するクラス
+// NowLoadingUIController.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using System.Collections;
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// NowLoading時のUIを管理するクラス
-/// </summary>
 public class NowLoadingUIController : MonoBehaviour
 {
     // テキストを表示する間隔
@@ -17,7 +19,7 @@ public class NowLoadingUIController : MonoBehaviour
     private readonly string LOADING_TEXT = "Now Loading...";
 
 
-    [Header("Loading時の使用するテキスト")]
+    [Header("Loading時に使用するテキスト")]
     [SerializeField] private TMP_Text loadingText = null;
 
     /// <summary>
@@ -29,7 +31,7 @@ public class NowLoadingUIController : MonoBehaviour
     }
 
     /// <summary>
-    /// コルーチンを停止しテキストを初期化する
+    /// コルーチンを停止し、表示中のテキストをリセットする
     /// </summary>
     private void OnDisable()
     {
@@ -40,7 +42,7 @@ public class NowLoadingUIController : MonoBehaviour
 
 
     /// <summary>
-    /// 一文字ずつテキストを表示するコルーチン
+    /// 「Now Loading...」を一文字ずつ繰り返し表示するコルーチン
     /// </summary>
     private IEnumerator ShowLoadingText()
     {

@@ -14,6 +14,7 @@ public class ScoreUI : MonoBehaviour
     [Header("ScoreUI の Source Asset")]
     [SerializeField] private VisualTreeAsset scoreUI = null;
 
+    [Header("ReturnButtonUI 参照用に使用するオブジェクト")]
     [SerializeField] private GameObject returnButtonUI = null;
 
     /// <summary>
@@ -21,39 +22,41 @@ public class ScoreUI : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        // MoneyManagerを取得
+        // シーン内のMoneyManagerを取得
         MoneyManager moneyManager = FindAnyObjectByType<MoneyManager>();
 
+        // MoneyManagerが取得できていない場合は処理しない
         if (moneyManager == null) return;
 
-        // UIの変更
+        // ScoreUIに変更
         uiDocument.rootVisualElement.Clear();
-
         scoreUI.CloneTree(uiDocument.rootVisualElement);
 
         // UIDocumentのルート要素を取得
         VisualElement root = uiDocument.rootVisualElement;
 
-        // Scoreという名前のLabelを取得
+        // UXML内からLabel "Score" を取得
         Label scoreLabel = root.Q<Label>("Score");
 
-
+        // ScoreLabelが取得できていない場合は処理しない
         if (scoreLabel == null) return;
-        // ScoreManagerにある合計ポイントをUIに表示する
+        // MoneyManagerにある合計スコアを表示する
         scoreLabel.text = moneyManager.totalMoney.ToString();
 
-        // HostReturnButtonという名前のButtonを取得
+        // UXML内から各Buttonを取得
         Button hostReturnTitle = root.Q<Button>("HostReturnButton");
-        // ClientReturnButtonという名前のButtonを取得
         Button clientReturnTitle = root.Q<Button>("ClientReturnButton");
-        // MessageLogという名前のVisualElementを取得
         VisualElement visualElement = root.Q<VisualElement>("MessageLog");
 
+        // ReturnButtonUIのコンポーネントを取得
         ReturnButtonUI button = returnButtonUI.GetComponent<ReturnButtonUI>();
+
+        // ReturnButtonUIの各ボタンとMessageLogを設定
         button.hostButton = hostReturnTitle;
         button.clientButton = clientReturnTitle;
         button.messageLog = visualElement;
 
+        // ReturnButtonUIを有効にする
         returnButtonUI.SetActive(true);
     }
 }

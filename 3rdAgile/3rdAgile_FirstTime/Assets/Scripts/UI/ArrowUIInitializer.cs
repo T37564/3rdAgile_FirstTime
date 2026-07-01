@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------
 // 矢印UIへローカルプレイヤーを設定するクラス
-// ArrowUIManager.cs
+// ArrowUIInitializer.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using Network.Player;
@@ -15,7 +15,7 @@ public class ArrowUIInitializer : MonoBehaviour
     private PlayerController localPlayer = null;
 
     /// <summary>
-    /// ローカルプレイヤーがまだ見つかっていない場合は探す
+    /// ローカルプレイヤーが見つかるまで検索する
     /// </summary>
     private void Update()
     {
@@ -31,7 +31,7 @@ public class ArrowUIInitializer : MonoBehaviour
     /// </summary>
     private void FindLocalPlayer()
     {
-        // 現在シーン上に存在しているPlayerControllerをすべて取得
+        // 現在シーン上に存在するPlayerControllerをすべて取得
         PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 
         foreach (PlayerController player in players)
@@ -45,7 +45,7 @@ public class ArrowUIInitializer : MonoBehaviour
             // ローカルプレイヤーとして保持
             localPlayer = player;
 
-            // 取得したプレイヤー情報をすべての矢印UIに渡す
+            // 取得したプレイヤーをすべての矢印UIに渡す
             SetPlayerToArrows(localPlayer.transform);
 
             return;
@@ -53,7 +53,7 @@ public class ArrowUIInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// すべての矢印UIに、基準となるプレイヤーを設定する
+    /// すべての矢印UIに基準となるプレイヤーを設定する
     /// </summary>
     private void SetPlayerToArrows(Transform playerTransform)
     {
@@ -65,7 +65,7 @@ public class ArrowUIInitializer : MonoBehaviour
             // 要素が空ならスキップ
             if (arrow == null) continue;
 
-            // 各矢印UIにローカルプレイヤーを設定
+            //  各矢印UIに基準となるプレイヤーを設定
             arrow.SetPlayer(playerTransform);
         }
     }

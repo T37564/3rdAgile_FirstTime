@@ -1,3 +1,8 @@
+// -----------------------------------------------------------------------------------
+// UIÇ≈égópÇ∑ÇÈVisualTreeAssetÇä«óùÇ∑ÇÈScriptableObject
+// UIAssetData.cs
+// Create.by TakahashiSaya
+//-----------------------------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,7 +13,7 @@ public class UIAssetData : ScriptableObject
     public VisualTreeAsset titleUI;
 
     [Header("VirtualKeyboard UI")]
-    public VisualTreeAsset VirtualKeyboardUI;
+    public VisualTreeAsset virtualKeyboardUI;
 
     [Header("Lobby UI")]
     public VisualTreeAsset lobbyUI;

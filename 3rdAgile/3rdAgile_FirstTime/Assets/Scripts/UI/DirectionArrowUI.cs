@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class DirectionArrowUI : MonoBehaviour
 {
+    // 矢印を非表示にする対象までの距離
     private readonly float DISTANCE_TO_HIDE_ARROW = 1.0f;
 
     [Header("追跡する対象タグ")]
@@ -35,7 +36,6 @@ public class DirectionArrowUI : MonoBehaviour
     private void Update()
     {
         UpdateArrow();
-
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class DirectionArrowUI : MonoBehaviour
     /// </summary>
     private void UpdateArrow()
     {
-        // プレイヤー、矢印UI、中心位置のどれかが未設定なら表示しない
+        // プレイヤーまたは矢印UIが未設定なら表示しない
         if (player == null || arrowRect == null)
         {
             SetArrowVisible(false);
@@ -113,7 +113,7 @@ public class DirectionArrowUI : MonoBehaviour
     /// </summary>
     private void SetArrowVisible(bool visible)
     {
-        // 矢印の参照が外れている場合実行しない
+        // 矢印UIの参照が設定されていない場合は処理を行わない
         if (arrowRect == null) return;
 
         // 現在の表示状態と違う場合のみ切り替える

@@ -67,7 +67,7 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // "Item"に触れているときUI表示
+        // Itemタグのオブジェクトに触れたときUIを表示
         if (other.CompareTag(ITEM_TAG_NAME))
         {
             currentItem = other;
@@ -97,7 +97,7 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // アイテムを持っているならUIを非表示
+        // アイテムを持っている間は拾うUIを非表示にし、納品先への矢印を表示
         if (playerController.IsHoldingItem)
         {
             ActionUIDisplay(false);
@@ -105,7 +105,7 @@ public class PlayerActionUI : MonoBehaviour
             return;
         }
 
-        // 触れていたアイテムが消えたらUIを非表示
+        // 対象アイテムが無くなったらUIと矢印を更新
         if (currentItem == null)
         {
             ActionUIDisplay(false);
@@ -128,7 +128,7 @@ public class PlayerActionUI : MonoBehaviour
             actionText.text = "";
         }
 
-        // ボタンのUI画像を非表示にする
+        // ボタン画像を一度すべて非表示にする
         actionImageGamepad.enabled = false;
         actionImageMouce.enabled = false;
 
@@ -149,7 +149,7 @@ public class PlayerActionUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 矢印の表示・非表示
+    /// 納品先への矢印の表示・非表示を切り替える
     /// </summary>
     public void SetVisible(bool visible)
     {
