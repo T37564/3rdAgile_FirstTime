@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------------------
 using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -53,9 +52,6 @@ public class VirtualKeyboardController : MonoBehaviour
     [Header("UI Asset Data 参照")]
     [SerializeField] private UIAssetData uiAssetData = null;
 
-    // UXML の root
-    private VisualElement root = null;
-
     // class="key" を持つ全てのキー（UI 要素）をまとめて格納
     private Button[] keys = null;
 
@@ -90,10 +86,10 @@ public class VirtualKeyboardController : MonoBehaviour
     {
         // 暗証番号入力UIに変更
         uiDocument.rootVisualElement.Clear();
-        uiAssetData.VirtualKeyboardUI.CloneTree(uiDocument.rootVisualElement);
+        uiAssetData.virtualKeyboardUI.CloneTree(uiDocument.rootVisualElement);
 
         // 仮想キーボードのVisualElementを探す
-        root = uiDocument.rootVisualElement;
+        VisualElement root = uiDocument.rootVisualElement;
 
         // UXML 内で class="key" が付いた要素を全部取得して配列に変換
         keys = root.Query<Button>(className: "key").ToList().ToArray();
@@ -337,7 +333,6 @@ public class VirtualKeyboardController : MonoBehaviour
                 break;
 
             default:
-                Debug.LogWarning("未対応のキー入力");
                 return;
 
         }
@@ -351,8 +346,11 @@ public class VirtualKeyboardController : MonoBehaviour
     {
         // 選択したUIの色を変える
         int highlightIndex = GetButtonIndex(index);
+
         if (highlightIndex >= 0)
+        {
             StartCoroutine(Highlight(highlightIndex));
+        }
 
         // 暗証番号の最大桁数より小さいとき
         if (matchingNumbers.Length < MAXIMUM_NUMBER_OF_DIGITS)
@@ -383,6 +381,7 @@ public class VirtualKeyboardController : MonoBehaviour
         // 暗証番号が入力されているとき
         if (MAXIMUM_NUMBER_OF_DIGITS == matchingNumbers.Length)
         {
+            // 二重押し防止のフラグが立っている場合は処理を中断する
             if (isDuplicateMonitoring) return;
 
             // 二重押し防止のフラグを立てる

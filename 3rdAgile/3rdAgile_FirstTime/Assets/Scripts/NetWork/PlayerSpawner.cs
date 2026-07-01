@@ -12,7 +12,13 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // 複数人のIDを取得するためList型
+    // ホストを表すPlayerRefのRawEncoded値
+    private const int HOST_PLAYER_RAW_ENCODED = -1;
+
+    // プレイヤーPrefabの情報が入ったScriptableObjectのパス
+    private readonly string PLAYER_PREFAB_DATA_PATH = "PlayerPrefabData/InGamePlayerPrefabData";
+
+    // セッション参加中プレイヤー一覧
     private List<PlayerRef> players = new List<PlayerRef>();
 
     // どのプレイヤーがどのオブジェクトを操作しているか
@@ -28,24 +34,21 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (!runner.IsServer) return;
 
         // プレイヤーのプレハブやスポーン位置・回転をまとめた ScriptableObject をロード
-        PlayerPrefabData inGamePlayerPrefab = Resources.Load<PlayerPrefabData>("PlayerPrefabData/InGamePlayerPrefabData");
+        PlayerPrefabData inGamePlayerPrefab = Resources.Load<PlayerPrefabData>(PLAYER_PREFAB_DATA_PATH);
 
         for (int i = 0; i < players.Count; i++)
         {
             // オブジェクトスポーン
             NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i],
-                        inGamePlayerPrefab.playerSpawnPositions[i],
-                         inGamePlayerPrefab.playerSpawnRotations[0],
-                         players[i]
-                         );
+                                                             inGamePlayerPrefab.playerSpawnPositions[i],
+                                                             inGamePlayerPrefab.playerSpawnRotations[0],
+                                                             players[i]
+                                                              );
 
             // PlayerRef と NetworkObject を紐づける
             playerObjects[players[i]] = spawnedPlayerObject;
         }
     }
-
-
-
 
     #region Player
     /// <summary>
@@ -69,17 +72,12 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         // ホストが抜けた場合
-        if (player.RawEncoded == -1)
+        if (player.RawEncoded == HOST_PLAYER_RAW_ENCODED)
         {
-            Debug.Log("ホストが退出しました");
-
             // 全端末（ホストもゲストも）タイトルへ
             FindAnyObjectByType<NetworkGameStarter>().ShutdownRunner();
             return;
         }
-
-        // クライアントが抜けた場合はゲーム続行
-        Debug.Log($"Client {player} left, game continues");
     }
 
     /// <summary>
@@ -90,7 +88,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         // プレイヤー一覧へ追加
         players.Add(player);
-        Debug.Log($"Player joined: {player}");
     }
 
     #endregion

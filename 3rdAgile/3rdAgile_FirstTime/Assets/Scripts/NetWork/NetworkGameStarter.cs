@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------------------
-// ルーム作成、参加、シーン管理、ゲーム開始の司令塔。
+// ルーム作成、参加、シーン管理、ゲーム開始の司令塔
 // NetworkGameStarter.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -16,14 +16,37 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     // 最大参加人数
     private readonly int MAX_PLAYER_COUNT = 4;
 
-    // ルーム情報などを入れるNetworkRunner
-    public NetworkRunner networkRunner = null;
+    // ルーム接続失敗時の再接続回数
+    private readonly int MAX_RECONNECT_COUNT = 5;
+
+    // ルーム暗証番号の最大値
+    private readonly int PIN_MAX_VALUE = 9999;
+    // ルーム暗証番号の最小値
+    private readonly int PIN_MIN_VALUE = 1000;
+
+    // 再接続時の待機時間
+    private readonly int RECONNECT_WAIT_TIME_MS = 3000;
+    // ホスト切断時の待機時間
+    private readonly int HOST_DISCONNECTED_WAIT_TIME_MS = 3000;
+
+    // NetworkRunner用オブジェクトの名前
+    private readonly string NETWORK_RUNNER_OBJECT_NAME = "NetworkRunner";
+
+    // タイトルシーンの名前
+    private readonly string TITLE_SCENE_NAME = "MainTitleScenes";
+
 
     // NetworkRunner をアタッチするためのオブジェクト
     private GameObject networkRunnerObject = null;
 
+    // ランダムな暗証番号を生成するためのRandomクラス
     private System.Random random = new System.Random();
 
+
+    // ルーム情報などを入れるNetworkRunner
+    public NetworkRunner networkRunner = null;
+
+    // ロビーUIのコールバックを受け取るための変数
     public NetworkLobbyUI networkLobbyUI = null;
 
     // ランキング時に使用するチーム名
@@ -32,12 +55,12 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     // ルーム暗証番号
     public string PIN { get; private set; } = "";
 
-    public static NetworkGameStarter Instance
-    {
-        get;
-        private set;
-    }
+    //　インスタンスを保持するためのシングルトン
+    public static NetworkGameStarter Instance { get; private set; } = null;
 
+    /// <summary>
+    /// すでに存在する場合は破棄し、シングルトンとして保持する
+    /// </summary>
     private void Awake()
     {
         if (Instance == null)
@@ -67,7 +90,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // ルーム暗証番号が被る可能性があるため、成功するまでループして再生成する
         while (true)
         {
-            // 仮部屋番号を生成
+            // 仮の部屋番号を生成
             string pin = RandomPIN();
 
             // Photon Cloudへ接続し、Hostとしてルームを作成する
@@ -92,36 +115,21 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                 // ロビーUIを表示
                 UIReferences.Instance.LobbyUI.SetActive(true);
 
-                Debug.Log("ホスト側接続完了");
-
                 // 正式に部屋番号を記録する
                 PIN = pin;
 
                 break;
             }
-
-            // PIN被り
-            if (result.ShutdownReason == ShutdownReason.GameIdAlreadyExists)
-            {
-                Debug.Log("PINが被ったため再生成");
-            }
-            else
-            {
-                Debug.Log($"別の原因で失敗 : {result.ShutdownReason}");
-                return;
-            }
         }
-
-
     }
 
     /// <summary>
-    /// ランダムな6桁の暗証番号を生成する
+    /// ランダムな4桁の暗証番号を生成する
     /// </summary>
     private string RandomPIN()
     {
         // 4桁のランダムな数字を生成
-        return random.Next(1000, 9999).ToString();
+        return random.Next(PIN_MIN_VALUE, PIN_MAX_VALUE).ToString();
     }
 
 
@@ -133,30 +141,29 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // ローディング画面を表示
         UIReferences.Instance.LoadingUI.SetActive(true);
 
-        // 例外が発生する可能性のある処理
         try
         {
             bool success = false;
 
             StartGameResult result = default;
 
-            for (int i = 0; i < 5; i++)
+            // 5回まで接続を試みる
+            for (int i = 0; i < MAX_RECONNECT_COUNT; i++)
             {
+                // NetworkRunner生成とコールバック登録
                 SetupNetworkRunner();
 
-                result = await networkRunner.StartGame(
-                    new StartGameArgs()
-                    {
-                        GameMode = GameMode.Client,
+                // FusionのPhoton Cloudへ接続し、作成されたルームへ参加する
+                result = await networkRunner.StartGame(new StartGameArgs()
+                {
+                    GameMode = GameMode.Client,
 
-                        SessionName = pin.Trim(),
+                    SessionName = pin.Trim(),
 
-                        EnableClientSessionCreation = false,
+                    EnableClientSessionCreation = false,
 
-                        SceneManager =
-                            networkRunnerObject
-                            .AddComponent<NetworkSceneManagerDefault>()
-                    });
+                    SceneManager = networkRunnerObject.AddComponent<NetworkSceneManagerDefault>()
+                });
 
                 // 接続成功
                 if (result.Ok)
@@ -166,71 +173,69 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
                     break;
                 }
 
-                // Runner終了
+                // NetworkRunnerを終了
                 await networkRunner.Shutdown();
 
-                // Runner削除
-                if (networkRunner != null &&
-                    networkRunner.gameObject != null)
+                // NetworkRunnerを削除
+                if (networkRunner != null && networkRunner.gameObject != null)
                 {
                     Destroy(networkRunner.gameObject);
                 }
 
                 networkRunner = null;
 
-                Debug.Log("3秒待機");
-
-                await Task.Delay(3000);
+                // 3秒待機
+                await Task.Delay(RECONNECT_WAIT_TIME_MS);
             }
 
 
             // 接続成功時
             if (success)
             {
+                // UIを切り替える
                 UIReferences.Instance.LoadingUI.SetActive(false);
                 UIReferences.Instance.LobbyUI.SetActive(true);
-
-                Debug.Log("ゲスト側接続完了");
             }
-            else
+            else　// 失敗時
             {
-                UIReferences.Instance.TitleUI.SetActive(true);
-                UIReferences.Instance.LoadingUI.SetActive(false);
-
-                //接続が失敗したことを知らせるメッセージログの表示
-                TitleUI titleUI = UIReferences.Instance.TitleUI.GetComponent<TitleUI>();
-                StartCoroutine(titleUI.MessageLogDisplay());
-
-                if (networkRunner != null)
-                {
-                    await networkRunner.Shutdown();
-
-                    if (networkRunner.gameObject != null)
-                    {
-                        Destroy(networkRunner.gameObject);
-                    }
-
-                    networkRunner = null;
-                }
+                // 接続失敗時の処理を実行
+                await ConnectionFailed();
             }
         }
-        catch (Exception error)
+        catch (Exception error) // 例外発生時
         {
-            UIReferences.Instance.TitleUI.SetActive(true);
-            UIReferences.Instance.LoadingUI.SetActive(false);
-            Debug.LogException(error);
+            // エラー内容をログに出力
+            Debug.LogError(error);
 
-            if (networkRunner != null)
+            // 接続失敗時の処理を実行
+            await ConnectionFailed();
+        }
+    }
+
+    /// <summary>
+    /// 接続失敗時の処理
+    /// </summary>
+    private async Task ConnectionFailed()
+    {
+        // ロビーUIを非表示にして、タイトルUIを表示
+        UIReferences.Instance.TitleUI.SetActive(true);
+        UIReferences.Instance.LoadingUI.SetActive(false);
+
+        //接続失敗を知らせるメッセージを表示
+        TitleUI titleUI = UIReferences.Instance.TitleUI.GetComponent<TitleUI>();
+        StartCoroutine(titleUI.MessageLogDisplay());
+
+        // NetworkRunnerを終了・破棄
+        if (networkRunner != null)
+        {
+            await networkRunner.Shutdown();
+
+            if (networkRunner.gameObject != null)
             {
-                await networkRunner.Shutdown();
-
-                if (networkRunner.gameObject != null)
-                {
-                    Destroy(networkRunner.gameObject);
-                }
-
-                networkRunner = null;
+                Destroy(networkRunner.gameObject);
             }
+
+            networkRunner = null;
         }
     }
 
@@ -239,13 +244,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void SetupNetworkRunner()
     {
-        Debug.Log(
-       "作成前 Runner数 : " +
-       FindObjectsByType<NetworkRunner>(
-           FindObjectsSortMode.None).Length);
-
         // NetworkRunner用オブジェクトを作成
-        networkRunnerObject = new GameObject("NetworkRunner");
+        networkRunnerObject = new GameObject(NETWORK_RUNNER_OBJECT_NAME);
         // シーン移動してもRunnerが破棄されないようにする
         DontDestroyOnLoad(networkRunnerObject);
 
@@ -283,11 +283,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
         // INetworkRunnerCallbacks を受け取るため自分自身を登録
         networkRunner.AddCallbacks(this);
-
-        Debug.Log(
-      "作成後 Runner数 : " +
-      FindObjectsByType<NetworkRunner>(
-          FindObjectsSortMode.None).Length);
     }
 
 
@@ -310,8 +305,8 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (networkRunner != null && networkRunner.IsServer)
         {
-            // ホストを最後に切断させるため
-            await Task.Delay(3000);
+            // ホストを最後に切断させるため3秒待機
+            await Task.Delay(HOST_DISCONNECTED_WAIT_TIME_MS);
         }
 
         if (networkRunner == null)
@@ -319,25 +314,22 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        // GameObject退避
+        // Shutdown後もDestroyするため退避
         GameObject runnerObject = networkRunner.gameObject;
 
-        // Shutdown
+        // NetworkRunnerを終了
         await networkRunner.Shutdown();
 
-        // 破棄
+        // NetworkRunnerを破棄
         if (runnerObject != null)
         {
             Destroy(runnerObject);
         }
-
         networkRunner = null;
-
         networkRunnerObject = null;
 
-        Debug.Log("Runner破棄完了");
-
-        SceneManager.LoadScene("MainTitleScenes");
+        // タイトルシーンに戻る
+        SceneManager.LoadScene(TITLE_SCENE_NAME);
     }
 
 
@@ -346,10 +338,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
     /// プレイヤー用キャラクターの生成や、参加時の初期設定などを行う場所。
     /// </summary>
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-        Debug.Log("ルーム生成完全完了");
-    }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
 
     /// <summary>
     /// プレイヤーがセッションから離脱した時に自動で呼ばれるコールバック。

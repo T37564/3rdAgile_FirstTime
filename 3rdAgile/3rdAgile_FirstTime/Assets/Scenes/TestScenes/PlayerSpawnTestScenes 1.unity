@@ -1620,7 +1620,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f5ec892ceb87e34e90101f5095b2806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReturnButtonUI
-  loadingCnavas: {fileID: 2038500127}
+  loadingCanvas: {fileID: 2038500127}
 --- !u!4 &1002047325
 Transform:
   m_ObjectHideFlags: 0

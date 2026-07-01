@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------
 // プレイヤーのPrefabデータをまとめて管理するScriptableObject
-// ロビー・ゲームシーン共通で使用
+// ロビーとゲームシーンで共通して使用する
 // PlayerPrefabData.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
@@ -18,6 +18,6 @@ public class PlayerPrefabData : ScriptableObject
     [Tooltip("各プレイヤーの生成位置")]
     public Vector3[] playerSpawnPositions;
 
-    [Tooltip("各プレイヤーの生成時回転")]
+    [Tooltip("各プレイヤーの生成時の回転")]
     public Quaternion[] playerSpawnRotations;
 }

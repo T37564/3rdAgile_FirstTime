@@ -10,40 +10,39 @@ using UnityEngine.UI;
 
 public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisplaySettings>
 {
-    // 画面に表示する時間
+    // エラーメッセージを表示する時間
     private readonly float DISPLAY_TIME = 3.0f;
 
 
-    [Header("Title UI")]
-    [SerializeField] public GameObject titleCanvas = null;
+    // Title UI
+    public GameObject titleCanvas = null;
 
-    [Header("ローディング用のイメージ")]
-    [SerializeField] public GameObject nowLoadingImage = null;
+    // ローディング用のイメージ
+    public GameObject nowLoadingImage = null;
 
-    [Header("ルーム名を入力するテキスト")]
-    [SerializeField] public TMP_InputField roomNameInput = null;
-
-
-
-    [Header("Lobby UI")]
-    [SerializeField] public GameObject lobbyCanvas = null;
-
-    [Header("ゲームスタート用のボタン")]
-    [SerializeField] public GameObject gameStartButton = null;
-
-    [Header("ロビーの人数を記入するUI")]
-    [SerializeField] public TextMeshProUGUI playerCountDisplayText = null;
+    // ルーム名を入力するテキスト
+    public TMP_InputField roomNameInput = null;
 
 
+    // Lobby UI
+    public GameObject lobbyCanvas = null;
 
-    [Header("System Message UI")]
-    [SerializeField] public GameObject systemMessageCanvas = null;
+    // ゲームスタート用のボタン
+    public GameObject gameStartButton = null;
 
-    [Header("エラーメッセージを表示する際の背景画像")]
-    [SerializeField] public Image systemMessageBackImage = null;
+    // ロビーの人数を表示するUI
+    public TextMeshProUGUI playerCountDisplayText = null;
 
-    [Header("エラー内容を表示するテキスト")]
-    [SerializeField] public TextMeshProUGUI[] errorText = null;
+
+
+    // System Message UI
+    public GameObject systemMessageCanvas = null;
+
+    // エラーメッセージを表示する際の背景画像
+    public Image systemMessageBackImage = null;
+
+    // エラー内容を表示するテキスト
+    public TextMeshProUGUI[] errorText = null;
 
     /// <summary>
     /// すべてのキャンバスを初期化
@@ -97,22 +96,21 @@ public class TitleCanvasDisplaySettings : SingletonMonobehaviour<TitleCanvasDisp
     /// </summary>
     public IEnumerator ShowErrorMessage(bool displayBackImage, string errorMessage, int textIndex)
     {
-        // エラーを伝えるためのキャンバス表示
+        // エラーを表示するキャンバスを非表示にする
         systemMessageCanvas.SetActive(true);
 
         // 黒背景の表示/非表示を切り替える
         systemMessageBackImage.enabled = displayBackImage;
 
-        // indexが範囲外の時
-        if (textIndex < 0 || errorText.Length <= textIndex)
-            yield break;
+        // 指定したインデックスが範囲外の場合
+        if (textIndex < 0 || errorText.Length <= textIndex) yield break;
 
         // 指定したテキスト欄にエラーメッセージを表示
         errorText[textIndex].text = errorMessage;
 
         yield return new WaitForSecondsRealtime(DISPLAY_TIME);
 
-        // SystemMessageUI初期化
+        // SystemMessageUIを初期化する
         ResetSystemMessageCanvas();
     }
 }
