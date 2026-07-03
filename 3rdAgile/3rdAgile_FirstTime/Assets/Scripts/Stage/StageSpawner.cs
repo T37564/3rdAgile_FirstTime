@@ -4,6 +4,7 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,55 +14,53 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private readonly string START_ROOM_PATH = "Stages/Start";
     private readonly string STRAIGHT_CORRIDOR_PATH = "Stages/StraightCorridor";
+    private readonly string ROOM_PATH = "Stages/Room";
     private readonly string T_CORRIDOR_PATH = "Stages/TCorridor";
     private readonly string CROSS_CORRIDOR_PATH = "Stages/CrossCorridor";
-    private readonly string ROOM_PATH = "Stages/Room";
     private readonly string GUARDIAN_ROOM_PATH = "Stages/GuardianRoom";
     private readonly string DEAD_END_PATH = "Stages/DeadEnd";
 
     #endregion
 
-    [Header("--- 部屋生成設定 ---")]
-    [SerializeField] private int maxRoomCount = 10;
+    private enum CorridorLongAxis
+    {
+        Z,
+        X
+    }
 
-    /// <summary>
-    /// 現在生成済みの部屋数
-    /// </summary>
-    private int roomCreateCount = 0;
+    [Header("--- Prefabs ---")]
+    [SerializeField] private NetworkObject startRoomPrefab = null!;
+    [SerializeField] private NetworkObject roomPrefab = null!;
+    [SerializeField] private NetworkObject straightCorridorPrefab = null!;
 
-    private readonly Queue<OpenConnector> openConnectors = new();
+    [Header("--- Generate Settings ---")]
+    [SerializeField] private float chunkSize = 10.0f;
 
-    [SerializeField] private float cellSize = 5.0f;
-    [SerializeField] private NetworkObject startRoomPrefab;
-    [Header("--- 通路prefab ---")]
-    [SerializeField] private NetworkObject straightCorridorPrefab;
-    [SerializeField] private NetworkObject tCorridorPrefab;
-    [SerializeField] private NetworkObject crossCorridorPrefab;
-    [SerializeField] private NetworkObject normalRoomPrefab;
-    [SerializeField] private NetworkObject guardianRoomPrefab;
+    [Tooltip("Start部屋を含めない通常部屋の数")]
+    [SerializeField] private int targetRoomCount = 10;
 
-    [SerializeField] private float normalRoomRate = 0.25f;
-    [SerializeField] private float guardianRoomRate = 0.15f;
-    [SerializeField] private int maxNormalRoomCount = 8;
-    [SerializeField] private int maxGuardianRoomCount = 3;
+    [Tooltip("生成を試す最大回数。詰まり防止用")]
+    [SerializeField] private int maxGenerateAttempts = 500;
 
-    private int normalRoomCount = 0;
-    private int guardianRoomCount = 0;
+    [Header("--- Corridor Settings ---")]
+    [SerializeField] private CorridorLongAxis corridorLongAxis = CorridorLongAxis.Z;
 
-    [SerializeField] private int maxPartCount = 30;
+    private readonly Dictionary<Vector2Int, NetworkObject> placedChunks = new();
+    private readonly List<Vector2Int> roomPositions = new();
 
-    private int createPartCount = 0;
-
-    private StageGrid? stageGrid;
+    private static readonly Vector2Int[] Directions =
+    {
+        Vector2Int.up,
+        Vector2Int.down,
+        Vector2Int.right,
+        Vector2Int.left
+    };
 
     private void Awake()
     {
         startRoomPrefab = Resources.Load<NetworkObject>(START_ROOM_PATH);
+        roomPrefab = Resources.Load<NetworkObject>(ROOM_PATH);
         straightCorridorPrefab = Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
-        tCorridorPrefab = Resources.Load<NetworkObject>(T_CORRIDOR_PATH);
-        crossCorridorPrefab = Resources.Load<NetworkObject>(CROSS_CORRIDOR_PATH);
-        normalRoomPrefab = Resources.Load<NetworkObject>(ROOM_PATH);
-        guardianRoomPrefab = Resources.Load<NetworkObject>(GUARDIAN_ROOM_PATH);
     }
 
     /// <summary>
@@ -70,180 +69,96 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         if (!runner.IsServer) return;
-
-        Debug.Log("べろべろばー");
-
-        stageGrid = new StageGrid(cellSize);
-
-        CreateStartRoom(runner);
-
-        CreateStageParts(runner);
+        Generate(runner);
     }
-
-    private void CreateStartRoom(NetworkRunner runner)
+    private void Generate(NetworkRunner runner)
     {
-        if (stageGrid == null)
+        placedChunks.Clear();
+        roomPositions.Clear();
+
+        Vector2Int startPos = Vector2Int.zero;
+
+        PlaceChunk(runner, startPos, startRoomPrefab, Quaternion.identity);
+        roomPositions.Add(startPos);
+
+        int createdRoomCount = 0;
+        int attempts = 0;
+
+        while (createdRoomCount < targetRoomCount && attempts < maxGenerateAttempts)
         {
-            Debug.LogError("StageGridが初期化されていない");
-            return;
+            attempts++;
+
+            Vector2Int baseRoomPos = roomPositions[Random.Range(0, roomPositions.Count)];
+            List<Vector2Int> shuffledDirections = GetShuffledDirections();
+
+            foreach (Vector2Int dir in shuffledDirections)
+            {
+                Vector2Int corridorPos = baseRoomPos + dir;
+                Vector2Int roomPos = baseRoomPos + dir * 2;
+
+                if (!CanPlace(corridorPos)) continue;
+                if (!CanPlace(roomPos)) continue;
+
+                PlaceChunk(runner, corridorPos, straightCorridorPrefab, GetCorridorRotation(dir));
+                PlaceChunk(runner, roomPos, roomPrefab, Quaternion.identity);
+
+                roomPositions.Add(roomPos);
+                createdRoomCount++;
+
+                break;
+            }
         }
 
-        Debug.Log("a---ho");
-        Vector2Int startGrid = Vector2Int.zero;
-        Vector3 startWorldPosition = stageGrid.GridToWorld(startGrid);
+        if (createdRoomCount < targetRoomCount)
+        {
+            Debug.LogWarning($"部屋を {targetRoomCount} 個生成できませんでした。生成数: {createdRoomCount}");
+        }
+    }
 
-        NetworkObject startobj = runner.Spawn(
-            startRoomPrefab,
-            startWorldPosition,
-            Quaternion.identity
+    private List<Vector2Int> GetShuffledDirections()
+    {
+        return Directions
+            .OrderBy(_ => Random.value)
+            .ToList();
+    }
+
+    private bool CanPlace(Vector2Int gridPos)
+    {
+        return !placedChunks.ContainsKey(gridPos);
+    }
+
+    private void PlaceChunk(NetworkRunner runner, Vector2Int gridPos, NetworkObject prefab, Quaternion rotation)
+    {
+        Vector3 worldPos = GridToWorld(gridPos);
+        NetworkObject instance = runner.Spawn(prefab, worldPos, rotation);
+        placedChunks.Add(gridPos, instance);
+    }
+
+    private Vector3 GridToWorld(Vector2Int gridPos)
+    {
+        return new Vector3(
+            gridPos.x * chunkSize,
+            0.0f,
+            gridPos.y * chunkSize
         );
-
-        stageGrid.Register(startGrid);
-
-        StagePiece? stagePiece = startobj.GetComponentInChildren<StagePiece>();
-
-        if (stagePiece == null)
-        {
-            Debug.LogError("StartRoomにStagePieceがついていない");
-            return;
-        }
-        Debug.Log("huzakennna");
-        foreach (StageConnector connector in stagePiece.Connectors)
-        {
-            openConnectors.Enqueue(
-                new OpenConnector(
-                    startGrid,
-                    connector.Direction
-                )
-            );
-            Debug.Log("majimuri");
-        }
-        Debug.Log("kietai");
     }
 
-    private void CreateStageParts(NetworkRunner runner)
+    private Quaternion GetCorridorRotation(Vector2Int dir)
     {
-        if (stageGrid == null)
+        bool needVertical = dir == Vector2Int.up || dir == Vector2Int.down;
+
+        return corridorLongAxis switch
         {
-            Debug.LogError("StageGridが初期化されていない");
-            return;
-        }
+            CorridorLongAxis.Z => needVertical
+                ? Quaternion.Euler(0.0f, 90.0f, 0.0f)
+                : Quaternion.identity,
 
-        while (openConnectors.Count > 0)
-        {
-            if (createPartCount >= maxPartCount) break;
+            CorridorLongAxis.X => needVertical
+                ? Quaternion.identity
+                : Quaternion.Euler(0.0f, 90.0f, 0.0f),
 
-            OpenConnector openConnector = openConnectors.Dequeue();
-
-            Vector2Int nextGrid =
-                openConnector.GridPosition + openConnector.Direction.ToVector();
-
-            if (stageGrid.IsUsed(nextGrid)) continue;
-
-            NetworkObject corridorPrefab = GetRandomStagePrefab();
-
-            Vector3 worldPosition = stageGrid.GridToWorld(nextGrid);
-
-            Quaternion rotation =
-                GetRotationFromDirection(openConnector.Direction);
-
-            NetworkObject corridorObj = runner.Spawn(
-                corridorPrefab,
-                worldPosition,
-                rotation
-            );
-
-            stageGrid.Register(nextGrid);
-            createPartCount++;
-
-            StagePiece? stagePiece = corridorObj.GetComponent<StagePiece>();
-
-            if (stagePiece == null)
-            {
-                Debug.LogError("通路にStagePieceがついていない");
-                continue;
-            }
-
-            if (corridorPrefab == normalRoomPrefab || corridorPrefab == guardianRoomPrefab) continue;
-
-            foreach (StageConnector connector in stagePiece.Connectors)
-            {
-                GridDirection worldDirection =
-                    RotateDirection(connector.Direction, openConnector.Direction);
-
-                if (worldDirection == openConnector.Direction.Opposite()) continue;
-
-                openConnectors.Enqueue(
-                    new OpenConnector(
-                        nextGrid,
-                        worldDirection
-                    )
-                );
-            }
-        }
-    }
-
-    private NetworkObject GetRandomStagePrefab()
-    {
-        float randomValue = UnityEngine.Random.value;
-
-        if (guardianRoomCount < maxGuardianRoomCount && randomValue < guardianRoomRate)
-        {
-            guardianRoomCount++;
-            return guardianRoomPrefab;
-        }
-
-        if (normalRoomCount < maxNormalRoomCount && randomValue < guardianRoomRate + normalRoomRate)
-        {
-            normalRoomCount++;
-            return normalRoomPrefab;
-        }
-
-        return GetRandomCorridorPrefab();
-    }
-
-    private NetworkObject GetRandomCorridorPrefab()
-    {
-        int index = Random.Range(0, 3);
-
-        return index switch
-        {
-            0 => straightCorridorPrefab,
-            1 => tCorridorPrefab,
-            2 => crossCorridorPrefab,
-            _ => straightCorridorPrefab
+            _ => Quaternion.identity
         };
-    }
-
-    private Quaternion GetRotationFromDirection(GridDirection direction)
-    {
-        float y = direction switch
-        {
-            GridDirection.Forward => 0.0f,
-            GridDirection.Right => 90.0f,
-            GridDirection.Back => 180.0f,
-            GridDirection.Left => 270.0f,
-            _ => 0.0f
-        };
-
-        return Quaternion.Euler(0.0f, y, 0.0f);
-    }
-
-    private GridDirection RotateDirection(
-        GridDirection localDirection,
-        GridDirection baseDirection)
-    {
-        int local = (int)localDirection;
-        int baseDir = (int)baseDirection;
-
-        int result = (local + baseDir) % 4;
-
-        return (GridDirection)result;
-    }
-
-    private bool IsGuardianRoom()
-    {
-        return UnityEngine.Random.value < 0.2f;
     }
 
     #region 未使用コールバック
