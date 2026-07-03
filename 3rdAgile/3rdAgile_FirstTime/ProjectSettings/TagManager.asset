@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - GreenArrow
   - LegendaryTreasure
+  - DeathPlayer
   layers:
   - Default
   - TransparentFX

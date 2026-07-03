@@ -11,6 +11,9 @@ public class ArrowUIInitializer : MonoBehaviour
     [Header("シーン上に配置している矢印UI一覧")]
     [SerializeField] private DirectionArrowUI[] arrowUIs = null;
 
+    [Header("シーン上に配置している複数矢印UI一覧")]
+    [SerializeField] private MultipleDirectionArrows[] multipleArrowUIs = null;
+
     // 自分が操作しているプレイヤーを保持する
     private PlayerController localPlayer = null;
 
@@ -67,6 +70,18 @@ public class ArrowUIInitializer : MonoBehaviour
 
             //  各矢印UIに基準となるプレイヤーを設定
             arrow.SetPlayer(playerTransform);
+        }
+
+        // 複数矢印UI配列が未設定なら何もしない
+        if (multipleArrowUIs == null) return;
+
+        foreach (MultipleDirectionArrows multipleArrow in multipleArrowUIs)
+        {
+            // 要素が空ならスキップ
+            if (multipleArrow == null) continue;
+
+            //  各矢印UIに基準となるプレイヤーを設定
+            multipleArrow.SetPlayer(playerTransform);
         }
     }
 }
