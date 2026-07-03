@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 2059099469994473305}
   - component: {fileID: 3687366153995666920}
   m_Layer: 0
-  m_Name: Room
+  m_Name: GuardianRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -208,7 +208,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 94f8106a9503a574ca29c4887fdafd2b, type: 2}
+  - {fileID: 2100000, guid: e8b5e0b6820975a4a9792b2aff56eddb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -265,7 +265,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 1979446775
+  SortKey: 2807030456
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

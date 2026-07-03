@@ -9,8 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8260751522068038340}
+  - component: {fileID: 1892408608562409881}
   m_Layer: 0
-  m_Name: ConnectionPosition_Left
+  m_Name: BackConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,6 +32,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5121665011813535329}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1892408608562409881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800960940841885118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 1
 --- !u!1 &3182542339464995084
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,8 +54,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7748230767231452296}
+  - component: {fileID: 1226627716500298118}
   m_Layer: 0
-  m_Name: ConnectionPosition_Right
+  m_Name: ForwardConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62,6 +77,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5121665011813535329}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1226627716500298118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3182542339464995084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageConnector
+  direction: 0
 --- !u!1 &4751597249906078329
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,9 +103,9 @@ GameObject:
   - component: {fileID: 4366755923911657172}
   - component: {fileID: 1721720089576322799}
   - component: {fileID: 6312153185758353696}
-  - component: {fileID: 6605747275440227480}
+  - component: {fileID: 5053710358255196567}
   m_Layer: 0
-  m_Name: Aisle
+  m_Name: StraightCorridor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,7 +121,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 1, z: 2}
+  m_LocalScale: {x: 10, y: 1, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7748230767231452296}
@@ -196,7 +224,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours: []
   ForceRemoteRenderTimeframe: 0
---- !u!114 &6605747275440227480
+--- !u!114 &5053710358255196567
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -205,9 +233,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4751597249906078329}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a04c6c864e5a2ae4b8b88be1127e5d73, type: 3}
+  m_Script: {fileID: 11500000, guid: 890cdf97ad6378c4fb5ba8b335d7ab82, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CorridorSpawnPoints
-  roomSpawnPoints:
-  - {fileID: 7748230767231452296}
-  - {fileID: 8260751522068038340}
+  m_EditorClassIdentifier: Assembly-CSharp::StagePiece
+  occupiedCells:
+  - {x: 0, y: 0}
+  connectors:
+  - {fileID: 1226627716500298118}
+  - {fileID: 1892408608562409881}

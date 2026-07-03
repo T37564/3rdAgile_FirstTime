@@ -281,6 +281,9 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // Fusion callbackへ登録
         networkRunner.AddCallbacks(matchingPlayerObjectSpawner);
 
+        var stageSpawner = networkRunnerObject.AddComponent<StageSpawner>();
+        networkRunner.AddCallbacks(stageSpawner);
+
         // INetworkRunnerCallbacks を受け取るため自分自身を登録
         networkRunner.AddCallbacks(this);
     }
