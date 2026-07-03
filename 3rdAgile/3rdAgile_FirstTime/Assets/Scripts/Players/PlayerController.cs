@@ -22,6 +22,10 @@ namespace Network.Player
         public event Action OnPlayerDied;
         public event Action OnPlayerRevived;
         #endregion
+        // プレイヤーのタグ
+        private readonly string PLAYER_TAG_NAME = "Player";
+        // プレイヤー死亡時のタグ
+        private readonly string PLAYER_DEATH_TAG_NAME = "DeathPlayer";
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
@@ -63,8 +67,8 @@ namespace Network.Player
         // IInteractableインターフェースの実装
         public Transform Transform => transform;
 
-        [Header("プレイヤーのHP")]
-        [SerializeField] private int playerHp = 0;
+        // プレイヤーのHP
+        private int playerHp = 1;
 
 
         /// <summary>
@@ -98,6 +102,21 @@ namespace Network.Player
             prevHoldingItem = IsHoldingItem;
 
             animator = GetComponent<Animator>();
+        }
+
+        /// <summary>
+        /// プレイヤーの状態に合わせてタグ変更
+        /// </summary>
+        private void Update()
+        {
+            if (IsAlive)
+            {
+                gameObject.tag = PLAYER_TAG_NAME;
+            }
+            else
+            {
+                gameObject.tag = PLAYER_DEATH_TAG_NAME;
+            }
         }
 
         /// <summary>
@@ -334,10 +353,7 @@ namespace Network.Player
             if (!Object.HasStateAuthority) return;
             if (!IsAlive) return;
 
-            IsAlive = false;
-
             playerHp -= damage;
-            Debug.Log(playerHp);
 
             if (holdingItem != null)
             {
@@ -346,6 +362,12 @@ namespace Network.Player
             }
 
             IsHoldingItem = false;
+
+            // 死亡時
+            if (playerHp <= 0)
+            {
+                IsAlive = false;
+            }
         }
 
         public void Revive()
