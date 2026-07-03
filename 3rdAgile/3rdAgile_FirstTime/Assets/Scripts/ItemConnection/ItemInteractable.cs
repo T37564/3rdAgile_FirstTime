@@ -21,6 +21,9 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
     private bool isCarrying = false;
 
+    // 運搬中で人手が欲しいことを知らせるフラグ
+    [Networked] public NetworkBool IsHelpPeople { get; set; }
+
     public override void Spawned()
     {
         //Debug.Log("ItemInteractable Spawned");
@@ -68,6 +71,12 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         if (CanCarry())
         {
             StartCarry();
+            IsHelpPeople = false;
+        }
+        else
+        {
+            // 人数が不足しているとき
+            IsHelpPeople = true;
         }
     }
 
