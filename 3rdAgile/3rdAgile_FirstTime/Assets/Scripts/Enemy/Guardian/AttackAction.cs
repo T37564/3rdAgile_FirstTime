@@ -47,7 +47,7 @@ public class AttackAction : NetworkBehaviour
 
     [Networked] private bool isIdleNetworked { get; set; } = false;
 
-    //[Networked] private TickTimer attackTimer { get; set; }
+    [Networked] private TickTimer attackTimer { get; set; }
 
     public override void Spawned()
     {
@@ -136,6 +136,7 @@ public class AttackAction : NetworkBehaviour
         {
             Debug.Log("攻撃準備");
             enemyState = EnemyState.attackReady;
+            //attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
             timer = attackReadyTime;
             navMeshAgent.isStopped = true;
         }
@@ -148,6 +149,7 @@ public class AttackAction : NetworkBehaviour
     private void AttackReadyState()
     {
         navMeshAgent.isStopped = true;
+        //attackTimer-=Runner.DeltaTime;
         timer -= Time.deltaTime;
         Debug.Log("攻撃予備動作: " + timer);
 
@@ -170,6 +172,7 @@ public class AttackAction : NetworkBehaviour
             Debug.Log("攻撃実行");
             enemyState = EnemyState.attack;
             //attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
+            timer = cooldownTime;
         }
     }
 
