@@ -151,8 +151,8 @@ MonoBehaviour:
   navMeshAgent: {fileID: 5144837309392015295}
   animator: {fileID: 3642214065220583639}
   attackDistance: 6
-  attackReadyTime: 5
-  cooldownTime: 7
+  attackReadyTime: 3
+  cooldownTime: 3
   attackDamage: 2
   guardianWanderingArea: {fileID: 2482790271233591212}
   isArrival: 0

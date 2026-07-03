@@ -18,6 +18,9 @@ public class AttackAction : NetworkBehaviour
 
     [SerializeField] private Animator animator;
 
+    // タイマーの秒数をリセットする変数
+    private float resetTimerCount = 0.0f;
+
     [Header("攻撃距離")]
     [SerializeField] private float attackDistance = 0.0f;
 
@@ -47,7 +50,7 @@ public class AttackAction : NetworkBehaviour
 
     [Networked] private bool isIdleNetworked { get; set; } = false;
 
-    //[Networked] private TickTimer attackTimer { get; set; }
+    [Networked] private TickTimer attackTimer { get; set; }
 
     public override void Spawned()
     {
@@ -73,6 +76,7 @@ public class AttackAction : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
 
+        // EnemyStateの状態によって行う処理を分ける
         switch (enemyState)
         {
             case EnemyState.move:
@@ -123,20 +127,25 @@ public class AttackAction : NetworkBehaviour
         // 動きを止めない
         navMeshAgent.isStopped = false;
 
+        // 徘徊する処理
         Wandering();
         isIdleNetworked = false;
 
         // 0.1f以上の速さで移動していたらisMoveNetworkedはtrueになる
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
         
-        Debug.Log(guardianController.currentDistance);
+        //Debug.Log(guardianController.currentDistance);
 
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
         {
             Debug.Log("攻撃準備");
+
+            // 攻撃の予備動作のタイマーを開始させる
+            attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
+            //timer -= Time.deltaTime;
+            
             enemyState = EnemyState.attackReady;
-            timer = attackReadyTime;
             navMeshAgent.isStopped = true;
         }
 
@@ -148,11 +157,11 @@ public class AttackAction : NetworkBehaviour
     private void AttackReadyState()
     {
         navMeshAgent.isStopped = true;
-        timer -= Time.deltaTime;
-        Debug.Log("攻撃予備動作: " + timer);
+        //Debug.Log("攻撃予備動作: " + Runner.Tick);
+        Debug.Log("攻撃予備動作: " + attackTimer.RemainingTime(Runner));
 
         // 攻撃のターゲットにしているプレイヤーの方を見る
-        transform.LookAt(guardianController.currentPlayer);
+        //transform.LookAt(guardianController.currentPlayer);
 
         isMoveNetworked = false;
         isIdleNetworked = true;
@@ -160,16 +169,16 @@ public class AttackAction : NetworkBehaviour
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
         if(guardianController.currentDistance >= attackDistance)
         {
+            Debug.Log("徘徊に移行");
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
         }
 
         // 予備動作時間が経過したら攻撃状態に移行
-        if (timer <= 0)
+        if (attackTimer.Expired(Runner))
         {
             Debug.Log("攻撃実行");
             enemyState = EnemyState.attack;
-            //attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
         }
     }
 
@@ -186,6 +195,7 @@ public class AttackAction : NetworkBehaviour
         Debug.Log("攻撃");
         RpcGuardianAttackAnimation();
 
+        // 攻撃対象のプレイヤーのPlayerControllerを取得
         PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
         if (playerController != null)
@@ -204,7 +214,9 @@ public class AttackAction : NetworkBehaviour
         Debug.Log("攻撃終了");
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
-        timer = cooldownTime;
+       　
+        // 攻撃後のクールダウンタイマーを開始させる
+        attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
     }
 
     /// <summary>
@@ -213,10 +225,11 @@ public class AttackAction : NetworkBehaviour
     private void CooldownState()
     {
         isIdleNetworked = true;
-
-        timer -= Time.deltaTime;
-        Debug.Log($"攻撃終了クールダウン "+ timer);
-        if (timer <= 0)
+        
+        //timer -= Time.deltaTime;
+        Debug.Log($"攻撃終了クールダウン " + attackTimer.RemainingTime(Runner));
+        //if (timer <= 0)
+        if(attackTimer.Expired(Runner))
         {
             Debug.Log("徘徊に移行");
             enemyState = EnemyState.move;
