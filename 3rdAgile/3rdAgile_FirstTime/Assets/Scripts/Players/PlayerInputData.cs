@@ -9,5 +9,7 @@ namespace Network.Player
         //public NetworkBool tryPick;
 
         public NetworkBool tryInteract;
+
+        public NetworkBool tryDrop;
     }
 }

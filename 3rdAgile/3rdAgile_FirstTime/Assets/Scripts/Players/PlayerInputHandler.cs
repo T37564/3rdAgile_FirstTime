@@ -21,10 +21,13 @@ namespace Network.Player
         // プレイヤーの移動入力を保存するための変数
         private Vector2 moveInput = Vector2.zero;
 
-        // 長押し入力が成立したかどうかを保存するための変数
-        private bool holdCompleted = false;
-
+        // 拾う入力
+        private bool interactHoldCompleted = false;
         private bool interactTriggered = false;
+
+        // 離す入力
+        private bool dropHoldCompleted = false;
+        private bool dropTriggered = false;
 
         // プレイヤーがインタラクト可能なオブジェクトを保存するリスト
         private List<IInteractable> interactables = new List<IInteractable>();
@@ -100,8 +103,7 @@ namespace Network.Player
         public void OnInteractPerformed(InputAction.CallbackContext context)
         {
             // 長押し成立フラグを立てる
-            holdCompleted = true;
-            Debug.Log("長押し入力が成立しました");
+            interactHoldCompleted = true;
         }
 
         /// <summary>
@@ -110,13 +112,13 @@ namespace Network.Player
         public void OnInteractCanceled(InputAction.CallbackContext context)
         {
             // 長押し入力が成立していなかったら何もせずメソッドから抜ける
-            if (!holdCompleted) return;
+            if (!interactHoldCompleted) return;
 
             //成立したとホストに通知するためのbool値をtrueで保存
             interactTriggered = true;
 
             // ボタンが離されたので再度長押し判定をとれるようにfalseに
-            holdCompleted = false;
+            interactHoldCompleted = false;
         }
         #endregion
 
@@ -126,7 +128,8 @@ namespace Network.Player
         /// </summary>
         public void OnItemDropedPerformed(InputAction.CallbackContext context)
         {
-            holdCompleted = true;
+            dropHoldCompleted = true;
+            Debug.Log("成立！");
         }
 
         /// <summary>
@@ -134,9 +137,9 @@ namespace Network.Player
         /// </summary>
         public void OnItemDropedCanceled(InputAction.CallbackContext context)
         {
-            if (!holdCompleted) return;
-            interactTriggered = false;
-            holdCompleted = false;
+            if (!dropHoldCompleted) return;
+            dropTriggered = true;
+            dropHoldCompleted = false;
         }
         #endregion
 
@@ -148,10 +151,12 @@ namespace Network.Player
             PlayerInputData data = new PlayerInputData
             {
                 move = moveInput,
-                tryInteract = interactTriggered
+                tryInteract = interactTriggered,
+                tryDrop = dropTriggered
             };
 
             interactTriggered = false;
+            dropTriggered = false;
             return data;
         }
 

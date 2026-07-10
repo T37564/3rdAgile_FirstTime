@@ -29,7 +29,7 @@ namespace Network.Player
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
-        [SerializeField] private float moveSpeed = 1.0f;
+        [SerializeField] private float moveSpeed = 3.0f;
 
         [Header("インタラクト判定半径")]
         [SerializeField] private float interactRadius = 2.0f;
@@ -38,7 +38,7 @@ namespace Network.Player
         [SerializeField] private LayerMask interactLayerMask;
 
         [Header("アイテムを持っているときの最大距離")]
-        [SerializeField] private float maxCarryDistance = 2.0f;
+        [SerializeField] private float maxCarryDistance = 5.0f;
 
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
@@ -161,6 +161,11 @@ namespace Network.Player
                 if (input.tryInteract)
                 {
                     TryInteract();
+                }
+
+                if (input.tryDrop)
+                {
+                    TryDropItem();
                 }
             }
         }
@@ -291,6 +296,16 @@ namespace Network.Player
             if (!target.CanInteract(this)) return;
 
             target.Interact(this);
+        }
+
+        private void TryDropItem()
+        {
+            if (!Object.HasStateAuthority) return;
+            if(!IsHoldingItem) return;
+            if (holdingItem == null) return;
+
+
+            holdingItem.Release(this);
         }
 
         private IInteractable FindNearestInteractable()
