@@ -68,8 +68,22 @@ namespace Network.Player
         public Transform Transform => transform;
 
         // プレイヤーのHP
-        private int playerHp = 1;
+        [Networked] public int playerHp { get; set; } = 3;
 
+        private int prevHp = 0;
+
+        // InGameUIController参照用
+        private InGameUIController gameUIController = null;
+
+
+
+        /// <summary>
+        /// InGameUIController の参照取得
+        /// </summary>
+        private void Start()
+        {
+            gameUIController = FindAnyObjectByType<InGameUIController>();
+        }
 
         /// <summary>
         /// ネットワーク上でオブジェクトが確定したときに呼び出されるコールバック関数
@@ -100,6 +114,8 @@ namespace Network.Player
 
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
+
+            prevHp = playerHp;
 
             animator = GetComponent<Animator>();
         }
@@ -343,6 +359,12 @@ namespace Network.Player
 
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
+
+            if (Object.HasInputAuthority && prevHp != playerHp)
+            {
+                gameUIController.PlayerHPDisplay(playerHp);
+                prevHp = playerHp;
+            }
         }
 
         /// <summary>

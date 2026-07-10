@@ -812,7 +812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0a4719dc48d5e4a8dd8ed55ec9554e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
-  totalTime: 90
+  totalTime: 300
   phaseLength: 120
   _CurrentPhase: 0
   gamePhaseTimes:
@@ -1186,6 +1186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameUIController
   scoreUI: {fileID: 1287500634}
+  uiDocument: {fileID: 790305688}
 --- !u!1 &742696466
 GameObject:
   m_ObjectHideFlags: 0

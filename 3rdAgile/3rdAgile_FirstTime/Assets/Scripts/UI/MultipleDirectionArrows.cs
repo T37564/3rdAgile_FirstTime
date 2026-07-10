@@ -90,6 +90,7 @@ public class MultipleDirectionArrows : MonoBehaviour
 
         // –îˆóUI‚Ì”‚Æ‘ÎÛ‚Ì”‚ğ”äŠr‚µ‚ÄA­‚È‚¢•û‚Ì”‚ğæ“¾
         int count = Mathf.Min(currentTarget.Length, arrowRect.Length);
+        if (count == 0) return;
 
         for (int i = 0; i < count; i++)
         {
