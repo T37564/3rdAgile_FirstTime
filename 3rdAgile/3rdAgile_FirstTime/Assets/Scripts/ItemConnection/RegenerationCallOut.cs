@@ -14,6 +14,9 @@ public class RegenerationCallOut : NetworkBehaviour
     [Header("rayの長さ")]
     [SerializeField] private float rayLength = 0.0f;
 
+    [Header("再生成判定するY座標")]
+    [SerializeField] private int regenerationJudgementCoordinate = 0;
+
     //アイテムが地面に配置されていない場合、再配置するためのフラグ
     public bool isGenerateRequest = false;
 
@@ -33,7 +36,7 @@ public class RegenerationCallOut : NetworkBehaviour
         
 
         //アイテムのY座標が一定以下でなおかつ地面についていないとき
-        if (transform.position.y <= -10 && !IsGround())
+        if (transform.position.y <= -regenerationJudgementCoordinate && !IsGround())
         {
             if (isGenerateRequest) return;
             isGenerateRequest = true;
