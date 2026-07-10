@@ -17,19 +17,6 @@ public class GuardianController : NetworkBehaviour
     public override void Spawned()
     {
         // Playerタグのオブジェクトを探す
-        //GameObject target = GameObject.FindWithTag("Player");
-
-        //if (target != null)
-        //{
-        //    //navMeshAgent.SetDestination(players.position);
-
-        //    players = target.transform;
-        //}
-        //else if (target == null)
-        //{
-        //    target = GameObject.FindWithTag("Player");
-        //    //Debug.LogError("Playerタグのオブジェクトが見つかりませんでした。");
-        //}
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
         Debug.Log($"Player数:{players.Length}");
