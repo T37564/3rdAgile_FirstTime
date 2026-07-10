@@ -197,20 +197,28 @@ public class AttackAction : NetworkBehaviour
         RpcGuardianAttackAnimation();
 
         // 攻撃対象のプレイヤーのPlayerControllerを取得
-        PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
+        //PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
-        if (playerController != null)
-        {
-            // プレイヤーにダメージを与える
-            playerController.TakeDamage(ATTACK_DAMAGE);
-        }
+        //if (playerController != null)
+        //{
+        //    // プレイヤーにダメージを与える
+        //    playerController.TakeDamage(ATTACK_DAMAGE);
+        //}
     }
 
     public void AttackAnimationFinished()
     {
         if (!Object.HasStateAuthority) return;
 
-        attackStarted = false;
+        // 攻撃対象のプレイヤーのPlayerControllerを取得
+        PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
+
+        if (guardianController.currentDistance <= attackDistance)
+        {
+            playerController.TakeDamage(ATTACK_DAMAGE);
+        }
+
+            attackStarted = false;
         Debug.Log("攻撃終了");
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
