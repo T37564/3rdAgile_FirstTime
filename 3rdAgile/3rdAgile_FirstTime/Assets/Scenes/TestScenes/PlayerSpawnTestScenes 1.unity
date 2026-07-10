@@ -681,12 +681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultipleDirectionArrows
   targetTag: DeathPlayer
-  arrowRect:
-  - {fileID: 2112954503}
-  - {fileID: 374534044}
-  - {fileID: 275208363}
-  - {fileID: 560538675}
-  radius: 120
+  arrows: []
   isItem: 0
 --- !u!1 &374534043
 GameObject:
@@ -1030,6 +1025,51 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &489584767
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 489584769}
+  - component: {fileID: 489584768}
+  m_Layer: 0
+  m_Name: PlayerDeathObservation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &489584768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489584767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b7f2f9bc22ca3944a41307a35fc803b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathObservation
+  gameTimer: {fileID: 385890815}
+--- !u!4 &489584769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489584767}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.81306, y: 2.48673, z: -2.71539}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2624,8 +2664,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DirectionArrowUI
   targetTag: LegendaryTreasure
-  arrowRect: {fileID: 793412313}
-  radius: 120
+  arrow: {fileID: 0}
 --- !u!1 &1451110065
 GameObject:
   m_ObjectHideFlags: 0
@@ -3192,8 +3231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DirectionArrowUI
   targetTag: DeliveryBox
-  arrowRect: {fileID: 1268066321}
-  radius: 120
+  arrow: {fileID: 0}
 --- !u!1 &2038500127
 GameObject:
   m_ObjectHideFlags: 0
@@ -3364,12 +3402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultipleDirectionArrows
   targetTag: Item
-  arrowRect:
-  - {fileID: 1055592111}
-  - {fileID: 1724883944}
-  - {fileID: 449028380}
-  - {fileID: 401227531}
-  radius: 120
+  arrows: []
   isItem: 1
 --- !u!1 &2112954502
 GameObject:
@@ -3472,3 +3505,4 @@ SceneRoots:
   - {fileID: 2038500132}
   - {fileID: 1649014567}
   - {fileID: 1066718444}
+  - {fileID: 489584769}

@@ -35,7 +35,7 @@ public class GameTimer : NetworkBehaviour
 
     // ゲームの残り時間を管理するためのTickTimerと、現在のゲームフェーズを管理するためのNetworkedプロパティ
     [Networked] private TickTimer GameTimerTick { get; set; }
-    [Networked] public GamePhase CurrentPhase { get; private set; }
+    [Networked] public GamePhase CurrentPhase { get;  set; }
 
     // 比較用の変数を用意して、フェーズが変わったときにイベントを呼び出すために使用
     private GamePhase previousPhase;
