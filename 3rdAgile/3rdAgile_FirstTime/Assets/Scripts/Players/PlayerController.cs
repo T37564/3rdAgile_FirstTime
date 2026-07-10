@@ -43,7 +43,7 @@ namespace Network.Player
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
 
-        [Networked] private NetworkBool IsAlive { get; set; }
+        [Networked] public NetworkBool IsAlive { get; set; }
         #endregion
 
         // ローカルでプレイヤーの入力を受け取るためのコンポーネント
