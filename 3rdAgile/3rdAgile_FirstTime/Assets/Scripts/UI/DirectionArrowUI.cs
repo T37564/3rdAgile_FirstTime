@@ -8,16 +8,18 @@ using UnityEngine;
 public class DirectionArrowUI : MonoBehaviour
 {
     // 矢印を非表示にする対象までの距離
-    private readonly float DISTANCE_TO_HIDE_ARROW = 1.0f;
+    private readonly float DISTANCE_TO_HIDE_ARROW = 2.0f;
+
+    // 矢印のプレイヤーまでの距離
+    private readonly float ARROW_ORWARD_DISTANCE = 1.75f;
+    // 矢印と地面の距離
+    private readonly float ARROW_HEIGHT = 0.2f;
 
     [Header("追跡する対象タグ")]
     [SerializeField] private string targetTag = "";
 
     [Header("矢印UIのRectTransform")]
-    [SerializeField] private RectTransform arrowRect = null;
-
-    [Header("矢印を中心からどれだけ離して表示するか")]
-    [SerializeField] private float radius = 120.0f;
+    [SerializeField] private Transform arrow = null;
 
     // この矢印UIの基準となる、自分が操作しているプレイヤー
     private Transform player = null;
@@ -44,7 +46,7 @@ public class DirectionArrowUI : MonoBehaviour
     private void UpdateArrow()
     {
         // プレイヤーまたは矢印UIが未設定なら表示しない
-        if (player == null || arrowRect == null)
+        if (player == null || arrow == null)
         {
             SetArrowVisible(false);
             return;
@@ -60,14 +62,12 @@ public class DirectionArrowUI : MonoBehaviour
             return;
         }
 
-        // プレイヤーから対象までの方向ベクトルを取得
+        // プレイヤーから対象への方向
         Vector3 direction = currentTarget.position - player.position;
-
-        // 高さ方向は無視して、XZ平面上の方向だけを見る
         direction.y = 0.0f;
 
-        // 対象に一定距離近づいたとき矢印を非表示にする
-        if (direction.sqrMagnitude <= DISTANCE_TO_HIDE_ARROW)
+        // 距離判定
+        if (direction.magnitude <= DISTANCE_TO_HIDE_ARROW)
         {
             SetArrowVisible(false);
             return;
@@ -76,15 +76,11 @@ public class DirectionArrowUI : MonoBehaviour
         // 長さを1に正規化して向きだけ取り出す
         direction.Normalize();
 
-        // 3D空間のXZ方向を、UI用の2Dベクトルに変換
-        Vector2 dir2D = new Vector2(direction.x, direction.z);
+        // プレイヤーの少し前に配置
+        arrow.position = player.position + direction * ARROW_ORWARD_DISTANCE + Vector3.up * ARROW_HEIGHT;
 
-        // 中心から指定半径だけ離した位置に矢印を配置する
-        arrowRect.anchoredPosition = dir2D * radius;
-
-        // 矢印画像の向きを対象方向に合わせる
-        float angle = Mathf.Atan2(dir2D.y, dir2D.x) * Mathf.Rad2Deg;
-        arrowRect.localRotation = Quaternion.Euler(0f, 0f, angle - 90f);
+        // 対象方向を向く
+        arrow.rotation = Quaternion.LookRotation(direction);
 
         // 対象があるので矢印を表示
         SetArrowVisible(true);
@@ -114,12 +110,12 @@ public class DirectionArrowUI : MonoBehaviour
     private void SetArrowVisible(bool visible)
     {
         // 矢印UIの参照が設定されていない場合は処理を行わない
-        if (arrowRect == null) return;
+        if (arrow == null) return;
 
         // 現在の表示状態と違う場合のみ切り替える
-        if (arrowRect.gameObject.activeSelf != visible)
+        if (arrow.gameObject.activeSelf != visible)
         {
-            arrowRect.gameObject.SetActive(visible);
+            arrow.gameObject.SetActive(visible);
         }
     }
 }
