@@ -352,6 +352,12 @@ namespace Network.Player
                 OnPlayerRevived?.Invoke();
             }
 
+            if (prevAlive && !IsAlive)
+            {
+                animator.SetTrigger("Death");
+                OnPlayerDied?.Invoke();
+            }
+
             if (!prevHoldingItem && IsHoldingItem)
             {
                 OnPickUpItem?.Invoke();
