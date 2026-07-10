@@ -12,6 +12,9 @@ public enum EnemyState
 }
 public class AttackAction : NetworkBehaviour
 {
+    // プレイヤーに与えるダメージ
+    private readonly int ATTACK_DAMAGE = 1;
+
     [SerializeField] private GuardianController guardianController;
 
     [SerializeField] private NavMeshAgent navMeshAgent;
@@ -30,8 +33,6 @@ public class AttackAction : NetworkBehaviour
     [Header("攻撃後硬直")]
     [SerializeField] private float cooldownTime = 0.0f;
 
-    [Header("プレイヤーに与えるダメージ")]
-    [SerializeField] private int attackDamage = 0;
 
     private float timer = 0.0f;
 
@@ -42,8 +43,8 @@ public class AttackAction : NetworkBehaviour
     private Vector3 WanderingPoint;
 
     // 徘徊する場所に到着したかの判定
-    public bool isArrival = false; 
-    
+    public bool isArrival = false;
+
     private bool attackStarted = false;
 
     [Networked] private bool isMoveNetworked { get; set; } = false;
@@ -97,7 +98,7 @@ public class AttackAction : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcGuardianAttackAnimation()
     {
         animator.SetTrigger("IsAttack");
@@ -133,7 +134,7 @@ public class AttackAction : NetworkBehaviour
 
         // 0.1f以上の速さで移動していたらisMoveNetworkedはtrueになる
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
-        
+
         //Debug.Log(guardianController.currentDistance);
 
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
@@ -144,7 +145,7 @@ public class AttackAction : NetworkBehaviour
             // 攻撃の予備動作のタイマーを開始させる
             attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
             //timer -= Time.deltaTime;
-            
+
             enemyState = EnemyState.attackReady;
             navMeshAgent.isStopped = true;
         }
@@ -167,7 +168,7 @@ public class AttackAction : NetworkBehaviour
         isIdleNetworked = true;
 
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
-        if(guardianController.currentDistance >= attackDistance)
+        if (guardianController.currentDistance >= attackDistance)
         {
             Debug.Log("徘徊に移行");
             navMeshAgent.isStopped = false;
@@ -201,8 +202,7 @@ public class AttackAction : NetworkBehaviour
         if (playerController != null)
         {
             // プレイヤーにダメージを与える
-            playerController.TakeDamage(attackDamage);
-            Debug.Log("ぶった");
+            playerController.TakeDamage(ATTACK_DAMAGE);
         }
     }
 
@@ -214,7 +214,7 @@ public class AttackAction : NetworkBehaviour
         Debug.Log("攻撃終了");
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
-       　
+
         // 攻撃後のクールダウンタイマーを開始させる
         attackTimer = TickTimer.CreateFromSeconds(Runner, cooldownTime);
     }
@@ -225,11 +225,11 @@ public class AttackAction : NetworkBehaviour
     private void CooldownState()
     {
         isIdleNetworked = true;
-        
+
         //timer -= Time.deltaTime;
         Debug.Log($"攻撃終了クールダウン " + attackTimer.RemainingTime(Runner));
         //if (timer <= 0)
-        if(attackTimer.Expired(Runner))
+        if (attackTimer.Expired(Runner))
         {
             Debug.Log("徘徊に移行");
             enemyState = EnemyState.move;

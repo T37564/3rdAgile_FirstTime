@@ -122,5 +122,4 @@ public class DirectionArrowUI : MonoBehaviour
             arrowRect.gameObject.SetActive(visible);
         }
     }
-
 }

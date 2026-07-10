@@ -22,6 +22,10 @@ namespace Network.Player
         public event Action OnPlayerDied;
         public event Action OnPlayerRevived;
         #endregion
+        // プレイヤーのタグ
+        private readonly string PLAYER_TAG_NAME = "Player";
+        // プレイヤー死亡時のタグ
+        private readonly string PLAYER_DEATH_TAG_NAME = "DeathPlayer";
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
@@ -63,9 +67,23 @@ namespace Network.Player
         // IInteractableインターフェースの実装
         public Transform Transform => transform;
 
-        [Header("プレイヤーのHP")]
-        [SerializeField] private int playerHp = 0;
+        // プレイヤーのHP
+        [Networked] public int playerHp { get; set; } = 3;
 
+        private int prevHp = 0;
+
+        // InGameUIController参照用
+        private InGameUIController gameUIController = null;
+
+
+
+        /// <summary>
+        /// InGameUIController の参照取得
+        /// </summary>
+        private void Start()
+        {
+            gameUIController = FindAnyObjectByType<InGameUIController>();
+        }
 
         /// <summary>
         /// ネットワーク上でオブジェクトが確定したときに呼び出されるコールバック関数
@@ -97,7 +115,24 @@ namespace Network.Player
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
 
+            prevHp = playerHp;
+
             animator = GetComponent<Animator>();
+        }
+
+        /// <summary>
+        /// プレイヤーの状態に合わせてタグ変更
+        /// </summary>
+        private void Update()
+        {
+            if (IsAlive)
+            {
+                gameObject.tag = PLAYER_TAG_NAME;
+            }
+            else
+            {
+                gameObject.tag = PLAYER_DEATH_TAG_NAME;
+            }
         }
 
         /// <summary>
@@ -317,6 +352,12 @@ namespace Network.Player
                 OnPlayerRevived?.Invoke();
             }
 
+            if (prevAlive && !IsAlive)
+            {
+                animator.SetTrigger("Death");
+                OnPlayerDied?.Invoke();
+            }
+
             if (!prevHoldingItem && IsHoldingItem)
             {
                 OnPickUpItem?.Invoke();
@@ -324,6 +365,12 @@ namespace Network.Player
 
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
+
+            if (Object.HasInputAuthority && prevHp != playerHp)
+            {
+                gameUIController.PlayerHPDisplay(playerHp);
+                prevHp = playerHp;
+            }
         }
 
         /// <summary>
@@ -334,10 +381,7 @@ namespace Network.Player
             if (!Object.HasStateAuthority) return;
             if (!IsAlive) return;
 
-            IsAlive = false;
-
             playerHp -= damage;
-            Debug.Log(playerHp);
 
             if (holdingItem != null)
             {
@@ -346,6 +390,12 @@ namespace Network.Player
             }
 
             IsHoldingItem = false;
+
+            // 死亡時
+            if (playerHp <= 0)
+            {
+                IsAlive = false;
+            }
         }
 
         public void Revive()
