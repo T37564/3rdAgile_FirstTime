@@ -75,6 +75,8 @@ namespace Network.Player
         // InGameUIControlleréQè∆óp
         private InGameUIController gameUIController = null;
 
+        public bool isAliveCount = false;
+
 
 
         /// <summary>
