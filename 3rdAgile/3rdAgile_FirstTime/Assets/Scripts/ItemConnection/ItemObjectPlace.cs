@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 [System.Serializable]
 public class ItemProbability
@@ -33,26 +34,6 @@ public class ItemDataTable
 }
 
 [System.Serializable]
-public class RoomSpawnPosition
-{
-    [Header("アイテムを配置する部屋の座標範囲を設定する")]
-    [Header("部屋の最小X座標")]
-    public float minX;
-
-    [Header("部屋の最大X座標")]
-    public float maxX;
-
-    [Header("部屋の最小Z座標")]
-    public float minZ;
-
-    [Header("部屋の最大Z座標")]
-    public float maxZ;
-
-    [Header("部屋のY座標")]
-    public float positionY; // 部屋のY座標
-}
-
-[System.Serializable]
 public class PhaseSpawnCount
 {
     [Header("フェーズ")]
@@ -73,9 +54,6 @@ public class ItemObjectPlace : MonoBehaviour
     [Header("フェーズごとのアイテム")]
     [SerializeField] public PhaseItemTable[] phaseItemTables;
 
-    [Header("部屋ごとのアイテム配置範囲のリスト")]
-    [SerializeField] private RoomSpawnPosition[] roomSpawnPositions;
-
     [Header("ランダム性のあるアイテムのデータテーブル")]
     [SerializeField] private ItemDataTable[] itemDataTable;
 
@@ -89,6 +67,8 @@ public class ItemObjectPlace : MonoBehaviour
     [SerializeField] private PhaseSpawnCount[] phaseSpawnCounts;
 
     private static ItemObjectPlace instance;
+
+    public List<BoxCollider> groundColliders = new();
 
     private void Awake()
     {
@@ -107,6 +87,35 @@ public class ItemObjectPlace : MonoBehaviour
             gameTimer = FindAnyObjectByType<GameTimer>();
             gameTimer.GetComponent<GameTimer>();
         }
+        StageSpawner.OnMapGenerated += RegisterGrounds;
+    }
+
+    private void OnDestroy()
+    {
+        StageSpawner.OnMapGenerated -= RegisterGrounds;
+    }
+    
+
+    /// <summary>
+    /// アイテム配置をする部屋なのかを確認してListに登録するメソッド
+    /// </summary>
+    public void RegisterGrounds()
+    {
+        // リストの中を空にする
+        groundColliders.Clear();
+
+        // オブジェクトのタグがItemGroundの場合取得する
+        GameObject[] grounds = GameObject.FindGameObjectsWithTag("ItemGround");
+
+        foreach (GameObject ground in grounds)
+        {
+            BoxCollider collider = ground.GetComponent<BoxCollider>();
+            if (collider != null)
+            {
+                groundColliders.Add(collider);
+            }
+        }
+        Debug.Log($"床登録数:{groundColliders.Count}");
     }
 
     public int GetSpawnCount(GamePhase phase)
@@ -209,23 +218,17 @@ public class ItemObjectPlace : MonoBehaviour
         };
     }
 
-    /// <summary>
-    /// 設定した部屋のアイテム配置範囲リストをランダムに選ぶメソッド
-    /// </summary>
-    private RoomSpawnPosition GetRandomRoom()
+    private BoxCollider GetRandomGround()
     {
-        // roomSpawnPositionsがnullまたは配列に設定していない場合
-        if (roomSpawnPositions == null || roomSpawnPositions.Length == 0)
+        if (groundColliders.Count == 0)
         {
-            Debug.LogError("部屋のスポーン位置が設定されていません");
+            Debug.LogError("ItemGroundタグが付いた床が見つかりません");
             return null;
         }
 
-        //配列の中からランダムに1つ選ぶ
-        int index = UnityEngine.Random.Range(0, roomSpawnPositions.Length);
+        int index = UnityEngine.Random.Range(0,groundColliders.Count);
 
-        //RoomSpawnPositionの配列で選ばれたものを返り値にする
-        return roomSpawnPositions[index];
+        return groundColliders[index];
     }
 
     /// <summary>
@@ -234,18 +237,28 @@ public class ItemObjectPlace : MonoBehaviour
     /// </summary>
     public Vector3 GetRandomPosition()
     {
-        // GetRandomRoomメソッドでランダムに選ばれた部屋を取得
-        RoomSpawnPosition roomSpawnPosition = GetRandomRoom();
+        BoxCollider boxColliderGround = GetRandomGround();
+        
+        if (boxColliderGround == null)
+        {
+            return Vector3.zero;
+        }
+
+        // ワールド座標でboxColliderGroundの範囲を取得
+        Bounds bounds = boxColliderGround.bounds;
 
         // 部屋の座標内のランダムな座標を代入
-        float randomX = UnityEngine.Random.Range(roomSpawnPosition.minX, roomSpawnPosition.maxX);
-        float randomZ = UnityEngine.Random.Range(roomSpawnPosition.minZ, roomSpawnPosition.maxZ);
+        float randomX = UnityEngine.Random.Range(bounds.min.x + 0.5f, bounds.max.x - 0.5f);
+        float randomZ = UnityEngine.Random.Range(bounds.min.z + 0.5f, bounds.max.z - 0.5f);
 
         //決められたY座標に配置する
-        float randomY = roomSpawnPosition.positionY;
+        float randomY = bounds.max.y + 1.0f;
+        Vector3 pos = new Vector3(randomX, bounds.max.y + 1.5f, randomZ);
+        //Debug.Log($"生成座標:{pos}");
 
         // 決められた座標を返り値にする
         return new Vector3(randomX, randomY, randomZ);
+        //return pos;
     }
 
     /// <summary>

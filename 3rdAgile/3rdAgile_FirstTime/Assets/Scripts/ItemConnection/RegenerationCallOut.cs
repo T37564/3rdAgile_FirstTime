@@ -33,14 +33,17 @@ public class RegenerationCallOut : NetworkBehaviour
         {
             return;
         }
-        
+
+        bool isFallen = transform.position.y <= -regenerationJudgementCoordinate;
 
         //アイテムのY座標が一定以下でなおかつ地面についていないとき
-        if (transform.position.y <= -regenerationJudgementCoordinate && !IsGround())
+        if (transform.position.y <= -regenerationJudgementCoordinate && !IsItemGround())
+        //if ((isFallen||IsItemGround()) && !isGenerateRequest)
         {
             if (isGenerateRequest) return;
             isGenerateRequest = true;
             
+
             //Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
             //RegenerationCallOutクラスにイベントを通知する
             //？があることで登録されているメソッドが無ければ呼び出さないようにする
@@ -57,7 +60,14 @@ public class RegenerationCallOut : NetworkBehaviour
 
     private bool IsGround()
     {
+        //Debug.Log($"Y={transform.position.y}");
+        //Debug.Log($"Ground={IsGround()}");
         return Physics.Raycast(transform.position, Vector3.down, rayLength, layerMask);
+    }
+
+    private bool IsItemGround()
+    {
+        return Physics.Raycast(transform.position,Vector3.down,out RaycastHit hit,rayLength, layerMask);
     }
 
     private void OnDrawGizmosSelected()

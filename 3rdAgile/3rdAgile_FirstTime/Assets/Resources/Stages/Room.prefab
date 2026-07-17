@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9120429280658539132}
   - component: {fileID: 859560483467723007}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: RightConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7110830050926758207}
   - component: {fileID: 683116987222278248}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BackConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6097828399544095630}
   - component: {fileID: 4854696600443682375}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: LeftConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,9 +150,9 @@ GameObject:
   - component: {fileID: 2059099469994473305}
   - component: {fileID: 3687366153995666920}
   - component: {fileID: 2709338944078073058}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Room
-  m_TagString: Untagged
+  m_TagString: ItemGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -319,7 +319,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4205816516570795123}
   - component: {fileID: 7714842238704554542}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ForwardConnector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
