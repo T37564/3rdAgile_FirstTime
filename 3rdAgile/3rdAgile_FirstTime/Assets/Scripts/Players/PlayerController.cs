@@ -29,7 +29,8 @@ namespace Network.Player
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
-        [SerializeField] private float moveSpeed = 3.0f;
+        [SerializeField] private float moveSpeed = 7.0f;
+        [SerializeField] private float carryingMoveSpeed = 4.0f;
 
         [Header("インタラクト判定半径")]
         [SerializeField] private float interactRadius = 2.0f;
@@ -38,7 +39,7 @@ namespace Network.Player
         [SerializeField] private LayerMask interactLayerMask;
 
         [Header("アイテムを持っているときの最大距離")]
-        [SerializeField] private float maxCarryDistance = 5.0f;
+        [SerializeField] private float maxCarryDistance = 3.0f;
 
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
@@ -201,7 +202,7 @@ namespace Network.Player
             }
 
             // アイテムの所持状態に応じて移動速度を変更
-            float speed = IsHoldingItem ? maxCarryDistance : moveSpeed;
+            float speed = IsHoldingItem ? carryingMoveSpeed : moveSpeed;
 
             // 移動量を計算
             Vector3 nextPosition = transform.position + move * speed * Runner.DeltaTime;

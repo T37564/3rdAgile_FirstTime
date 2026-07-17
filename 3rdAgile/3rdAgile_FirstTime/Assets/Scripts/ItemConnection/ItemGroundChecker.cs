@@ -41,7 +41,7 @@ public class ItemGroundChecker : NetworkBehaviour
 
             Debug.Log("アイテムが完全に納品エリアに接地しています。");
 
-            OnGroundedStateChanged?.Invoke(amount);
+            //OnGroundedStateChanged?.Invoke(amount);
             Debug.Log("アイテムのAmount: " + amount);
             //gameObject.SetActive(false);
             Runner.Despawn(Object);
