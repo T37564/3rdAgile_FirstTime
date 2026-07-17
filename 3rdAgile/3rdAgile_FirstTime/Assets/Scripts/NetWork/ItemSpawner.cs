@@ -1,6 +1,7 @@
 using Fusion;
 using Fusion.Sockets;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -66,6 +67,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
+        Debug.Log($"SpawnItems 呼び出し Phase={phase}");
         // フェーズごとに出現させるアイテムの数を取得
         int spawnCount = itemObjectPlace.GetSpawnCount(phase);
 
@@ -93,7 +95,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                     // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                     if (regenerationCallOut != null)
                     {
-                        //Debug.Log("再配置を要求");
+                        Debug.Log("再配置を要求");
                         regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
                     }
                 });
@@ -137,6 +139,7 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        Debug.Log("OnSceneLoadDone 呼び出し");
         // 管理者だけ実行
         if (!runner.IsServer) return;
 
@@ -159,43 +162,8 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError("ItemObjectPlace script が付いてない！");
             return;
         }
-
-        // 現在のフェーズ取得
-        GamePhase phase = gameTimer.CurrentPhase;
-
-
-        //生成する数だけpositionを作ってください
-        int spawnCount = itemObjectPlace.GetSpawnCount(phase);
-
-        // 出現させるアイテムの数だけループする
-        // ランダムに決められた座標に、ランダムに決められたアイテムを生成する
-        for (int i = 0; i < spawnCount; i++)
-        {
-            itemCount++;
-
-            // 生成する際のランダムな位置を取得
-            Vector3 generatePosition = itemObjectPlace.GetRandomPosition();
-
-            // 生成するオブジェクトを取得
-            NetworkObject prefab = itemObjectPlace.GetRandomPrefabByPhase(phase);
-
-            if (prefab == null) continue;
-
-            // ネットワークを使ったアイテム生成
-            runner.Spawn(prefab, generatePosition, Quaternion.identity, null, (runner, obj) =>
-            {
-                SetupItem(obj);
-
-                RegenerationCallOut regenerationCallOut = obj.GetComponent<RegenerationCallOut>();
-
-                // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
-                if (regenerationCallOut != null)
-                {
-                    //Debug.Log("再配置を要求");
-                    regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
-                }
-            });
-        }
+        // 最初のフェーズでアイテムを配置する処理のコルーチンを実行
+        StartCoroutine(SpawnFirstPhaseItem(runner));
     }
 
     /// <summary>
@@ -219,6 +187,15 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         // アイテムの情報をセットする
         storage.SetData(data);
+    }
+
+    private IEnumerator SpawnFirstPhaseItem(NetworkRunner runner)
+    {
+        // アイテム配置用の床が1つ以上登録されていた場合アイテムを配置
+        yield return new WaitUntil(() => itemObjectPlace.groundColliders.Count > 0);
+
+        // アイテムを配置
+        SpawnItems(gameTimer.CurrentPhase,runner);
     }
 
 

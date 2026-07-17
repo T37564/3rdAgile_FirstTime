@@ -48,6 +48,10 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private readonly Dictionary<Vector2Int, NetworkObject> placedChunks = new();
     private readonly List<Vector2Int> roomPositions = new();
 
+    // 部屋を生成した後に処理を行うイベント
+    //public static Action? OnMapGenerated;
+    public static Action? OnMapGenerated;
+
     private static readonly Vector2Int[] Directions =
     {
         Vector2Int.up,
@@ -68,6 +72,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        Debug.Log("StageSpawner OnSceneLoadDone");
         if (!runner.IsServer) return;
         Generate(runner);
     }
@@ -100,6 +105,8 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 if (!CanPlace(roomPos)) continue;
 
                 PlaceChunk(runner, corridorPos, straightCorridorPrefab, GetCorridorRotation(dir));
+
+                // 部屋の生成
                 PlaceChunk(runner, roomPos, roomPrefab, Quaternion.identity);
 
                 roomPositions.Add(roomPos);
@@ -108,6 +115,9 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 break;
             }
         }
+        
+        // すべての部屋を生成した後イベント実行
+        OnMapGenerated?.Invoke();
 
         if (createdRoomCount < targetRoomCount)
         {

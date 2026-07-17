@@ -4973,6 +4973,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   rayLength: 1
+  regenerationJudgementCoordinate: 20
   isGenerateRequest: 0
   _isCarried: 0
 --- !u!114 &8599090137824959149
@@ -5006,6 +5007,8 @@ MonoBehaviour:
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}
+  _IsHelpPeople:
+    _value: 0
 --- !u!54 &2142278982236377383
 Rigidbody:
   m_ObjectHideFlags: 0
