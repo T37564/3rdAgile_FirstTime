@@ -37,14 +37,13 @@ public class RegenerationCallOut : NetworkBehaviour
         bool isFallen = transform.position.y <= -regenerationJudgementCoordinate;
 
         //アイテムのY座標が一定以下でなおかつ地面についていないとき
-        if (transform.position.y <= -regenerationJudgementCoordinate && !IsItemGround())
-        //if ((isFallen||IsItemGround()) && !isGenerateRequest)
+        if (isFallen || !IsItemGround())
         {
             if (isGenerateRequest) return;
             isGenerateRequest = true;
-            
+            Debug.Log(transform.position.y);
 
-            //Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
+            Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
             //RegenerationCallOutクラスにイベントを通知する
             //？があることで登録されているメソッドが無ければ呼び出さないようにする
             OnNeedRegenerate?.Invoke(this);
@@ -58,13 +57,9 @@ public class RegenerationCallOut : NetworkBehaviour
         transform.position = newPosition;
     }
 
-    private bool IsGround()
-    {
-        //Debug.Log($"Y={transform.position.y}");
-        //Debug.Log($"Ground={IsGround()}");
-        return Physics.Raycast(transform.position, Vector3.down, rayLength, layerMask);
-    }
-
+    /// <summary>
+    /// アイテムが指定したLayer上にいるかを判定するメソッド
+    /// </summary>
     private bool IsItemGround()
     {
         return Physics.Raycast(transform.position,Vector3.down,out RaycastHit hit,rayLength, layerMask);
