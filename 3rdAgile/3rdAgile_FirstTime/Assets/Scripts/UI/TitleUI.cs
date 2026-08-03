@@ -4,7 +4,9 @@
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class TitleUI : MonoBehaviour
@@ -29,6 +31,10 @@ public class TitleUI : MonoBehaviour
     // メッセージログのVisualElement
     private VisualElement messageLog = null;
 
+    private Focusable nowFocusedButton = null;
+
+    private readonly Color FOCUSE_BUTTON_BACKIMAGE_COLOR = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+
     private void OnEnable()
     {
         // タイトルのUIに切り替える
@@ -47,6 +53,13 @@ public class TitleUI : MonoBehaviour
         // イベント登録
         createRoom.clicked += titleButtonController.OnClickCreateRoomButton;
         enterRoom.clicked += titleButtonController.OnClickEnterRoomButton;
+
+        // ゲームバッドがつながっているとき
+        if (Gamepad.current != null)
+        {
+            // 部屋作成部分にフォーカスを当てる
+            StartCoroutine(FocusDelay());
+        }
     }
 
     /// <summary>
@@ -67,6 +80,15 @@ public class TitleUI : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (nowFocusedButton == null) return;
+        ((Button)nowFocusedButton).style.unityBackgroundImageTintColor =
+   nowFocusedButton == uiDocument.rootVisualElement.panel.focusController.focusedElement ? Color.white : FOCUSE_BUTTON_BACKIMAGE_COLOR;
+
+        nowFocusedButton = uiDocument.rootVisualElement.panel.focusController.focusedElement;
+    }
+
     /// <summary>
     ///  接続失敗メッセージを一定時間表示する
     /// </summary>
@@ -77,5 +99,17 @@ public class TitleUI : MonoBehaviour
         yield return new WaitForSeconds(MESSAGELOG_DISPLAY_TIME);
 
         messageLog.style.display = DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// レイアウト計算が終わった後に部屋作成部分にフォーカスを当てる処理
+    /// </summary>
+    private IEnumerator FocusDelay()
+    {
+        yield return null;
+        createRoom.Focus();
+
+        nowFocusedButton = uiDocument.rootVisualElement.panel.focusController.focusedElement;
+        ((Button)nowFocusedButton).style.unityBackgroundImageTintColor = FOCUSE_BUTTON_BACKIMAGE_COLOR;
     }
 }
