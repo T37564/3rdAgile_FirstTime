@@ -11,6 +11,7 @@ TagManager:
   - LegendaryTreasure
   - DeathPlayer
   - ItemGround
+  - EnemyGround
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - deliveryOfMaterialsArea
   - Player
   - ItemGround
-  - 
+  - EnemyGround
   - 
   - 
   - 

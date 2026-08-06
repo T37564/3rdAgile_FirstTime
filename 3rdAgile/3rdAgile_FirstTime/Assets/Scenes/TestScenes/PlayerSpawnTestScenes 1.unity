@@ -801,6 +801,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathObservation
   gameTimer: {fileID: 385890815}
+  gameOverMessage: {fileID: 0}
+  gameOverBackImage: {fileID: 0}
 --- !u!4 &489584769
 Transform:
   m_ObjectHideFlags: 0
@@ -1010,13 +1012,14 @@ GameObject:
   m_Component:
   - component: {fileID: 746735746}
   - component: {fileID: 746735745}
+  - component: {fileID: 746735747}
   m_Layer: 0
   m_Name: EnemySpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &746735745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1024,7 +1027,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 746735744}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 935ac5322f962f344bcf480d378a8339, type: 3}
   m_Name: 
@@ -1034,6 +1037,7 @@ MonoBehaviour:
   generateCount: 1
   spawnTransform:
   - {fileID: 1847198804}
+  enemyObjectPlace: {fileID: 746735747}
 --- !u!4 &746735746
 Transform:
   m_ObjectHideFlags: 0
@@ -1049,6 +1053,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &746735747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746735744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f23b3d694dc77304ea446ba07298ee23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyObjectPlace
+  enemyGroundColliders:
+  - {fileID: 1254402773794257899, guid: a67ad32370721864f96d5bf7b7fff34a, type: 3}
 --- !u!1 &790305687
 GameObject:
   m_ObjectHideFlags: 0
@@ -1416,22 +1434,6 @@ MonoBehaviour:
   - phase: 3
     items:
     - itemPrefab: {fileID: -5405382398450028345, guid: 7000bb0fef7ebe443a871fa9cb58caf6, type: 3}
-  roomSpawnPositions:
-  - minX: -15
-    maxX: 15
-    minZ: -15
-    maxZ: 15
-    positionY: 0.5
-  - minX: -20
-    maxX: 20
-    minZ: -20
-    maxZ: 20
-    positionY: 5
-  - minX: -40
-    maxX: 40
-    minZ: -40
-    maxZ: 40
-    positionY: 10
   itemDataTable:
   - randomDataType: 0
     sampleMasterDatas:

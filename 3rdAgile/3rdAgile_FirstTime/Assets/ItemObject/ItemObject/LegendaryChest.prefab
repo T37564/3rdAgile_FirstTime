@@ -4970,7 +4970,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RegenerationCallOut
   layerMask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 1024
   rayLength: 1.5
   regenerationJudgementCoordinate: 20
   isGenerateRequest: 0
