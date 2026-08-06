@@ -2,6 +2,7 @@ using Fusion;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 [Serializable]
 public class GenerateEnemyType
@@ -16,6 +17,8 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int generateCount = 0;
 
     [SerializeField] Transform[] spawnTransform;
+
+    [SerializeField] private EnemyObjectPlace enemyObjectPlace;
 
     //[SerializeField] private NetworkRunner runner;
 
@@ -43,14 +46,14 @@ public class EnemySpawner : MonoBehaviour
 
     private void GenerateEnemy()
     {
-        Debug.Log(generateEnemys[0].enemyObject);
-        Debug.Log(spawnTransform.Length);
-
         for (int i = 0; i < generateCount; i++)
         {
-            Debug.Log(spawnTransform[i]);
-            Instantiate(generateEnemys[i].enemyObject, 
-                spawnTransform[i].position, spawnTransform[i].rotation);
+            Vector3 generatePosition=enemyObjectPlace.GetRandomPosition();
+
+            Instantiate(generateEnemys[i].enemyObject,generatePosition,Quaternion.identity);
+            NavMeshAgent agent = GetComponent<NavMeshAgent>();
+
+            Debug.Log(agent.isOnNavMesh);
         }
     }
 }
