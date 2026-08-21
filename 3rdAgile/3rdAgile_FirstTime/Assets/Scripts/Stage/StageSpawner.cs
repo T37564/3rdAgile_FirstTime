@@ -5,6 +5,7 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -52,6 +53,10 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     //public static Action? OnMapGenerated;
     public static Action? OnMapGenerated;
 
+    public static Action? OnNavMeshGenerated;
+
+    private NavMeshSurface navMeshSurface;
+
     private static readonly Vector2Int[] Directions =
     {
         Vector2Int.up,
@@ -62,9 +67,11 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
+        Debug.Log($"Awake Object = {gameObject.name}");
         startRoomPrefab = Resources.Load<NetworkObject>(START_ROOM_PATH);
         roomPrefab = Resources.Load<NetworkObject>(ROOM_PATH);
         straightCorridorPrefab = Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
+
     }
 
     /// <summary>
@@ -75,6 +82,18 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("StageSpawner OnSceneLoadDone");
         if (!runner.IsServer) return;
         Generate(runner);
+
+        navMeshSurface = FindAnyObjectByType<NavMeshSurface>();
+        Debug.Log($"NavMeshSurface : {navMeshSurface}");
+        if (navMeshSurface == null)
+        {
+            Debug.LogError("NavMeshSurfaceが取得できていないためNavMeshを生成できません");
+            return;
+        }
+        navMeshSurface.BuildNavMesh();
+
+        // NavMesh生成完了後にイベントを実行
+        OnNavMeshGenerated?.Invoke();
     }
     private void Generate(NetworkRunner runner)
     {
@@ -118,6 +137,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         
         // すべての部屋を生成した後イベント実行
         OnMapGenerated?.Invoke();
+        //navMeshSurface.BuildNavMesh();
 
         if (createdRoomCount < targetRoomCount)
         {
