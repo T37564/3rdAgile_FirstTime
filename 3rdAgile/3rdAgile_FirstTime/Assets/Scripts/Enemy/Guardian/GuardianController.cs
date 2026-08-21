@@ -46,6 +46,12 @@ public class GuardianController : NetworkBehaviour
             if (currentDistance <= searchRange)
             {
                 targetPos.y = transform.position.y;
+
+                if(!navMeshAgent.isOnNavMesh)
+                {
+                    Debug.LogWarning("NavMeshAgent‚ªNavMeshã‚É‚ ‚è‚Ü‚¹‚ñB");
+                    return;
+                }
                 navMeshAgent.SetDestination(targetPos);
 
             }
