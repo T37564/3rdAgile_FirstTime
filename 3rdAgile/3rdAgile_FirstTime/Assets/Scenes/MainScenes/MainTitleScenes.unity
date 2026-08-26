@@ -401,6 +401,7 @@ MonoBehaviour:
   uiDocument: {fileID: 2080090540}
   uIAssetData: {fileID: 11400000, guid: 3d3fd1c9357061b4fa09cc69ffc28e85, type: 2}
   titleButtonController: {fileID: 444393182}
+  titleUI: {fileID: 1551750875}
 --- !u!1 &922870602
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,7 +976,7 @@ MonoBehaviour:
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
   m_ActionsAsset: {fileID: -944628639613478452, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
-  m_PointAction: {fileID: 0}
+  m_PointAction: {fileID: -3566249209551795425, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
   m_MoveAction: {fileID: -6601027628780742343, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
   m_SubmitAction: {fileID: 3247952622033325183, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
   m_CancelAction: {fileID: 0}

@@ -5,12 +5,16 @@
 //-----------------------------------------------------------------------------------
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class LobbyUI : MonoBehaviour
 {
     // テキストを一定時間表示させるための時間
     private const float DISPLAY_TIME = 1.0f;
+
+    // フォーカス時の色（灰色）
+    private readonly Color FOCUSE_BUTTON_BACKIMAGE_COLOR = new Color(0.5f, 0.5f, 0.5f, 1.0f);
 
     [Header("UIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
@@ -20,6 +24,8 @@ public class LobbyUI : MonoBehaviour
 
     [Header("タイトルボタン参照用")]
     [SerializeField] private TitleButtonController titleButtonController = null;
+    [Header("タイトルUI参照用")]
+    [SerializeField] private TitleUI titleUI = null;
 
 
 
@@ -62,11 +68,22 @@ public class LobbyUI : MonoBehaviour
         // スタートボタンが押されたときのイベント登録
         gameStartButton.clicked += titleButtonController.ClickStartButton;
 
+        // マウスが入った＆出たを登録解除
+        gameStartButton.RegisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        gameStartButton.RegisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+
         // NetworkGameStarter のインスタンスを取得　
         networkGameStarter = NetworkGameStarter.Instance;
 
         // ホスト用のロビーUI表示を更新する
         networkGameStarter.networkLobbyUI.DisplayHostUI(networkGameStarter.networkRunner, this);
+
+        // ゲームバッドがつながっているとき
+        if (Gamepad.current != null)
+        {
+            // 部屋作成部分にフォーカスを当てる
+            StartCoroutine(FocusGameStartButton());
+        }
     }
 
     /// <summary>
@@ -78,6 +95,10 @@ public class LobbyUI : MonoBehaviour
         {
             gameStartButton.clicked -= titleButtonController.ClickStartButton;
         }
+
+        // マウスが入った＆出たを登録解除
+        gameStartButton.UnregisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        gameStartButton.UnregisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
     }
 
     /// <summary>
@@ -90,5 +111,16 @@ public class LobbyUI : MonoBehaviour
         yield return new WaitForSecondsRealtime(DISPLAY_TIME);
 
         lackOfPersonnel.style.display = DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// ゲームパッド使用中にボタンをフォーカスする処理
+    /// </summary>
+    private IEnumerator FocusGameStartButton()
+    {
+        yield return null;
+
+        gameStartButton.Focus();
+        gameStartButton.style.unityBackgroundImageTintColor = FOCUSE_BUTTON_BACKIMAGE_COLOR;
     }
 }
