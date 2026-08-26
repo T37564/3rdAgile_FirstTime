@@ -8,8 +8,6 @@ public class EnemyObjectPlace : MonoBehaviour
 {
     public List<BoxCollider> enemyGroundColliders = new();
 
-    private List<StageTypeKinds> stageTypeKinds = new();
-
     private void OnEnable()
     {
         StageSpawner.OnMapGenerated += RegisterGrounds;

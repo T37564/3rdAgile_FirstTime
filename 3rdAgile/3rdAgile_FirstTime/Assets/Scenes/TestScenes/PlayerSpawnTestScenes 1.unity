@@ -1035,7 +1035,7 @@ MonoBehaviour:
   generateEnemys:
   - enemyPrefabObject: {fileID: -1977406020987954072, guid: 857ce865c004afa4fb94219e8d3ed43b, type: 3}
     stageTypes: 1
-  enumStageType: 0
+  enumStageType: 1
   generateCount: 1
   spawnTransform:
   - {fileID: 1847198804}
