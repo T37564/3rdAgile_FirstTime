@@ -4,8 +4,10 @@
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
 using Fusion;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class ReturnButtonUI : NetworkBehaviour
@@ -14,6 +16,9 @@ public class ReturnButtonUI : NetworkBehaviour
     private readonly int HOST_SHUTDOWN_WAIT_TIME_MS = 5000;
     // クライアント用のシャットダウン待機時間
     private readonly int CLIENT_SHUTDOWN_WAIT_TIME_MS = 2000;
+
+    // フォーカス時の色（灰色）
+    private readonly Color FOCUSE_BUTTON_BACKIMAGE_COLOR = new Color(0.5f, 0.5f, 0.5f, 1.0f);
 
     [Header("ローディング時に表示するUI")]
     [SerializeField] private GameObject loadingCanvas = null;
@@ -43,17 +48,38 @@ public class ReturnButtonUI : NetworkBehaviour
         {
             // ホスト用のルーム解散ボタンを表示
             hostButton.style.display = DisplayStyle.Flex;
+
+            // ゲームバッドがつながっているとき
+            if (Gamepad.current != null)
+            {
+                // 部屋作成部分にフォーカスを当てる
+                StartCoroutine(FocusDelay(hostButton));
+            }
         }
         else // クライアントのみ
         {
             // クライアント用のルーム退出ボタンを表示
             clientButton.style.display = DisplayStyle.Flex;
+
+            // ゲームバッドがつながっているとき
+            if (Gamepad.current != null)
+            {
+                // 部屋作成部分にフォーカスを当てる
+                StartCoroutine(FocusDelay(clientButton));
+            }
         }
 
         // イベント登録
         hostButton.clicked += HostClickedRoomDisband;
         clientButton.clicked += ClientClickedLeaveRoom;
+
+        // マウスが入った＆出たを登録解除
+        hostButton.RegisterCallback<MouseEnterEvent>(OnMouseEnter);
+        hostButton.RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        clientButton.RegisterCallback<MouseEnterEvent>(OnMouseEnter);
+        clientButton.RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
     }
+
 
     /// <summary>
     /// イベント登録解除
@@ -62,6 +88,44 @@ public class ReturnButtonUI : NetworkBehaviour
     {
         hostButton.clicked -= HostClickedRoomDisband;
         clientButton.clicked -= ClientClickedLeaveRoom;
+
+        // マウスが入った＆出たを登録解除
+        hostButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
+        hostButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        clientButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
+        clientButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+    }
+
+    /// <summary>
+    /// マウスがボタンに入ったときに選択中の色に変更する
+    /// </summary>
+    public void OnMouseEnter(MouseEnterEvent mouseEnterEvent)
+    {
+        if (mouseEnterEvent.currentTarget is Button button)
+        {
+            button.style.unityBackgroundImageTintColor = FOCUSE_BUTTON_BACKIMAGE_COLOR;
+        }
+    }
+
+    /// <summary>
+    /// マウスがボタンから離れたときに色を元に戻す
+    /// </summary>
+    public void OnMouseLeave(MouseLeaveEvent mouseEnterEvent)
+    {
+        if (mouseEnterEvent.currentTarget is Button button)
+        {
+            button.style.unityBackgroundImageTintColor = Color.white;
+        }
+    }
+
+    /// <summary>
+    /// レイアウト計算が終わった後に部屋作成部分にフォーカスを当てる処理
+    /// </summary>
+    public IEnumerator FocusDelay(Button focusButton)
+    {
+        yield return null;
+        focusButton.Focus();
+        focusButton.style.unityBackgroundImageTintColor = FOCUSE_BUTTON_BACKIMAGE_COLOR;
     }
 
     /// <summary>
