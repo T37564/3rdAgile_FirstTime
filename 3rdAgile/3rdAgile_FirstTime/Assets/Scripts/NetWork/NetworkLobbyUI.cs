@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------------
 using Fusion;
 using Fusion.Sockets;
+using Network.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,9 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
     // LobbyUI参照用
     private LobbyUI lobbyUI = null;
 
+    // SEManager参照用
+    private SEManager seManager = null;
+
     #region Player
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。
@@ -28,6 +32,16 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
     {
         // プレイヤー人数表示を更新
         UpdateCount(runner);
+
+        if (seManager == null)
+        {
+            seManager = FindAnyObjectByType<SEManager>();
+        }
+
+        if (runner.IsServer)
+        {
+            seManager.SEPlayOneShot(seManager.SEList.playerJoinSE);
+        }
     }
 
 
@@ -40,6 +54,18 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
     {
         // プレイヤー人数表示を更新
         UpdateCount(runner);
+
+        if (seManager == null)
+        {
+            seManager = FindAnyObjectByType<SEManager>();
+        }
+
+
+
+        if (runner.IsServer)
+        {
+            seManager.SEPlayOneShot(seManager.SEList.playerLeaveSE);
+        }
     }
     #endregion
 
