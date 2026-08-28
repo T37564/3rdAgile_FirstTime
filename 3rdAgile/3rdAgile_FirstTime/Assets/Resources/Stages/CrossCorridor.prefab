@@ -168,6 +168,7 @@ GameObject:
   - component: {fileID: 5366921161397080892}
   - component: {fileID: 784508336500219684}
   - component: {fileID: 6645420777919001029}
+  - component: {fileID: 8871275322290394035}
   m_Layer: 0
   m_Name: CrossCorridor
   m_TagString: Untagged
@@ -233,6 +234,19 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours: []
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &8871275322290394035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3956919692348897292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9d68fd8a4781314e851985146e6ab31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StagePlice
+  stageType: 0
 --- !u!1 &4279269224654646887
 GameObject:
   m_ObjectHideFlags: 0

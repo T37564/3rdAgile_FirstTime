@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 1254402773794257899}
   - component: {fileID: 2059099469994473305}
   - component: {fileID: 3687366153995666920}
+  - component: {fileID: -4856341880340146703}
   m_Layer: 0
   m_Name: GuardianRoom
   m_TagString: Untagged
@@ -290,6 +291,19 @@ MonoBehaviour:
   - {fileID: 683116987222278248}
   - {fileID: 859560483467723007}
   - {fileID: 4854696600443682375}
+--- !u!114 &-4856341880340146703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8125285459053750638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9d68fd8a4781314e851985146e6ab31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StagePlice
+  stageType: 0
 --- !u!1 &8495567664885212603
 GameObject:
   m_ObjectHideFlags: 0

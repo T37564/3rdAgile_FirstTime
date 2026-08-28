@@ -18,13 +18,7 @@ public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] public GenerateEnemyType[] generateEnemys;
 
-    [SerializeField] private StageTypeKinds enumStageType;
-
-    public StageTypeKinds StageType => enumStageType;
-
     [SerializeField] private int generateCount = 0;
-
-    [SerializeField] Transform[] spawnTransform;
 
     [SerializeField] private EnemyObjectPlace enemyObjectPlace;
 
@@ -80,19 +74,16 @@ public class EnemySpawner : MonoBehaviour
                 continue;
             }
 
-            Vector3 spawnPosition = GetRandomSpawnPosition();
-
-            //Vector3 generatePosition =enemyObjectPlace.GetRandomPosition();
+            Vector3 spawnPosition = enemyObjectPlace.GetRandomPosition(generateEnemys[i].stageTypes);
+            Debug.Log(
+    $"【敵生成】" +
+    $"Enemy={enemyPrefab.name}, " +
+    $"StageType={generateEnemys[i].stageTypes}, " +
+    $"Position={spawnPosition}"
+);
 
             runner.Spawn(enemyPrefab, spawnPosition, Quaternion.identity);
         }
     }
 
-    private Vector3 GetRandomSpawnPosition()
-    {
-        // 現在作成している
-        // 敵出現用のランダム座標取得処理
-
-        return Vector3.zero;
-    }
 }

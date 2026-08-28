@@ -168,6 +168,7 @@ GameObject:
   - component: {fileID: 76265407084183011}
   - component: {fileID: 4523570183070290021}
   - component: {fileID: 2349657975418486959}
+  - component: {fileID: -7014108765219075228}
   m_Layer: 0
   m_Name: TCorridor
   m_TagString: Untagged
@@ -231,6 +232,19 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours: []
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &-7014108765219075228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2961357376758664862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9d68fd8a4781314e851985146e6ab31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StagePlice
+  stageType: 3
 --- !u!1 &4696371117888965598
 GameObject:
   m_ObjectHideFlags: 0

@@ -1035,10 +1035,7 @@ MonoBehaviour:
   generateEnemys:
   - enemyPrefabObject: {fileID: -1977406020987954072, guid: 857ce865c004afa4fb94219e8d3ed43b, type: 3}
     stageTypes: 1
-  enumStageType: 0
   generateCount: 1
-  spawnTransform:
-  - {fileID: 1847198804}
   enemyObjectPlace: {fileID: 746735747}
 --- !u!4 &746735746
 Transform:
@@ -1067,8 +1064,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f23b3d694dc77304ea446ba07298ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyObjectPlace
-  enemyGroundColliders:
-  - {fileID: 1254402773794257899, guid: a67ad32370721864f96d5bf7b7fff34a, type: 3}
 --- !u!1 &790305687
 GameObject:
   m_ObjectHideFlags: 0

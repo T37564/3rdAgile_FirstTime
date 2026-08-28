@@ -1,73 +1,117 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static Unity.VisualScripting.Metadata;
 
 public class EnemyObjectPlace : MonoBehaviour
 {
-    public List<BoxCollider> enemyGroundColliders = new();
+    private List<StageTypeKinds> stageTypeKindList = new();
 
-    private List<StageTypeKinds> stageTypeKinds = new();
+    private Dictionary<StageTypeKinds, List<BoxCollider>> groundDictionary = new();
 
-    private void OnEnable()
-    {
-        StageSpawner.OnMapGenerated += RegisterGrounds;
-    }
-
-    private void OnDisable()
-    {
-        StageSpawner.OnMapGenerated -= RegisterGrounds;
-    }
+    
 
     public void RegisterGrounds()
     {
-        enemyGroundColliders.Clear();
+        groundDictionary.Clear();
+        
+        //stageTypeKindList.Clear();
 
-        //StageTypeKinds[] stages = FindObjectsByType<StageTypeKinds>(FindObjectsSortMode.None);
+        StageTypeSetting[] stages = FindObjectsByType<StageTypeSetting>(FindObjectsSortMode.None);
 
-        //stageTypeKinds.AddRange(stages);
-
-        GameObject[] grounds = GameObject.FindGameObjectsWithTag("EnemyGround");
-
-        foreach (GameObject ground in grounds)
+        foreach (StageTypeSetting stage in stages)
         {
-            BoxCollider box = ground.GetComponent<BoxCollider>();
-
-            NavMeshSurface surface = ground.GetComponent<NavMeshSurface>();
-            //surface.BuildNavMesh();
-
-            if (box != null)
+            StageTypeKinds type = stage.StageType;
+            if(!groundDictionary.ContainsKey(type))
             {
-                enemyGroundColliders.Add(box);
+                groundDictionary[type] = new List<BoxCollider>();
+            }
+
+            Transform[] children = stage.GetComponentsInChildren<Transform>();
+            //Debug.Log($"敵出現地面の登録数: {enemyGroundColliders.Count}");
+            foreach (Transform child in children)
+            {
+                Debug.Log($"敵出現地面: {child.name}");
+                if (!child.CompareTag("ItemGround"))
+                {
+                    Debug.Log("ItemGroundタグがついていないオブジェクトをスキップ: " + child.name);
+                    continue;
+                }
+
+                BoxCollider boxCollider = child.GetComponent<BoxCollider>();
+                if (boxCollider != null)
+                {
+                    Debug.Log("ItemGround登録: " + child.name);
+                    groundDictionary[type].Add(boxCollider);
+                }
             }
         }
     }
 
-    public Vector3 GetRandomPosition()
+    public Vector3 GetRandomPosition(StageTypeKinds stageType)
     {
-        if (enemyGroundColliders.Count == 0)
+        List<BoxCollider> grounds = new();
+        StageTypeSetting[] stages = FindObjectsByType<StageTypeSetting>(FindObjectsSortMode.None);
+        foreach (StageTypeSetting stage in stages)
         {
-            Debug.LogError("EnemyGroundがありません");
+            if (stage.StageType != stageType)
+            {
+                continue;
+            }
+            Transform[] children=stage.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                if (!child.CompareTag("ItemGround"))
+                {
+                    continue;
+                }
+                BoxCollider boxCollider = child.GetComponent<BoxCollider>();
+
+                if (boxCollider != null)
+                {
+                    Debug.Log(
+                            $"ItemGround発見: {child.name}, " +
+                            $"位置: {child.position}, " +
+                            $"Bounds: {boxCollider.bounds}"
+                        );
+                    grounds.Add(boxCollider);
+                }
+            }
+        }
+
+        if (grounds.Count == 0)
+        {
+            Debug.LogError(
+                $"{stageType} の敵出現用地面がありません"
+            );
+
             return Vector3.zero;
         }
+        BoxCollider ground = grounds[Random.Range(0, grounds.Count)];
 
-        BoxCollider box = enemyGroundColliders[Random.Range(0, enemyGroundColliders.Count)];
+        Debug.Log(
+    $"Ground確認: {ground.name}\n" +
+    $"Transform.position = {ground.transform.position}\n" +
+    $"Bounds.center = {ground.bounds.center}\n" +
+    $"Bounds.min = {ground.bounds.min}\n" +
+    $"Bounds.max = {ground.bounds.max}"
+);
 
-        Bounds bounds = box.bounds;
+        //int index=Random.Range(0, grounds.Count);
+        //BoxCollider ground = enemyGroundColliders[index];
+        Physics.SyncTransforms();
+        Bounds boxBounds=ground.bounds;
 
-        float x = Random.Range(bounds.min.x + 0.5f, bounds.max.x - 0.5f);
-        float z = Random.Range(bounds.min.z + 0.5f, bounds.max.z - 0.5f);
+        float x = Random.Range(boxBounds.min.x + 0.5f, boxBounds.max.x - 0.5f);
+        float z = Random.Range(boxBounds.min.z + 0.5f, boxBounds.max.z - 0.5f);
+        float y=boxBounds.max.y;
 
-        // Collider上付近の座標を作る
-        Vector3 randomPosition = new Vector3(x, bounds.max.y + 1.0f, z);
-        // 近くのNavMesh上の座標を取得
-        if (NavMesh.SamplePosition(randomPosition, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
-        {
-            return hit.position;
-        }
-
-        //return new Vector3(x, bounds.max.y + 1f, z);
-        return randomPosition;
+        Vector3 position = new Vector3(x, y, z);
+        Debug.Log($"生成位置: {position}");
+        
+        return position;
     }
 }
