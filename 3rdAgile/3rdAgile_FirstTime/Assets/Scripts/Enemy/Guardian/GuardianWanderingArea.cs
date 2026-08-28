@@ -12,7 +12,7 @@ public class GuardianWanderingArea : NetworkBehaviour
     public void FindWanderingGround()
     {
         // Groundタグが付いているオブジェクトを取得
-        GameObject[] groundObjects = GameObject.FindGameObjectsWithTag("Ground");
+        GameObject[] groundObjects = GameObject.FindGameObjectsWithTag("ItemGround");
         
         // 最小値
         shortestDistance = Mathf.Infinity;
