@@ -29,7 +29,8 @@ namespace Network.Player
 
         [Header("-- Player Settings --")]
         [Header("プレイヤーの移動速度")]
-        [SerializeField] private float moveSpeed = 3.0f;
+        [SerializeField] private float moveSpeed = 7.0f;
+        [SerializeField] private float carryingMoveSpeed = 6.0f;
 
         [Header("インタラクト判定半径")]
         [SerializeField] private float interactRadius = 2.0f;
@@ -38,7 +39,7 @@ namespace Network.Player
         [SerializeField] private LayerMask interactLayerMask;
 
         [Header("アイテムを持っているときの最大距離")]
-        [SerializeField] private float maxCarryDistance = 5.0f;
+        [SerializeField] private float maxCarryDistance = 3.0f;
 
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
@@ -191,97 +192,43 @@ namespace Network.Player
         /// </summary>
         private void Move(Vector2 moveInput)
         {
-            //Vector3に変換
+            
+
             Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
 
-            // 正規化
             if (move.sqrMagnitude > 1f)
             {
                 move.Normalize();
             }
 
-            // アイテムの所持状態に応じて移動速度を変更
-            float speed = IsHoldingItem ? maxCarryDistance : moveSpeed;
+            float speed = IsHoldingItem
+                ? carryingMoveSpeed
+                : moveSpeed; 
 
-            // 移動量を計算
-            Vector3 nextPosition = transform.position + move * speed * Runner.DeltaTime;
+            Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
 
-            // アイテムを持っているときは、アイテムとの距離がmaxCarryDistanceを超えないように制限
             if (IsHoldingItem && holdingItem != null)
             {
-                // アイテムの位置を取得
-                Vector3 itemPosition = holdingItem.Transform.position;
+                Vector3 direction = holdingItem.Transform.position - transform.position;
 
-                // プレイヤーとアイテムの距離を計算
-                Vector3 diff = nextPosition - itemPosition;
-                diff.y = 0f; // 水平方向のみに制限
+                direction.y = 0f;
 
-                // 距離がmaxCarryDistanceを超える場合は、距離をmaxCarryDistanceに制限
-                if (diff.magnitude > maxCarryDistance)
-                {
-                    // 距離をmaxCarryDistanceに制限した位置を計算
-                    diff = diff.normalized * maxCarryDistance;
-                    // プレイヤーの次の位置を、アイテムからmaxCarryDistanceの位置に修正
-                    nextPosition = itemPosition + diff;
-                    // Y座標は変えない
-                    nextPosition.y = transform.position.y;
-                }
-                // プレイヤーの回転をアイテムの方向に固定
-                Vector3 direction = (holdingItem.Transform.position - transform.position);
-                direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
-
-                // 入力があるときだけ回転
                 if (direction.sqrMagnitude > 0.01f)
                 {
-                    // アイテムの方向に回転
                     currentAngle = Quaternion.LookRotation(direction);
 
                     transform.rotation = currentAngle;
                 }
             }
-            // アイテムを持っていないときは移動方向に回転
-            else
+            else if (move.sqrMagnitude > 0.01f)
             {
-                float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
-
-                currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
+                currentAngle = Quaternion.LookRotation(move);
 
                 transform.rotation = currentAngle;
             }
 
-            // プレイヤーの位置を更新
             transform.position = nextPosition;
 
-            //// 入力があるときだけ回転
-            //if (move.sqrMagnitude > 0.01f)
-            //{
-            //    // アイテムを持っているときはアイテムの方向に回転
-            //    if (IsHoldingItem)
-            //    {
-            //        // プレイヤーの回転をアイテムの方向に固定
-            //        Vector3 direction = (holdingItem.Transform.position - transform.position);
-            //        direction.y = 0f; // 水平方向のみに回転させるためにY成分を0にする
-
-            //        if (direction.sqrMagnitude > 0.01f)
-            //        {
-            //            currentAngle = Quaternion.LookRotation(direction);
-
-            //            transform.rotation = currentAngle;
-            //        }
-            //    }
-            //    // アイテムを持っていないときは移動方向に回転
-            //    else
-            //    {
-            //        float angle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
-
-            //        currentAngle = Quaternion.Euler(0.0f, angle, 0.0f);
-
-            //        transform.rotation = currentAngle;
-            //    }
-            //}
-
-
-            // アニメーション制御
             UpdateAnimation(moveInput);
         }
 
@@ -303,7 +250,7 @@ namespace Network.Player
         private void TryDropItem()
         {
             if (!Object.HasStateAuthority) return;
-            if(!IsHoldingItem) return;
+            if (!IsHoldingItem) return;
             if (holdingItem == null) return;
 
 

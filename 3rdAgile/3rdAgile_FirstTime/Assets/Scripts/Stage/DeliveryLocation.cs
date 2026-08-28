@@ -173,9 +173,11 @@ public class DeliveryLocation : NetworkBehaviour
         //Debug.Log("カレントアイテムっ！！！");
 
         int score = currentItemStorage.itemData.GetInt("Amount");
+        int requiredPeople = currentItemStorage.itemData.GetInt("RequiredPeople");
+
 
         //ScoreManager.Instance.AddScore(score);
-        MoneyManager.Instance.AddAmount(score);
+        MoneyManager.Instance.AddAmount(score, requiredPeople);
 
         // アイテムを運んでいるプレイヤーを解除する処理
         currentItem.ReleaseAll(); 
