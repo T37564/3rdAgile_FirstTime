@@ -52,6 +52,9 @@ public class VirtualKeyboardController : MonoBehaviour
     [Header("UI Asset Data 参照")]
     [SerializeField] private UIAssetData uiAssetData = null;
 
+    [Header("SEManager　参照")]
+    [SerializeField] private SEManager seManager = null;
+
     // class="key" を持つ全てのキー（UI 要素）をまとめて格納
     private Button[] keys = null;
 
@@ -357,6 +360,9 @@ public class VirtualKeyboardController : MonoBehaviour
         {
             // 入力した数字を追加する
             matchingNumbers += index.ToString();
+
+            // SEを鳴らす
+            seManager.SEPlayOneShot(seManager.SEList.numberInputSE);
         }
         else
         {
@@ -387,6 +393,9 @@ public class VirtualKeyboardController : MonoBehaviour
             // 二重押し防止のフラグを立てる
             isDuplicateMonitoring = true;
 
+            // SEを鳴らす
+            seManager.SEPlayOneShot(seManager.SEList.numberInputSE);
+
             // 仮想キーボードを非表示にする
             gameObject.SetActive(false);
 
@@ -416,8 +425,13 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // 文字が１文字以上あるとき
         if (0 < matchingNumbers.Length)
+        {
             // 入力文字列の最後の文字を削除
             matchingNumbers = matchingNumbers.Substring(0, matchingNumbers.Length - 1);
+
+            // SEを鳴らす
+            seManager.SEPlayOneShot(seManager.SEList.numberDeleteSE);
+        }
 
         // 暗証番号の数値が書かれたUIの更新
         MatchingNumbersTextChange();
@@ -479,11 +493,17 @@ public class VirtualKeyboardController : MonoBehaviour
     {
         if (keys[currentIndex].text == "消" && 0 < matchingNumbers.Length)
         {
+            // SEを鳴らす
+            seManager.SEPlayOneShot(seManager.SEList.numberDeleteSE);
+
             // 入力中の数字を削除する
             DeleteButton();
         }
         else if (keys[currentIndex].text == "決" && 0 < matchingNumbers.Length)
         {
+            // SEを鳴らす
+            seManager.SEPlayOneShot(seManager.SEList.numberInputSE);
+
             // 決定ボタン処理
             DecisionButton();
         }
@@ -494,6 +514,9 @@ public class VirtualKeyboardController : MonoBehaviour
             {
                 // 入力した数字を追加する
                 matchingNumbers += keys[currentIndex].text;
+
+                // SEを鳴らす
+                seManager.SEPlayOneShot(seManager.SEList.numberInputSE);
             }
             else
             {
@@ -502,6 +525,8 @@ public class VirtualKeyboardController : MonoBehaviour
                 restrictionText.style.display = DisplayStyle.Flex;
             }
         }
+
+      
 
         // 暗証番号表示UIを更新
         MatchingNumbersTextChange();

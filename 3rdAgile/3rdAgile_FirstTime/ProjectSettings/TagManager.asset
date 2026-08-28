@@ -12,6 +12,7 @@ TagManager:
   - DeathPlayer
   - ItemGround
   - EnemyGround
+  - SEManage
   layers:
   - Default
   - TransparentFX

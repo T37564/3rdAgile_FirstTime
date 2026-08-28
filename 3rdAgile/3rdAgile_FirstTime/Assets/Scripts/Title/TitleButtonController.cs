@@ -3,6 +3,7 @@
 // TitleButtonController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -17,14 +18,20 @@ public class TitleButtonController : MonoBehaviour
     // 仮のチーム名
     private const string DEFAULT_TEAM_NAME = "test";
 
-    [Header("NetworkGameStarterの参照")]
+    [Header("NetworkGameStarterの参照用")]
     [SerializeField] private NetworkGameStarter networkGameStarter = null;
 
+    [Header("SEManagerの参照用")]
+    [SerializeField] private SEManager seManager = null;
+
     /// <summary>
-    ///  ホストとしてルームを作成する
+    /// チームメンバーを募集するボタンを押したとき
     /// </summary>
     public void OnClickCreateRoomButton()
     {
+        // SEを鳴らす
+        seManager.SEPlayOneShot(seManager.SEList.teamButtonSE);
+
         // タイトルUI非表示
         UIReferences.Instance.TitleUI.SetActive(false);
 
@@ -32,10 +39,13 @@ public class TitleButtonController : MonoBehaviour
     }
 
     /// <summary>
-    /// 指定したPINでルームに参加する
+    /// チームに入るボタンを押したとき
     /// </summary>
     public void OnClickEnterRoomButton()
     {
+        // SEを鳴らす
+        seManager.SEPlayOneShot(seManager.SEList.teamButtonSE);
+
         // タイトルUI非表示
         UIReferences.Instance.TitleUI.SetActive(false);
 
@@ -44,7 +54,7 @@ public class TitleButtonController : MonoBehaviour
     }
 
     /// <summary>
-    /// CreateRoomボタン押下時に呼ばれる
+    /// チーム名を使用してルーム作成
     /// </summary>
     private void HostModeStartButton(string teamName)
     {
@@ -53,7 +63,7 @@ public class TitleButtonController : MonoBehaviour
     }
 
     /// <summary>
-    /// EnterRoomボタン押下時に呼ばれる
+    /// 暗証番号入力時に呼ばれる
     /// </summary>
     public void GuestModeStartButton(string pin)
     {
@@ -81,6 +91,15 @@ public class TitleButtonController : MonoBehaviour
             StartCoroutine(lobbyUI.ActiveLackOfPersonnel());
             return;
         }
+
+        StartCoroutine(LoadSceneCorutine());
+    }
+
+    private IEnumerator LoadSceneCorutine()
+    {
+        seManager.SEPlayOneShot(seManager.SEList.gameStartSE);
+
+        yield return new WaitForSeconds(1.0f);
 
         // Fusionのシーン同期機能を使ってゲームシーンへ移動
         networkGameStarter.networkRunner.LoadScene(GAME_SCENE_NAME);

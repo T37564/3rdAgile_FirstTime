@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c29902fb7843f14791b058f5094e5aa, type: 3}
+  m_Name: SEList
+  m_EditorClassIdentifier: Assembly-CSharp::SEList
+  teamButtonSE: {fileID: 8300000, guid: 0c05bd2227ff59340bd875fb5a61e697, type: 3}
+  numberDeleteSE: {fileID: 8300000, guid: 3f630862898fe0c4ea4c12a122a0e80e, type: 3}
+  numberInputSE: {fileID: 8300000, guid: 6d662b14f32332e42a18f7512890915f, type: 3}
+  playerLeaveSE: {fileID: 8300000, guid: 642f285bca3c1b245ba6a0debe7a62a1, type: 3}
+  playerJoinSE: {fileID: 8300000, guid: be0a57d2fdbfa4448862afdae6fa1833, type: 3}
+  gameStartSE: {fileID: 8300000, guid: 8f6bab63bb8ed6f419bde63278ab38b9, type: 3}
+  treasurePickupSE: {fileID: 8300000, guid: 7b93a22a046633943ba3deb788d9a4a1, type: 3}
+  treasureDeliverSE: {fileID: 8300000, guid: ef9a21608ea7270428eb151ec5ae277d, type: 3}
