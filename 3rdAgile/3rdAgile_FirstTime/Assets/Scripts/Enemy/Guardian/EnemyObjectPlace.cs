@@ -4,7 +4,6 @@ using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using static Unity.VisualScripting.Metadata;
 
 public class EnemyObjectPlace : MonoBehaviour
 {

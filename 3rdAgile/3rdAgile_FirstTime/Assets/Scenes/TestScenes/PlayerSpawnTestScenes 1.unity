@@ -698,18 +698,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0a4719dc48d5e4a8dd8ed55ec9554e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
-  totalTime: 300
+  totalTime: 360
   phaseLength: 120
   _CurrentPhase: 0
   gamePhaseTimes:
   - phase: 0
-    timeInSeconds: 30
+    timeInSeconds: 120
   - phase: 1
-    timeInSeconds: 30
+    timeInSeconds: 150
   - phase: 2
-    timeInSeconds: 20
+    timeInSeconds: 30
   - phase: 3
-    timeInSeconds: 10
+    timeInSeconds: 60
 --- !u!4 &385890816
 Transform:
   m_ObjectHideFlags: 0
