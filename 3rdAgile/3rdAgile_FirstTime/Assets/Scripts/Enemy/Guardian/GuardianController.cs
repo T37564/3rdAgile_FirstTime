@@ -19,7 +19,7 @@ public class GuardianController : NetworkBehaviour
         // Playerタグのオブジェクトを探す
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
-        Debug.Log($"Player数:{players.Length}");
+        Debug.Log($"[Enemy Spawned] {gameObject.name} Position={transform.position}");
     }
 
     private void Update()
@@ -30,7 +30,7 @@ public class GuardianController : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if(!HasStateAuthority) return;
-
+        Debug.Log($"[AI開始前] {transform.position}");
         FindNearestPlauer();
 
 
@@ -53,7 +53,6 @@ public class GuardianController : NetworkBehaviour
                     return;
                 }
                 navMeshAgent.SetDestination(targetPos);
-
             }
         }
     }
@@ -64,7 +63,6 @@ public class GuardianController : NetworkBehaviour
     private void FindNearestPlauer()
     {
         GameObject[] playersObject = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log($"見つかったプレイヤー数:{playersObject.Length}");
 
         float shortestDistance = Mathf.Infinity;
         Transform nearestPlayer = null;
