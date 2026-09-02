@@ -47,7 +47,19 @@ public class EnemySpawner : MonoBehaviour
         StageSpawner.OnNavMeshGenerated -= GenerateEnemy;
     }
 
+    private void OnNavMeshGenerated()
+    {
+        StartCoroutine(GenerateEnemyAfterReady());
+    }
 
+    private IEnumerator GenerateEnemyAfterReady()
+    {
+        yield return null;
+
+        Physics.SyncTransforms();
+
+        GenerateEnemy();
+    }
 
     private void GenerateEnemy()
     {
@@ -75,15 +87,61 @@ public class EnemySpawner : MonoBehaviour
             }
 
             Vector3 spawnPosition = enemyObjectPlace.GetRandomPosition(generateEnemys[i].stageTypes);
-            Debug.Log(
-    $"【敵生成】" +
-    $"Enemy={enemyPrefab.name}, " +
-    $"StageType={generateEnemys[i].stageTypes}, " +
-    $"Position={spawnPosition}"
-);
 
-            runner.Spawn(enemyPrefab, spawnPosition, Quaternion.identity);
+            runner.Spawn(enemyPrefab, spawnPosition, Quaternion.identity, null, (runner, spawnedEnemy) =>
+            {
+                NavMeshAgent agent = spawnedEnemy.GetComponent<NavMeshAgent>();
+                if (agent != null)
+                {
+                    Debug.Log(
+                        $"Spawn直後: {spawnedEnemy.transform.position}"
+                    );
+
+                    if (NavMesh.SamplePosition(
+                        spawnedEnemy.transform.position,
+                        out NavMeshHit hit,
+                        2.0f,
+                        NavMesh.AllAreas))
+                    {
+                        agent.Warp(hit.position);
+
+                        Debug.Log(
+                            $"NavMesh上へWarp: {hit.position}"
+                        );
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            "Spawn位置の近くにNavMeshがありません"
+                        );
+                    }
+                }
+            });
+
+            Debug.Log(
+    $"【敵Spawn後】" +
+    $"名前={enemyPrefab.name}, " +
+    $"位置={enemyPrefab.transform.position}, " +
+    $"指定位置={spawnPosition}"
+);
+            //StartCoroutine(CheckEnemyPosition(spawnedEnemy, spawnPosition));
         }
     }
 
+    private IEnumerator CheckEnemyPosition(NetworkObject enemy,Vector3 spawnPosition)
+    {
+        yield return null;
+
+        Debug.Log($"【1フレーム後】" + $"実際={enemy.transform.position}, " + $"指定={spawnPosition}");
+
+        //if (enemy.transform.position != spawnPosition)
+        //{
+        //    enemy.transform.position = spawnPosition;
+
+        //    Debug.Log(
+        //        $"【位置修正】" +
+        //        $"修正後={enemy.transform.position}"
+        //    );
+        //}
+    }
 }
