@@ -58,6 +58,12 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        Debug.Log(
+       $"退出PlayerRef = {player}, " +
+       $"RawEncoded = {player.RawEncoded}, " +
+       $"IsServer = {runner.IsServer}"
+   );
+
         // 対象プレイヤーのオブジェクトが存在する場合
         if (playerObjects.TryGetValue(player, out var obj))
         {
