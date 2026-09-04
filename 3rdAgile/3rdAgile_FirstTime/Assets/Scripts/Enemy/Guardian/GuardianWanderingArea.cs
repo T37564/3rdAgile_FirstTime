@@ -35,8 +35,10 @@ public class GuardianWanderingArea : NetworkBehaviour
 
     public Vector3 GetRandomPoint()
     {
+        // 徘徊する地面のBoundsを取得
         Bounds bounds = wanderingGroundPosition.GetComponent<Renderer>().bounds;
 
+        // Bounds内のランダムな座標を生成
         float randomX = Random.Range(bounds.min.x, bounds.max.x);
         float randomZ = Random.Range(bounds.min.z, bounds.max.z);
 
@@ -44,7 +46,8 @@ public class GuardianWanderingArea : NetworkBehaviour
         //Debug.Log(randomPoint);
         NavMeshHit hit;
 
-        if(NavMesh.SamplePosition(randomPoint,out hit, 2f, NavMesh.AllAreas))
+        // NavMesh上の有効な位置を取得
+        if (NavMesh.SamplePosition(randomPoint,out hit, 2f, NavMesh.AllAreas))
         {
             return hit.position;
         }

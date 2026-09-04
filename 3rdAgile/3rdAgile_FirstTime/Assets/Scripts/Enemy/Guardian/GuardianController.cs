@@ -31,7 +31,7 @@ public class GuardianController : NetworkBehaviour
     {
         if(!HasStateAuthority) return;
         Debug.Log($"[AI開始前] {transform.position}");
-        FindNearestPlauer();
+        FindNearestPlayer();
 
 
         if (currentPlayer != null)
@@ -45,6 +45,7 @@ public class GuardianController : NetworkBehaviour
             // searchRangeの範囲にRayが当たるか判定する
             if (currentDistance <= searchRange)
             {
+                // 目的地のY座標をガーディアンのY座標に合わせる
                 targetPos.y = transform.position.y;
 
                 if(!navMeshAgent.isOnNavMesh)
@@ -52,6 +53,7 @@ public class GuardianController : NetworkBehaviour
                     Debug.LogWarning("NavMeshAgentがNavMesh上にありません。");
                     return;
                 }
+                // ナビメッシュエージェントの目的地を設定
                 navMeshAgent.SetDestination(targetPos);
             }
         }
@@ -60,26 +62,31 @@ public class GuardianController : NetworkBehaviour
     /// <summary>
     /// プレイヤーの中で一番近いプレイヤーを追いかけるメソッド
     /// </summary>
-    private void FindNearestPlauer()
+    private void FindNearestPlayer()
     {
         GameObject[] playersObject = GameObject.FindGameObjectsWithTag("Player");
 
+        // 最短距離を初期化
         float shortestDistance = Mathf.Infinity;
         Transform nearestPlayer = null;
 
-        foreach(GameObject playerObject in playersObject)
+        // プレイヤーの中で一番近いプレイヤーを探す
+        foreach (GameObject playerObject in playersObject)
         {
             if (playerObject == null) continue;
 
+            // プレイヤーとの距離を計算
             float distance = Vector3.Distance(transform.position, playerObject.transform.position);
 
             if (distance < shortestDistance)
             {
+                // 最短距離を更新
                 shortestDistance = distance;
+                // 一番近いプレイヤーを更新
                 nearestPlayer = playerObject.transform;
             }
         }
-
-        currentPlayer =nearestPlayer;
+        // 最も近いプレイヤーを設定
+        currentPlayer = nearestPlayer;
     }
 }
