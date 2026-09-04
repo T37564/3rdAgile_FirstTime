@@ -18,7 +18,7 @@ using UnityEngine;
 public class DeliveryLocation : NetworkBehaviour
 {
     [Header("アイテムを探すためのパラメータ")]
-    [SerializeField] private float searchRadius = 3.0f;
+    [SerializeField] private float searchRadius = 5.0f;
     [SerializeField] private float scanInterval = 0.1f; // アイテムを探す間隔
 
     [Header("レイヤーマスク")]

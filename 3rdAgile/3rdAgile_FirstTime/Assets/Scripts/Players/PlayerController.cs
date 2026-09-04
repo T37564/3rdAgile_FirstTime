@@ -78,7 +78,11 @@ namespace Network.Player
 
         public bool isAliveCount = false;
 
+        private bool isInStartArea = false;
+        public bool IsInStartArea => isInStartArea;
 
+        [SerializeField] private Vector3 startAreaCenter;
+        [SerializeField] private Vector3 startAreaSize;
 
         /// <summary>
         /// InGameUIController の参照取得
@@ -120,6 +124,8 @@ namespace Network.Player
 
             prevHp = playerHp;
 
+            isInStartArea = true;
+
             animator = GetComponent<Animator>();
         }
 
@@ -143,9 +149,10 @@ namespace Network.Player
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            isInStartArea = InStartArea(transform.position);
+
             // 入力を取得
-            if (!GetInput<PlayerInputData>(out var input))
-                return;
+            if (!GetInput<PlayerInputData>(out var input)) return;
 
             if (Runner.IsForward)
             {
@@ -301,6 +308,16 @@ namespace Network.Player
             IsHoldingItem = false;
         }
 
+        private bool InStartArea(Vector3 position)
+        {
+            Vector3 halfSize = startAreaSize * 0.5f;
+
+            return position.x >= startAreaCenter.x - halfSize.x &&
+                   position.x <= startAreaCenter.x + halfSize.x &&
+                   position.z >= startAreaCenter.z - halfSize.z &&
+                   position.z <= startAreaCenter.z + halfSize.z;
+        }
+
         /// <summary>
         /// ローカル通知用の関数
         /// </summary>
@@ -395,10 +412,5 @@ namespace Network.Player
             Revive();
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, interactRadius);
-        }
     }
 }
