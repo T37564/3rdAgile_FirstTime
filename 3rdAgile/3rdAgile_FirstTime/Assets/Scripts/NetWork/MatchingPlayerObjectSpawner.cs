@@ -11,9 +11,6 @@ using UnityEngine;
 
 public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // 先に入ったホスト分マイナスする数
-    private readonly int HOST_COUNT = 1;
-
     // プレイヤーがスポーンしたときの生成位置
     private Vector3[] playerSpawnPosition = null;
 
@@ -25,6 +22,18 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
 
     // プレイヤーのPrefabの情報が入ったScriptableObject
     private PlayerPrefabData playerPrefabData = null;
+
+    // どのプレイヤーがどのオブジェクトを操作しているか
+    private Dictionary<PlayerRef, NetworkObject> playerObjects = new Dictionary<PlayerRef, NetworkObject>();
+
+    // どのプレイヤーがどのインデックスを使用しているか
+    private List<int> usedPlayerIndexes = new List<int>();
+
+    // どのプレイヤーがどのインデックスを使用しているかを管理する辞書
+    private Dictionary<PlayerRef, int> playerIndexes = new Dictionary<PlayerRef, int>();
+
+    // ホストプレイヤーのPlayerRefを保持する変数
+    public PlayerRef hostPlayer= PlayerRef.None;
 
     /// <summary>
     /// ScriptableObjectからPrefab情報を取得
@@ -59,28 +68,40 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
         // ホストのみ処理をする
         if (!runner.IsServer) return;
 
-        // ホストプレイヤー生成
+        NetworkObject spawnedPlayerObject = null;
+
+        // あいているインデックスを取得
+        int index = GetAvailablePlayerIndex();
+
+
+        // ホストのプレイヤーを記録する
         if (player == runner.LocalPlayer)
         {
-            Debug.Log("接続完了");
-            runner.Spawn(playerPrefab[0],
-                playerSpawnPosition[0],
-                playerSpawnRotation[0],
-                player);
+            hostPlayer = player;
         }
-        else // ゲストプレイヤー生成
-        {
-            // プレイヤー参加順のインデックスを取得
-            int index = player.AsIndex;
 
-            runner.Spawn(
-                // ホスト分のインデックスを調整
-                playerPrefab[index - HOST_COUNT],
-                // ホスト分のIndexを調整
-                playerSpawnPosition[index - HOST_COUNT],
-                playerSpawnRotation[index - HOST_COUNT],
-                player);
+        // オブジェクト生成処理
+        spawnedPlayerObject = runner.Spawn(playerPrefab[index], playerSpawnPosition[index],
+                                                    playerSpawnRotation[index], player);
+
+        playerObjects[player] = spawnedPlayerObject;
+        playerIndexes[player] = index;
+
+        // 使用済みインデックスを追加
+        usedPlayerIndexes.Add(index);
+    }
+
+    /// <summary>
+    /// あいているインデックスを取得する処理
+    /// </summary>
+    private int GetAvailablePlayerIndex()
+    {
+        for (int i = 0; i < playerPrefab.Length; i++)
+        {
+            if (!usedPlayerIndexes.Contains(i)) return i;
         }
+
+        return -1;
     }
 
     /// <summary>
@@ -88,7 +109,25 @@ public class MatchingPlayerObjectSpawner : MonoBehaviour, INetworkRunnerCallback
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        // ホストのみ処理
+        if (!runner.IsServer) return;
+
+        // ゲスト側が抜けた際の処理
+        if (playerObjects.TryGetValue(player, out NetworkObject playerObject))
+        {
+            runner.Despawn(playerObject);
+
+            if (playerIndexes.TryGetValue(player, out int index))
+            {
+                usedPlayerIndexes.Remove(index);
+                playerIndexes.Remove(player);
+            }
+
+            playerObjects.Remove(player);
+        }
+    }
     #endregion
 
     #region Input

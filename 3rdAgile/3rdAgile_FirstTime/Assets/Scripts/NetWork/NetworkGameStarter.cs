@@ -6,6 +6,7 @@
 using Fusion;
 using Fusion.Sockets;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -28,6 +29,9 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     private readonly int RECONNECT_WAIT_TIME_MS = 3000;
     // ホスト切断時の待機時間
     private readonly int HOST_DISCONNECTED_WAIT_TIME_MS = 3000;
+
+    // 接続切断時のメッセージ表示時間
+    private readonly float DISCONNECTED_MESSAAGE_DISPLAY_TIME = 3.0f;
 
     // NetworkRunner用オブジェクトの名前
     private readonly string NETWORK_RUNNER_OBJECT_NAME = "NetworkRunner";
@@ -306,6 +310,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public async void ShutdownRunner()
     {
+        Debug.Log($"ShutdownRunner開始 IsServer:{networkRunner?.IsServer}");
         if (networkRunner != null && networkRunner.IsServer)
         {
             // ホストを最後に切断させるため3秒待機
@@ -323,16 +328,7 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // NetworkRunnerを終了
         await networkRunner.Shutdown();
 
-        // NetworkRunnerを破棄
-        if (runnerObject != null)
-        {
-            Destroy(runnerObject);
-        }
-        networkRunner = null;
-        networkRunnerObject = null;
-
-        // タイトルシーンに戻る
-        SceneManager.LoadScene(TITLE_SCENE_NAME);
+        ClearRoomData(runnerObject);
     }
 
 
@@ -375,7 +371,47 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// セッション終了やエラー発生、手動による Shutdown() 呼び出しなどで発生。
     /// ネットワーク終了時の後片付け（UI戻し、オブジェクト破棄、状態リセットなど）を行う。
     /// </summary>
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    {
+        // ホスト側が切断された場合
+        if (!runner.IsServer && shutdownReason == ShutdownReason.DisconnectedByPluginLogic)
+        {
+            // 切断メッセージ表示
+            networkLobbyUI.DisplayMessageDisconnected();
+            // Shutdown後もDestroyするため退避
+            GameObject runnerObject = networkRunner.gameObject;
+            ClearRoomData(runnerObject);
+
+            StartCoroutine(BackToTheTitle());
+        }
+    }
+
+    /// <summary>
+    /// 所持しているNetworkRunnerを破棄し、部屋情報をクリアする
+    /// </summary>
+    private void ClearRoomData(GameObject runnerObject)
+    {
+        // NetworkRunnerを破棄
+        if (runnerObject != null)
+        {
+            Destroy(runnerObject);
+        }
+
+        // 部屋名など、自分で保持している情報をクリア
+        networkRunner = null;
+        networkRunnerObject = null;
+    }
+
+    /// <summary>
+    /// 数秒後にタイトルシーンへ戻るコルーチン
+    /// </summary>
+    private IEnumerator BackToTheTitle()
+    {
+        yield return new WaitForSecondsRealtime(DISCONNECTED_MESSAAGE_DISPLAY_TIME);
+
+        // タイトルシーンへ遷移
+        SceneManager.LoadScene(TITLE_SCENE_NAME);
+    }
 
     /// <summary>
     /// クライアントがサーバー（ホスト）への接続に成功した時に呼ばれるコールバック。
@@ -480,10 +516,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// 新しいホストに自動で引き継がれる処理を行うためのコールバック。
     /// ゲームの継続・オブジェクトの再割り当てなどを行う。
     /// </summary>
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-    {
-        // ホスト変更処理
-        HostMigrationManager.Instance.HandleHostMigration();
-    }
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     #endregion
 }

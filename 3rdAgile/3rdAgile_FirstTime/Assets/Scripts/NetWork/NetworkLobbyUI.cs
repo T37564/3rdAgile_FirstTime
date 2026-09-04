@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------------------
 using Fusion;
 using Fusion.Sockets;
-using Network.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,6 +98,15 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
 
         // プレイヤー人数表示を更新
         UpdateCount(runner);
+    }
+
+
+    /// <summary>
+    /// ロビー中に接続が切断されたときに表示するUI
+    /// </summary>
+    public void DisplayMessageDisconnected()
+    {
+        lobbyUI.DisplayDisconnectedMessage();
     }
 
     #region Input

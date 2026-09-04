@@ -41,6 +41,9 @@ public class LobbyUI : MonoBehaviour
     // プレイヤーの人数不足を知らせるラベル
     public Label lackOfPersonnel = null;
 
+    // 接続切断メッセージを表示するUI
+    public VisualElement dsconnectedMessage = null;
+
     // NetworkGameStarterの参照用
     private NetworkGameStarter networkGameStarter = null;
 
@@ -61,9 +64,11 @@ public class LobbyUI : MonoBehaviour
         playerCount = root.Q<Label>("CountText");
         roomPIN = root.Q<Label>("PINText");
         lackOfPersonnel = root.Q<Label>("LackOfPersonnel");
+        dsconnectedMessage = root.Q<VisualElement>("DisconnectedMessage");
 
         // プレイヤー人数不足を知らせるラベルを非表示にする
         lackOfPersonnel.style.display = DisplayStyle.None;
+        dsconnectedMessage.style.display = DisplayStyle.None;
 
         // スタートボタンが押されたときのイベント登録
         gameStartButton.clicked += titleButtonController.ClickStartButton;
@@ -122,5 +127,13 @@ public class LobbyUI : MonoBehaviour
 
         gameStartButton.Focus();
         gameStartButton.style.unityBackgroundImageTintColor = FOCUSE_BUTTON_BACKIMAGE_COLOR;
+    }
+
+    /// <summary>
+    /// ホストからの接続が切断されたときに表示するメッセージ
+    /// </summary>
+    public void DisplayDisconnectedMessage()
+    {
+        dsconnectedMessage.style.display = DisplayStyle.Flex;
     }
 }
