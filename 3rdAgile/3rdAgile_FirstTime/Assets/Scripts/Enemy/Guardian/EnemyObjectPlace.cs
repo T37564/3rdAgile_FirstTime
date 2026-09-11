@@ -71,11 +71,11 @@ public class EnemyObjectPlace : MonoBehaviour
 
                 if (boxCollider != null)
                 {
-                    Debug.Log(
-                            $"ItemGround”­Œ©: {child.name}, " +
-                            $"ˆÊ’u: {child.position}, " +
-                            $"Bounds: {boxCollider.bounds}"
-                        );
+                    //Debug.Log(
+                    //        $"ItemGround”­Œ©: {child.name}, " +
+                    //        $"ˆÊ’u: {child.position}, " +
+                    //        $"Bounds: {boxCollider.bounds}"
+                    //    );
                     grounds.Add(boxCollider);
                 }
             }
