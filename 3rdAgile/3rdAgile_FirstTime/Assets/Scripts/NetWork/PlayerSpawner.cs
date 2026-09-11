@@ -39,12 +39,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         for (int i = 0; i < players.Count; i++)
         {
             // オブジェクトスポーン
-            NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i],
-                                                             inGamePlayerPrefab.playerSpawnPositions[i],
-                                                             inGamePlayerPrefab.playerSpawnRotations[0],
-                                                             players[i]
-                                                              );
-
+            NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i], inGamePlayerPrefab.playerSpawnPositions[i],
+                                                             inGamePlayerPrefab.playerSpawnRotations[0], players[i]);
             // PlayerRef と NetworkObject を紐づける
             playerObjects[players[i]] = spawnedPlayerObject;
         }
@@ -56,35 +52,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-        Debug.Log(
-       $"退出PlayerRef = {player}, " +
-       $"RawEncoded = {player.RawEncoded}, " +
-       $"IsServer = {runner.IsServer}"
-   );
-
-        // 対象プレイヤーのオブジェクトが存在する場合
-        if (playerObjects.TryGetValue(player, out var obj))
-        {
-            // プレイヤーオブジェクトを削除
-            runner.Despawn(obj);
-
-            // プレイヤーオブジェクト情報を削除
-            playerObjects.Remove(player);
-
-            // プレイヤーのID情報を消す
-            players.Remove(player);
-        }
-
-        // ホストが抜けた場合
-        if (player.RawEncoded == HOST_PLAYER_RAW_ENCODED)
-        {
-            // 全端末（ホストもゲストも）タイトルへ
-            FindAnyObjectByType<NetworkGameStarter>().ShutdownRunner();
-            return;
-        }
-    }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。

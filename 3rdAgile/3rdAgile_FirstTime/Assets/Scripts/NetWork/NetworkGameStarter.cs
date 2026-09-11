@@ -303,14 +303,11 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
 
     /// <summary>
-    /// Host切断時やゲーム終了時に
-    /// NetworkRunnerを終了・破棄し、
-    /// タイトルシーンへ戻る処理。
+    /// ゲーム終了時に NetworkRunnerを終了・破棄し、タイトルシーンへ戻る処理。
     /// 将来的にはHostMigration対応予定。
     /// </summary>
     public async void ShutdownRunner()
     {
-        Debug.Log($"ShutdownRunner開始 IsServer:{networkRunner?.IsServer}");
         if (networkRunner != null && networkRunner.IsServer)
         {
             // ホストを最後に切断させるため3秒待機
