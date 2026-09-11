@@ -136,6 +136,17 @@ public class AttackAction : NetworkBehaviour
         isMoveNetworked = navMeshAgent.velocity.magnitude > 0.1f;
 
         //Debug.Log(guardianController.currentDistance);
+        // プレイヤーがスタートエリア内なら攻撃しない
+        if (guardianController.currentPlayer != null)
+        {
+            PlayerController playerController =
+                guardianController.currentPlayer.GetComponent<PlayerController>();
+
+            if (playerController != null && playerController.IsInStartArea)
+            {
+                return;
+            }
+        }
 
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
@@ -167,12 +178,33 @@ public class AttackAction : NetworkBehaviour
         isMoveNetworked = false;
         isIdleNetworked = true;
 
+        // 攻撃対象のプレイヤーを取得
+        PlayerController playerController = null;
+
+        if (guardianController.currentPlayer != null)
+        {
+            playerController =
+                guardianController.currentPlayer.GetComponent<PlayerController>();
+        }
+
+        // プレイヤーがスタートエリア内に入ったら攻撃をキャンセル
+        if (playerController != null && playerController.IsInStartArea)
+        {
+            Debug.Log("プレイヤーがスタートエリアに入ったため、攻撃をキャンセル");
+
+            navMeshAgent.isStopped = false;
+            enemyState = EnemyState.move;
+
+            return;
+        }
+
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
-        if (guardianController.currentDistance >= attackDistance)
+        if (guardianController.currentDistance > attackDistance)
         {
             Debug.Log("徘徊に移行");
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
+            return;
         }
 
         // 予備動作時間が経過したら攻撃状態に移行

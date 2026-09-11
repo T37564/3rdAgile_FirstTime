@@ -840,6 +840,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Network.Player.PlayerController
   moveSpeed: 1
+  carryingMoveSpeed: 6
   interactRadius: 2
   interactLayerMask:
     serializedVersion: 2
@@ -847,8 +848,13 @@ MonoBehaviour:
   maxCarryDistance: 1.5
   _IsHoldingItem:
     _value: 0
+  _IsAlive:
+    _value: 0
   holdingItem: {fileID: 0}
-  playerHp: 0
+  _playerHp: 3
+  isAliveCount: 0
+  startAreaCenter: {x: 0, y: 0, z: 0}
+  startAreaSize: {x: 10, y: 0, z: 10}
 --- !u!114 &636633377995965450
 MonoBehaviour:
   m_ObjectHideFlags: 0
