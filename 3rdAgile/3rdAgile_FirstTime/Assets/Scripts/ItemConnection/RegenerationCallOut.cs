@@ -20,9 +20,6 @@ public class RegenerationCallOut : NetworkBehaviour
     //アイテムが地面に配置されていない場合、再配置するためのフラグ
     public bool isGenerateRequest = false;
 
-    [Networked] public PlayerRef Carrier { get; set; }
-
-    [Networked] public bool isCarried { get; set; }
 
     //誰かに知らせるためのイベント
     public Action<RegenerationCallOut> OnNeedRegenerate;
@@ -34,6 +31,7 @@ public class RegenerationCallOut : NetworkBehaviour
             return;
         }
 
+        // アイテムのY座標が一定以下の場合trueになる
         bool isFallen = transform.position.y <= -regenerationJudgementCoordinate;
 
         //アイテムのY座標が一定以下でなおかつ地面についていないとき
@@ -48,13 +46,6 @@ public class RegenerationCallOut : NetworkBehaviour
             //？があることで登録されているメソッドが無ければ呼び出さないようにする
             OnNeedRegenerate?.Invoke(this);
         }
-    }
-
-    public void RegeneratePosition(Vector3 newPosition)
-    {
-        if (!Object.HasStateAuthority) return;
-
-        transform.position = newPosition;
     }
 
     /// <summary>

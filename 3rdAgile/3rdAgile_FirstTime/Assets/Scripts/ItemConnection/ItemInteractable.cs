@@ -19,6 +19,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     [SerializeField] private float followSpeed = 8.0f;
     [SerializeField] private Vector3 carryOffset = Vector3.zero;
 
+    // 運搬中かどうかのフラグ
     private bool isCarrying = false;
 
     // 運搬中で人手が欲しいことを知らせるフラグ
