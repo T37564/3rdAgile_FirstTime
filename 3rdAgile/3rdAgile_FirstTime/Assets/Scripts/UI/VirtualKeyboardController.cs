@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class VirtualKeyboardController : MonoBehaviour
@@ -43,6 +44,9 @@ public class VirtualKeyboardController : MonoBehaviour
     [Header("PlayerInput 参照")]
     [SerializeField] private PlayerInput playerInput = null;
 
+    [Header("InputControls 参照")]
+    [SerializeField] private InputActionReference backAction = null;
+
     [Header("UI Toolkit のルート要素を参照するための UIDocument")]
     [SerializeField] private UIDocument uiDocument = null;
 
@@ -55,8 +59,16 @@ public class VirtualKeyboardController : MonoBehaviour
     [Header("SEManager　参照")]
     [SerializeField] private SEManager seManager = null;
 
+    [Header("タイトルUI参照用")]
+    [SerializeField] private TitleUI titleUI = null;
+
     // class="key" を持つ全てのキー（UI 要素）をまとめて格納
     private Button[] keys = null;
+
+    // タイトルに戻るボタン
+    private Button returnTitleButton = null;
+    // ゲームパッドで戻るときのUI
+    private VisualElement returnTitleGamepad = null;
 
     // UIToolkitの暗証番号を入れるLabel
     private Label matchingNumbersText = null;
@@ -82,6 +94,7 @@ public class VirtualKeyboardController : MonoBehaviour
     // 連続で決定ボタンを押さないようにするフラグ
     private bool isDuplicateMonitoring = false;
 
+
     /// <summary>
     /// オブジェクト有効化時にUI要素と入力イベントを登録する
     /// </summary>
@@ -96,6 +109,12 @@ public class VirtualKeyboardController : MonoBehaviour
 
         // UXML 内で class="key" が付いた要素を全部取得して配列に変換
         keys = root.Query<Button>(className: "key").ToList().ToArray();
+        
+        // UXML 内で Button "ReturnTitle" を見つけて入れる
+        returnTitleButton = root.Q<Button>("ReturnTitle");
+        returnTitleGamepad=root.Q<VisualElement>("ReturnTitleGamepad");
+
+        // UXML 内で Label "InputNumber" を見つけて入れる
         matchingNumbersText = root.Q<Label>("InputNumber");
 
         // UXML 内で Label "Restriction" を見つけて入れる
@@ -114,6 +133,14 @@ public class VirtualKeyboardController : MonoBehaviour
         // マウスクリックイベントを登録
         playerInput.actions["NumberAssignment"].performed += ClickCalculatorButton;
 
+        returnTitleButton.clicked += ReturnTitleButtonClicked;
+        // マウスが入った＆出たを登録
+        returnTitleButton.RegisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        returnTitleButton.RegisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+
+        backAction.action.performed += OnBackPerformed;
+        backAction.action.Enable();
+
         // UIDocumentのボタンが押されたときのイベントを新しく作る
         clickActions = new Action[keys.Length];
 
@@ -130,6 +157,13 @@ public class VirtualKeyboardController : MonoBehaviour
         {
             // キーを選択状態にする
             GamepadHighlight(0);
+            returnTitleButton.style.display = DisplayStyle.None;
+            returnTitleGamepad.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            returnTitleButton.style.display = DisplayStyle.Flex;
+            returnTitleGamepad.style.display = DisplayStyle.None;
         }
 
         // 入力状態を初期化
@@ -150,6 +184,14 @@ public class VirtualKeyboardController : MonoBehaviour
         playerInput.actions["MoveSelectNumber"].performed -= OnMoveNumberUI;
         playerInput.actions["MoveSelectNumber"].canceled -= OnStopMoveNumberUI;
         playerInput.actions["NumberAssignment"].performed -= ClickCalculatorButton;
+
+        returnTitleButton.clicked -= ReturnTitleButtonClicked;
+        // マウスが入った＆出たを登録解除
+        returnTitleButton.UnregisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        returnTitleButton.UnregisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+
+        backAction.action.performed -= OnBackPerformed;
+        backAction.action.Disable();
 
         // クリックイベントを解除
         for (int i = 0; i < keys.Length; i++)
@@ -555,5 +597,24 @@ public class VirtualKeyboardController : MonoBehaviour
 
             default: return -1;
         }
+    }
+
+    /// <summary>
+    /// タイトルに戻る処理
+    /// </summary>
+    private void ReturnTitleButtonClicked()
+    {
+        // SEを鳴らす
+        seManager.SEPlayOneShot(seManager.SEList.numberDeleteSE);
+        // タイトルに戻る処理を呼び出す
+       SceneManager.LoadScene("MainTitleScenes");
+    }
+
+    /// <summary>
+    /// ゲームパッドB長押し時の処理
+    /// </summary>
+    private void OnBackPerformed(InputAction.CallbackContext context)
+    {
+        ReturnTitleButtonClicked();
     }
 }
