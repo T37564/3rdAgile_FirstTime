@@ -116,7 +116,7 @@ namespace Network.Player
             {
                 IsAlive = true;
                 IsHoldingItem = false;
-                interactLayerMask = LayerMask.GetMask("Item");
+                interactLayerMask = LayerMask.GetMask("Item", "Player");
             }
 
             prevAlive = IsAlive;
@@ -325,19 +325,16 @@ namespace Network.Player
         {
             if (prevAlive && !IsAlive)
             {
+                animator.SetBool("IsDeath",true);
                 OnPlayerDied?.Invoke();
             }
 
             if (!prevAlive && IsAlive)
             {
+                animator.SetBool("IsDeath", false);
                 OnPlayerRevived?.Invoke();
             }
 
-            if (prevAlive && !IsAlive)
-            {
-                animator.SetTrigger("Death");
-                OnPlayerDied?.Invoke();
-            }
 
             if (!prevHoldingItem && IsHoldingItem)
             {
@@ -384,6 +381,7 @@ namespace Network.Player
             if (!Object.HasStateAuthority) return;
             if (IsAlive) return;
 
+            playerHp = 3;
             IsAlive = true;
         }
 

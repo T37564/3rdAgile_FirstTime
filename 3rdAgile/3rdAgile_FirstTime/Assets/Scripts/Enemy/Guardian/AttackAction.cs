@@ -151,7 +151,6 @@ public class AttackAction : NetworkBehaviour
         // プレイヤーとの距離が攻撃距離以下になったら攻撃準備状態に移行
         if (guardianController.currentDistance <= attackDistance)
         {
-            Debug.Log("攻撃準備");
 
             // 攻撃の予備動作のタイマーを開始させる
             attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
@@ -170,7 +169,6 @@ public class AttackAction : NetworkBehaviour
     {
         navMeshAgent.isStopped = true;
         //Debug.Log("攻撃予備動作: " + Runner.Tick);
-        Debug.Log("攻撃予備動作: " + attackTimer.RemainingTime(Runner));
 
         // 攻撃のターゲットにしているプレイヤーの方を見る
         //transform.LookAt(guardianController.currentPlayer);
@@ -201,7 +199,6 @@ public class AttackAction : NetworkBehaviour
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
         if (guardianController.currentDistance > attackDistance)
         {
-            Debug.Log("徘徊に移行");
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
             return;
@@ -210,7 +207,6 @@ public class AttackAction : NetworkBehaviour
         // 予備動作時間が経過したら攻撃状態に移行
         if (attackTimer.Expired(Runner))
         {
-            Debug.Log("攻撃実行");
             enemyState = EnemyState.attack;
         }
     }
@@ -225,7 +221,6 @@ public class AttackAction : NetworkBehaviour
 
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
-        Debug.Log("攻撃");
         RpcGuardianAttackAnimation();
 
         // 攻撃対象のプレイヤーのPlayerControllerを取得
@@ -251,7 +246,6 @@ public class AttackAction : NetworkBehaviour
         }
 
             attackStarted = false;
-        Debug.Log("攻撃終了");
         // 攻撃後一定時間攻撃できないようにする
         enemyState = EnemyState.moveCoolDown;
 
@@ -267,11 +261,9 @@ public class AttackAction : NetworkBehaviour
         isIdleNetworked = true;
 
         //timer -= Time.deltaTime;
-        Debug.Log($"攻撃終了クールダウン " + attackTimer.RemainingTime(Runner));
         //if (timer <= 0)
         if (attackTimer.Expired(Runner))
         {
-            Debug.Log("徘徊に移行");
             enemyState = EnemyState.move;
         }
     }

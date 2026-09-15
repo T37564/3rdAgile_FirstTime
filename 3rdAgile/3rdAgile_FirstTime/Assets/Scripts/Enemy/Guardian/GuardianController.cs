@@ -46,10 +46,8 @@ public class GuardianController : NetworkBehaviour
         if(!HasStateAuthority) return;
         //Debug.Log($"[AIŠJn‘O] {transform.position}");
         FindNearestPlayer();
-        Debug.Log($"currentPlayer = {currentPlayer}");
 
         PlayerController playerController = currentPlayer?.GetComponent<PlayerController>();
-        Debug.Log($"playerController = {playerController}");
 
 
         if (playerController == null)
@@ -85,7 +83,6 @@ public class GuardianController : NetworkBehaviour
             wanderingPoint = guardianWanderingArea.GetRandomPoint();
 
             navMeshAgent.SetDestination(wanderingPoint);
-            Debug.Log($"yœpœjŠJnz–Ú“I’n={wanderingPoint}");
 
             return;
         }
@@ -95,7 +92,6 @@ public class GuardianController : NetworkBehaviour
             wanderingPoint = guardianWanderingArea.GetRandomPoint();
             
             navMeshAgent.SetDestination(wanderingPoint);
-            Debug.Log($"yœpœjzŸ‚Ì–Ú“I’n={wanderingPoint}");
         }
     }
 
