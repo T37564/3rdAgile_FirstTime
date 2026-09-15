@@ -6,7 +6,6 @@
 using Fusion;
 using Fusion.Sockets;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -304,7 +303,6 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
 
     /// <summary>
     /// ゲーム終了時に NetworkRunnerを終了・破棄し、タイトルシーンへ戻る処理。
-    /// 将来的にはHostMigration対応予定。
     /// </summary>
     public async void ShutdownRunner()
     {
@@ -322,8 +320,10 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // Shutdown後もDestroyするため退避
         GameObject runnerObject = networkRunner.gameObject;
 
-        // NetworkRunnerを終了
         await networkRunner.Shutdown();
+
+        // タイトルシーンへ遷移
+        SceneManager.LoadScene(TITLE_SCENE_NAME);
 
         ClearRoomData(runnerObject);
     }
@@ -373,13 +373,23 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
         // ホスト側が切断された場合
         if (!runner.IsServer && shutdownReason == ShutdownReason.DisconnectedByPluginLogic)
         {
-            // 切断メッセージ表示
-            networkLobbyUI.DisplayMessageDisconnected();
+            // ゲーム中切断メッセージ表示
+            InGameUIController uiController = FindAnyObjectByType<InGameUIController>();
+            if (uiController != null)
+            {
+                uiController.DisplayDisconnectedMessage();
+            }
+            else
+            {
+                // ロビー中切断メッセージ表示
+                networkLobbyUI.DisplayMessageDisconnected();
+            }
+
+                _ = BackToTheTitle();
+
             // Shutdown後もDestroyするため退避
             GameObject runnerObject = networkRunner.gameObject;
             ClearRoomData(runnerObject);
-
-            StartCoroutine(BackToTheTitle());
         }
     }
 
@@ -402,10 +412,9 @@ public class NetworkGameStarter : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary>
     /// 数秒後にタイトルシーンへ戻るコルーチン
     /// </summary>
-    private IEnumerator BackToTheTitle()
+    private async Task BackToTheTitle()
     {
-        yield return new WaitForSecondsRealtime(DISCONNECTED_MESSAAGE_DISPLAY_TIME);
-
+        await Task.Delay(Mathf.RoundToInt(DISCONNECTED_MESSAAGE_DISPLAY_TIME * 1000));
         // タイトルシーンへ遷移
         SceneManager.LoadScene(TITLE_SCENE_NAME);
     }

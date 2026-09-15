@@ -12,9 +12,6 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // ホストを表すPlayerRefのRawEncoded値
-    private const int HOST_PLAYER_RAW_ENCODED = -1;
-
     // プレイヤーPrefabの情報が入ったScriptableObjectのパス
     private readonly string PLAYER_PREFAB_DATA_PATH = "PlayerPrefabData/InGamePlayerPrefabData";
 
@@ -52,7 +49,18 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// プレイヤーが操作していたネットワークオブジェクトの削除処理や、
     /// 人数管理・UI更新・プレイヤーリスト整理などを行う。
     /// </summary>
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        if(!runner.IsServer) return;
+
+        // ゲスト側が抜けた際の処理
+        if (playerObjects.TryGetValue(player, out NetworkObject playerObject))
+        {
+            runner.Despawn(playerObject);
+
+            playerObjects.Remove(player);
+        }
+    }
 
     /// <summary>
     /// 新しいプレイヤーがセッションに参加した時に自動で呼ばれるコールバック。

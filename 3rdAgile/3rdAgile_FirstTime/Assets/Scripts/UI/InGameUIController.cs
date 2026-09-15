@@ -18,6 +18,9 @@ public class InGameUIController : MonoBehaviour
     // HPのUI
     private VisualElement[] hartUIs = null;
 
+    // 接続切断メッセージのUI
+    public VisualElement message = null;
+
     /// <summary>
     /// 使用するUIを取得する
     /// </summary>
@@ -26,6 +29,8 @@ public class InGameUIController : MonoBehaviour
         // UXML内からHPのVisualElementを取得
         VisualElement root = uiDocument.rootVisualElement;
         VisualElement hp = root.Q<VisualElement>("HP");
+
+        message = root.Q<VisualElement>("DisconnectedMessage");
 
         // 取得したHPの子要素をすべて取得
         hartUIs = hp.Children().ToArray();
@@ -59,5 +64,13 @@ public class InGameUIController : MonoBehaviour
     public void ShowScoreUI()
     {
         scoreUI.enabled = true;
+    }
+
+    /// <summary>
+    /// ホストからの接続が切断されたときに表示するメッセージ
+    /// </summary>
+    public void DisplayDisconnectedMessage()
+    {
+        message.style.display = DisplayStyle.Flex;
     }
 }
