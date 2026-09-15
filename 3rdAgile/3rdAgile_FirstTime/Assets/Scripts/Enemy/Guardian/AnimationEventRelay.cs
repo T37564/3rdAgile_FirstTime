@@ -11,7 +11,6 @@ public class AnimationEventRelay : MonoBehaviour
 
     public void AttackAnimationFinished()
     {
-        Debug.Log("呼ばれた");
         attackAction.AttackAnimationFinished();
     }
 }
