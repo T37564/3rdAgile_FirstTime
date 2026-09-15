@@ -12,9 +12,6 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    // ホストを表すPlayerRefのRawEncoded値
-    private const int HOST_PLAYER_RAW_ENCODED = -1;
-
     // プレイヤーPrefabの情報が入ったScriptableObjectのパス
     private readonly string PLAYER_PREFAB_DATA_PATH = "PlayerPrefabData/InGamePlayerPrefabData";
 
@@ -39,12 +36,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         for (int i = 0; i < players.Count; i++)
         {
             // オブジェクトスポーン
-            NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i],
-                                                             inGamePlayerPrefab.playerSpawnPositions[i],
-                                                             inGamePlayerPrefab.playerSpawnRotations[0],
-                                                             players[i]
-                                                              );
-
+            NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i], inGamePlayerPrefab.playerSpawnPositions[i],
+                                                             inGamePlayerPrefab.playerSpawnRotations[0], players[i]);
             // PlayerRef と NetworkObject を紐づける
             playerObjects[players[i]] = spawnedPlayerObject;
         }
@@ -58,31 +51,14 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log(
-       $"退出PlayerRef = {player}, " +
-       $"RawEncoded = {player.RawEncoded}, " +
-       $"IsServer = {runner.IsServer}"
-   );
+        if(!runner.IsServer) return;
 
-        // 対象プレイヤーのオブジェクトが存在する場合
-        if (playerObjects.TryGetValue(player, out var obj))
+        // ゲスト側が抜けた際の処理
+        if (playerObjects.TryGetValue(player, out NetworkObject playerObject))
         {
-            // プレイヤーオブジェクトを削除
-            runner.Despawn(obj);
+            runner.Despawn(playerObject);
 
-            // プレイヤーオブジェクト情報を削除
             playerObjects.Remove(player);
-
-            // プレイヤーのID情報を消す
-            players.Remove(player);
-        }
-
-        // ホストが抜けた場合
-        if (player.RawEncoded == HOST_PLAYER_RAW_ENCODED)
-        {
-            // 全端末（ホストもゲストも）タイトルへ
-            FindAnyObjectByType<NetworkGameStarter>().ShutdownRunner();
-            return;
         }
     }
 
