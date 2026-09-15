@@ -3,9 +3,11 @@
 // LobbyUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using DG.Tweening.Core.Easing;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class LobbyUI : MonoBehaviour
@@ -27,6 +29,12 @@ public class LobbyUI : MonoBehaviour
     [Header("タイトルUI参照用")]
     [SerializeField] private TitleUI titleUI = null;
 
+    [Header("NowLoading表示用オブジェクト")]
+    [SerializeField] private GameObject nowLoading = null;
+
+    [Header("InputControls 参照")]
+    [SerializeField] private InputActionReference backAction = null;
+
 
 
     // ゲームスタートのボタン
@@ -44,8 +52,14 @@ public class LobbyUI : MonoBehaviour
     // 接続切断メッセージを表示するUI
     public VisualElement dsconnectedMessage = null;
 
+    // ゲームパッドで戻るときのUI
+    private VisualElement returnTitleGamepad = null;
+
     // NetworkGameStarterの参照用
     private NetworkGameStarter networkGameStarter = null;
+
+    // タイトルシーンに戻るためのボタン
+    private Button returnButton = null;
 
 
     private void OnEnable()
@@ -65,6 +79,8 @@ public class LobbyUI : MonoBehaviour
         roomPIN = root.Q<Label>("PINText");
         lackOfPersonnel = root.Q<Label>("LackOfPersonnel");
         dsconnectedMessage = root.Q<VisualElement>("DisconnectedMessage");
+        returnButton = root.Q<Button>("ReturnButton");
+        returnTitleGamepad = root.Q<VisualElement>("ReturnTitleGamepad");
 
         // プレイヤー人数不足を知らせるラベルを非表示にする
         lackOfPersonnel.style.display = DisplayStyle.None;
@@ -73,9 +89,16 @@ public class LobbyUI : MonoBehaviour
         // スタートボタンが押されたときのイベント登録
         gameStartButton.clicked += titleButtonController.ClickStartButton;
 
-        // マウスが入った＆出たを登録解除
+        // スタートボタンのマウスが入った＆出たを登録
         gameStartButton.RegisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
         gameStartButton.RegisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+
+        // 戻るボタンが押されたときのイベント登録
+        returnButton.clicked += HostMatchingPaused;
+
+        // 戻るボタンのマウスが入った＆出たを登録
+        returnButton.RegisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        returnButton.RegisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
 
         // NetworkGameStarter のインスタンスを取得　
         networkGameStarter = NetworkGameStarter.Instance;
@@ -83,11 +106,21 @@ public class LobbyUI : MonoBehaviour
         // ホスト用のロビーUI表示を更新する
         networkGameStarter.networkLobbyUI.DisplayHostUI(networkGameStarter.networkRunner, this);
 
+        backAction.action.performed += ReturnTitleButtonClicked;
+        backAction.action.Enable();
+
         // ゲームバッドがつながっているとき
         if (Gamepad.current != null)
         {
             // 部屋作成部分にフォーカスを当てる
             StartCoroutine(FocusGameStartButton());
+            returnButton.style.display = DisplayStyle.None;
+            returnTitleGamepad.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            returnButton.style.display = DisplayStyle.Flex;
+            returnTitleGamepad.style.display = DisplayStyle.None;
         }
     }
 
@@ -100,10 +133,16 @@ public class LobbyUI : MonoBehaviour
         {
             gameStartButton.clicked -= titleButtonController.ClickStartButton;
         }
+        returnButton.clicked -= HostMatchingPaused;
 
         // マウスが入った＆出たを登録解除
         gameStartButton.UnregisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
         gameStartButton.UnregisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+        returnButton.UnregisterCallback<MouseEnterEvent>(titleUI.OnMouseEnter);
+        returnButton.UnregisterCallback<MouseLeaveEvent>(titleUI.OnMouseLeave);
+
+        backAction.action.performed -= ReturnTitleButtonClicked;
+        backAction.action.Disable();
     }
 
     /// <summary>
@@ -135,5 +174,27 @@ public class LobbyUI : MonoBehaviour
     public void DisplayDisconnectedMessage()
     {
         dsconnectedMessage.style.display = DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// 戻るボタンを押したとき処理
+    /// </summary>
+    private void HostMatchingPaused()
+    {
+        // ロビーUIをクリアしてNowLoadingを表示
+        uiDocument.rootVisualElement.Clear();
+        nowLoading.SetActive(true);
+
+        // NetworkGameStarterのShutdownRunnerを呼び出す
+        networkGameStarter.ShutdownRunner();
+    }
+
+    /// <summary>
+    /// タイトルに戻る処理
+    /// </summary>
+    private void ReturnTitleButtonClicked(InputAction.CallbackContext context)
+    {
+        // タイトルに戻る処理を呼び出す
+        SceneManager.LoadScene("MainTitleScenes");
     }
 }

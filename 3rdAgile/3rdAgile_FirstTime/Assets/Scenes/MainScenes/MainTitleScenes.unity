@@ -547,6 +547,8 @@ MonoBehaviour:
   uIAssetData: {fileID: 11400000, guid: 3d3fd1c9357061b4fa09cc69ffc28e85, type: 2}
   titleButtonController: {fileID: 444393182}
   titleUI: {fileID: 1551750875}
+  nowLoading: {fileID: 1604728052}
+  backAction: {fileID: 7197579957856082480, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
 --- !u!1 &922870602
 GameObject:
   m_ObjectHideFlags: 0
@@ -1359,10 +1361,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VirtualKeyboardController
   playerInput: {fileID: 617468237}
+  backAction: {fileID: 7197579957856082480, guid: bf529fe4541cf2b42bcaadd922fa4df9, type: 3}
   uiDocument: {fileID: 2080090540}
   titleButtonController: {fileID: 444393182}
   uiAssetData: {fileID: 11400000, guid: 3d3fd1c9357061b4fa09cc69ffc28e85, type: 2}
   seManager: {fileID: 432183110}
+  titleUI: {fileID: 1551750875}
 --- !u!4 &2009124984
 Transform:
   m_ObjectHideFlags: 0
