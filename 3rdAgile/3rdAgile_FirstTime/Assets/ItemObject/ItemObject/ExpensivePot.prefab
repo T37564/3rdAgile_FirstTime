@@ -4855,6 +4855,7 @@ GameObject:
   - component: {fileID: -5405382398450028345}
   - component: {fileID: 2503834546525113366}
   - component: {fileID: 2812675938977088477}
+  - component: {fileID: 40031754914130476}
   m_Layer: 6
   m_Name: ExpensivePot
   m_TagString: Item
@@ -4975,7 +4976,6 @@ MonoBehaviour:
   rayLength: 1.5
   regenerationJudgementCoordinate: 20
   isGenerateRequest: 0
-  _isCarried: 0
 --- !u!114 &8599090137824959149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5093,6 +5093,19 @@ MonoBehaviour:
     m_Bits: 128
   rayLength: 1
   boxSize: {x: 1, y: 1, z: 1}
+--- !u!114 &40031754914130476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d05e7817e96341349a52f1a3e4ee4c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  itemUINameData: {fileID: 11400000, guid: a5f3c65ffa53c4248849b8deb87b086a, type: 2}
 --- !u!1001 &3687386691257075211
 PrefabInstance:
   m_ObjectHideFlags: 0
