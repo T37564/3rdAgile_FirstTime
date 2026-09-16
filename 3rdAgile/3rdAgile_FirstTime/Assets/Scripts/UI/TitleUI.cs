@@ -101,6 +101,21 @@ public class TitleUI : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        // ゲームパッドが操作されたらフォーカスを戻す
+        if (Gamepad.current != null && IsGamepadInput())
+        {
+            if (uiDocument.rootVisualElement.panel != null)
+            {
+                Focusable focused = uiDocument.rootVisualElement.panel.focusController.focusedElement;
+
+                // ボタンにフォーカスがなければCreateRoomへ戻す
+                if (focused is not Button)
+                {
+                    createRoom.Focus();
+                }
+            }
+        }
+
         Focusable focusedElement = uiDocument.rootVisualElement.panel.focusController.focusedElement;
 
         if (focusedElement == nowFocusedButton) return;
@@ -118,6 +133,31 @@ public class TitleUI : MonoBehaviour
         }
 
         nowFocusedButton = focusedElement;
+    }
+
+    private bool IsGamepadInput()
+    {
+        Gamepad gamepad = Gamepad.current;
+
+        if (gamepad == null)
+            return false;
+
+        // 十字キー
+        if (gamepad.dpad.ReadValue() != Vector2.zero)
+            return true;
+
+        // 左スティック
+        if (gamepad.leftStick.ReadValue().magnitude > 0.1f)
+            return true;
+
+        // ボタン
+        if (gamepad.buttonSouth.wasPressedThisFrame ||
+            gamepad.buttonEast.wasPressedThisFrame ||
+            gamepad.buttonWest.wasPressedThisFrame ||
+            gamepad.buttonNorth.wasPressedThisFrame)
+            return true;
+
+        return false;
     }
 
     /// <summary>
