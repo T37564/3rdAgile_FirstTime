@@ -145,6 +145,48 @@ public class LobbyUI : MonoBehaviour
         backAction.action.Disable();
     }
 
+    private void Update()
+    {
+        // ゲームパッドが操作されたらフォーカスを戻す
+        if (Gamepad.current != null && IsGamepadInput())
+        {
+            if (uiDocument.rootVisualElement.panel != null)
+            {
+                Focusable focused = uiDocument.rootVisualElement.panel.focusController.focusedElement;
+
+                // ボタンにフォーカスがなければCreateRoomへ戻す
+                if (focused is not Button)
+                {
+                    gameStartButton.Focus();
+                }
+            }
+        }
+    }
+    private bool IsGamepadInput()
+    {
+        Gamepad gamepad = Gamepad.current;
+
+        if (gamepad == null)
+            return false;
+
+        // 十字キー
+        if (gamepad.dpad.ReadValue() != Vector2.zero)
+            return true;
+
+        // 左スティック
+        if (gamepad.leftStick.ReadValue().magnitude > 0.1f)
+            return true;
+
+        // ボタン
+        if (gamepad.buttonSouth.wasPressedThisFrame ||
+            gamepad.buttonEast.wasPressedThisFrame ||
+            gamepad.buttonWest.wasPressedThisFrame ||
+            gamepad.buttonNorth.wasPressedThisFrame)
+            return true;
+
+        return false;
+    }
+
     /// <summary>
     /// プレイヤー人数不足のメッセージを一定時間表示するコルーチン
     /// </summary>
@@ -194,7 +236,6 @@ public class LobbyUI : MonoBehaviour
     /// </summary>
     private void ReturnTitleButtonClicked(InputAction.CallbackContext context)
     {
-        // タイトルに戻る処理を呼び出す
-        SceneManager.LoadScene("MainTitleScenes");
+        HostMatchingPaused();
     }
 }
