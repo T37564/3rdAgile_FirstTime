@@ -23,16 +23,27 @@ public class PlayerActionUI : MonoBehaviour
     [Header("実行可能なアクションを表示するテキスト")]
     [SerializeField] private TextMeshProUGUI actionText = null;
 
+    [Header("アイテム取得時に使用するキャンバス")]
+    [SerializeField] private GameObject worldSpaceCanvas = null;
+
     [Header("ゲームパッド用のボタンUI")]
     [SerializeField] private Image actionImageGamepad = null;
     [Header("キーボード・マウス用のボタンUI")]
     [SerializeField] private Image actionImageMouce = null;
+
+    [Header("アイテムの金額表示テキスト")]
+    [SerializeField] private TextMeshProUGUI itemPriceText = null;
+    [Header("アイテムの運搬人数表示テキスト")]
+    [SerializeField] private TextMeshProUGUI itemTransportCountText = null;
 
     // 現在触れているアイテムを保持する
     private Collider currentItem = null;
 
     // プレイヤーコントローラー参照用
     private PlayerController playerController = null;
+
+    // アイテムの情報
+    private Item itemData = null;
 
     // アイテム納品箱まで案内する矢印
     private GameObject greenArrow = null;
@@ -70,8 +81,20 @@ public class PlayerActionUI : MonoBehaviour
         // Itemタグのオブジェクトに触れたときUIを表示
         if (other.CompareTag(ITEM_TAG_NAME))
         {
+            itemData = other.GetComponent<Item>();
             currentItem = other;
             ActionUIDisplay(true);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (playerController == null || !playerController.HasInputAuthority) return;
+
+        // アイテムに触れている間はUIの位置をアイテムの位置に合わせて更新する
+        if (other.CompareTag(ITEM_TAG_NAME))
+        {
+            ItemUIChangePosition(other.transform);
         }
     }
 
@@ -85,6 +108,7 @@ public class PlayerActionUI : MonoBehaviour
         // 触れていたアイテムに離れたときUI非表示
         if (other == currentItem)
         {
+            itemData = null;
             currentItem = null;
             ActionUIDisplay(false);
         }
@@ -118,6 +142,15 @@ public class PlayerActionUI : MonoBehaviour
     /// </summary>
     private void ActionUIDisplay(bool display)
     {
+        worldSpaceCanvas.SetActive(display);
+
+        if (itemData != null)
+        {
+            // アイテムの金額と運搬人数をUIに反映する
+            itemPriceText.text = itemData.ItemData.ItemPrice + "$";
+            itemTransportCountText.text = "0" + "/" + itemData.ItemData.ItemTransportCount;
+        }
+
         // 「拾う」テキストを表示、非表示にする
         if (display)
         {
@@ -146,6 +179,14 @@ public class PlayerActionUI : MonoBehaviour
             // キーボード・マウス用UIを表示
             actionImageMouce.enabled = true;
         }
+    }
+
+    /// <summary>
+    /// UIの位置をアイテムの位置に合わせて更新する処理
+    /// </summary>
+    private void ItemUIChangePosition(Transform itemPosition)
+    {
+        worldSpaceCanvas.transform.position = itemPosition.position;
     }
 
     /// <summary>

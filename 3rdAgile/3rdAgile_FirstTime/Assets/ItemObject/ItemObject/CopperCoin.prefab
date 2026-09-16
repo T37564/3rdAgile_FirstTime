@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -5405382398450028345}
   - component: {fileID: -6526743460853460398}
   - component: {fileID: -7077518550128411561}
+  - component: {fileID: -7262518670382714086}
   m_Layer: 6
   m_Name: CopperCoin
   m_TagString: Item
@@ -138,7 +139,6 @@ MonoBehaviour:
   rayLength: 1.5
   regenerationJudgementCoordinate: 20
   isGenerateRequest: 0
-  _isCarried: 0
 --- !u!114 &9045057846944883647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,6 +256,19 @@ MonoBehaviour:
     m_Bits: 128
   rayLength: 1
   boxSize: {x: 1, y: 1, z: 1}
+--- !u!114 &-7262518670382714086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854831717035632874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d05e7817e96341349a52f1a3e4ee4c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  itemUINameData: {fileID: 11400000, guid: 337e32f1ba98de44f842a8dbebb3b9ce, type: 2}
 --- !u!1 &6347406299185293961
 GameObject:
   m_ObjectHideFlags: 0
