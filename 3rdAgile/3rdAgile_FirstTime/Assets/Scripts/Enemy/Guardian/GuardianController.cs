@@ -6,8 +6,10 @@ using UnityEngine.AI;
 
 public class GuardianController : NetworkBehaviour
 {
+    [Header("敵のナビメッシュ")]
     [SerializeField] private NavMeshAgent navMeshAgent;
 
+    [Header("徘徊時の向かう座標をランダムに決めているクラス")]
     [SerializeField] private GuardianWanderingArea guardianWanderingArea;
 
     public Transform currentPlayer { get; private set; }
@@ -28,9 +30,6 @@ public class GuardianController : NetworkBehaviour
 
     public override void Spawned()
     {
-        // Playerタグのオブジェクトを探す
-        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
         Debug.Log($"[Enemy Spawned] {gameObject.name} Position={transform.position}");
 
         guardianWanderingArea.FindWanderingGround();
@@ -76,12 +75,14 @@ public class GuardianController : NetworkBehaviour
         }
         navMeshAgent.isStopped = false;
 
+        // 敵がプレイヤーを追いかけている状態で強制的に徘徊状態にする
         if (!isWandering)
         {
             isWandering = true;
 
             wanderingPoint = guardianWanderingArea.GetRandomPoint();
 
+            // NavMeshAgentの目的地を設定
             navMeshAgent.SetDestination(wanderingPoint);
 
             return;

@@ -53,6 +53,8 @@ public class EnemyObjectPlace : MonoBehaviour
     public Vector3 GetRandomPosition(StageTypeKinds stageType)
     {
         List<BoxCollider> grounds = new();
+
+        // StageTypeSettingクラスのインスタンスをすべて取得し、指定されたStageTypeに一致するものを探す
         StageTypeSetting[] stages = FindObjectsByType<StageTypeSetting>(FindObjectsSortMode.None);
         foreach (StageTypeSetting stage in stages)
         {
@@ -63,6 +65,7 @@ public class EnemyObjectPlace : MonoBehaviour
             Transform[] children=stage.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
+                // ItemGroundタグがついていないオブジェクトはスキップ
                 if (!child.CompareTag("ItemGround"))
                 {
                     continue;
@@ -71,11 +74,6 @@ public class EnemyObjectPlace : MonoBehaviour
 
                 if (boxCollider != null)
                 {
-                    //Debug.Log(
-                    //        $"ItemGround発見: {child.name}, " +
-                    //        $"位置: {child.position}, " +
-                    //        $"Bounds: {boxCollider.bounds}"
-                    //    );
                     grounds.Add(boxCollider);
                 }
             }
@@ -91,23 +89,17 @@ public class EnemyObjectPlace : MonoBehaviour
         }
         BoxCollider ground = grounds[Random.Range(0, grounds.Count)];
 
-        Debug.Log(
-    $"Ground確認: {ground.name}\n" +
-    $"Transform.position = {ground.transform.position}\n" +
-    $"Bounds.center = {ground.bounds.center}\n" +
-    $"Bounds.min = {ground.bounds.min}\n" +
-    $"Bounds.max = {ground.bounds.max}"
-);
-
         //int index=Random.Range(0, grounds.Count);
         //BoxCollider ground = enemyGroundColliders[index];
         Physics.SyncTransforms();
         Bounds boxBounds=ground.bounds;
 
+        // 生成位置をランダムに決定する
         float x = Random.Range(boxBounds.min.x + 0.5f, boxBounds.max.x - 0.5f);
         float z = Random.Range(boxBounds.min.z + 0.5f, boxBounds.max.z - 0.5f);
         float y=boxBounds.max.y;
-
+        
+        // 生成位置を決定
         Vector3 position = new Vector3(x, y, z);
         Debug.Log($"生成位置: {position}");
         
