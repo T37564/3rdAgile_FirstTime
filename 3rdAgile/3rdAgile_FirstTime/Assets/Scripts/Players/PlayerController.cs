@@ -39,7 +39,7 @@ namespace Network.Player
         [SerializeField] private LayerMask interactLayerMask;
 
         [Header("アイテムを持っているときの最大距離")]
-        [SerializeField] private float maxCarryDistance = 3.0f;
+        [SerializeField] private float maxCarryDistance = 1.0f;
 
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
@@ -199,8 +199,6 @@ namespace Network.Player
         /// </summary>
         private void Move(Vector2 moveInput)
         {
-            
-
             Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
 
             if (move.sqrMagnitude > 1f)
@@ -212,19 +210,32 @@ namespace Network.Player
                 ? carryingMoveSpeed
                 : moveSpeed; 
 
-            Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
+            Vector3 nextPosition = transform.position + move * speed * Runner.DeltaTime;
 
             if (IsHoldingItem && holdingItem != null)
             {
-                Vector3 direction = holdingItem.Transform.position - transform.position;
+                //Vector3 direction = holdingItem.Transform.position - transform.position;
 
-                direction.y = 0f;
+                //direction.y = 0f;
 
-                if (direction.sqrMagnitude > 0.01f)
+                //if (direction.sqrMagnitude > 0.01f)
+                //{
+                //    currentAngle = Quaternion.LookRotation(direction);
+
+                //    transform.rotation = currentAngle;
+                //}
+
+                Vector3 itemPosition = holdingItem.Transform.position;
+
+                Vector3 offset = nextPosition - itemPosition;
+                offset.y = 0f;
+
+                if (offset.sqrMagnitude > maxCarryDistance * maxCarryDistance)
                 {
-                    currentAngle = Quaternion.LookRotation(direction);
+                    offset = offset.normalized * maxCarryDistance;
 
-                    transform.rotation = currentAngle;
+                    nextPosition.x = itemPosition.x + offset.x;
+                    nextPosition.z = itemPosition.z + offset.z;
                 }
             }
             else if (move.sqrMagnitude > 0.01f)
