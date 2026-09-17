@@ -26,6 +26,9 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     // 運搬中かどうかのフラグ
     public bool isCarrying = false;
 
+    // アイテムを持っているかどうかのフラグ
+    [Networked] public NetworkBool IsHaveItem { get; set; }
+
     // 運搬中で人手が欲しいことを知らせるフラグ
     [Networked] public NetworkBool IsHelpPeople { get; set; }
 
@@ -57,8 +60,8 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
             return false;
         }
 
-            // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
-            if (carriers.Count >= RequiredPeople)
+        // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
+        if (carriers.Count >= RequiredPeople)
         {
             return false;
         }
@@ -74,6 +77,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         // プレイヤーを運び手リストに追加
         carriers.Add(player);
         carriersItem.Add(player.Object.InputAuthority);
+        IsHaveItem = true;
 
         player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
@@ -81,7 +85,6 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         if (CanCarry())
         {
             StartCarry();
-            IsHelpPeople = false;
         }
         else
         {
@@ -102,6 +105,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     private void StartCarry()
     {
         isCarrying = true;
+        IsHelpPeople = false;
 
         Vector3 center = GetCarriersCenter();
         carryOffset = transform.position - center;
@@ -159,12 +163,20 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
         carriers.Remove(player);
         carriersItem.Remove(player.Object.InputAuthority);
+        IsHaveItem = false;
         player.ClearHoldingItem(this);
 
         if (carriers.Count < RequiredPeople)
         {
             isCarrying = false;
+            IsHelpPeople = true;
             Debug.Log("人数不足でアイテムの運搬を中止");
+        }
+
+        if (carriers.Count == 0)
+        {
+            IsHelpPeople = false;
+            Debug.Log("全員がアイテムを離した");
         }
     }
 
@@ -184,7 +196,9 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
         // 運び手リストを空にする
         carriers.Clear();
-
+        carriersItem.Clear();
+        IsHaveItem = false;
+        IsHelpPeople = true;
         // 運搬状態を終了する
         isCarrying = false;
     }
