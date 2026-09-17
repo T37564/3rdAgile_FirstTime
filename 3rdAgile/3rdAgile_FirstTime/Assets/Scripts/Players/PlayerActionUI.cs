@@ -48,6 +48,9 @@ public class PlayerActionUI : MonoBehaviour
     // アイテム納品箱まで案内する矢印
     private GameObject greenArrow = null;
 
+    // アイテムの運搬人数参照用
+    private ItemInteractable itemInteractable = null;
+
     /// <summary>
     /// 参照用プレイヤーコントローラー取得、UIの初期化
     /// </summary>
@@ -78,9 +81,10 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // Itemタグのオブジェクトに触れたときUIを表示
+        // Itemタグのオブジェクトに触れたときUIを表示&荷物を運んでいないとき
         if (other.CompareTag(ITEM_TAG_NAME))
         {
+            itemInteractable = other.GetComponent<ItemInteractable>();
             itemData = other.GetComponent<Item>();
             currentItem = other;
             ActionUIDisplay(true);
@@ -108,7 +112,6 @@ public class PlayerActionUI : MonoBehaviour
         // 触れていたアイテムに離れたときUI非表示
         if (other == currentItem)
         {
-            itemData = null;
             currentItem = null;
             ActionUIDisplay(false);
         }
@@ -121,18 +124,24 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // アイテムを持っている間は拾うUIを非表示にし、納品先への矢印を表示
-        if (playerController.IsHoldingItem)
+        // 対象アイテムがない
+        if (itemInteractable == null)
         {
             ActionUIDisplay(false);
-            SetVisible(true);
+            SetVisible(false);
             return;
         }
 
-        // 対象アイテムが無くなったらUIと矢印を更新
-        if (currentItem == null)
+        // 運搬人数が必要人数に達した
+        if (itemInteractable.carriersItem.Count == int.Parse(itemData.ItemData.ItemTransportCount))
         {
             ActionUIDisplay(false);
+            SetVisible(true);
+        }
+        else
+        {
+            // まだ人数不足
+            ActionUIDisplay(true);
             SetVisible(false);
         }
     }
@@ -144,11 +153,11 @@ public class PlayerActionUI : MonoBehaviour
     {
         worldSpaceCanvas.SetActive(display);
 
-        if (itemData != null)
+        if (itemData != null && itemInteractable != null)
         {
             // アイテムの金額と運搬人数をUIに反映する
             itemPriceText.text = itemData.ItemData.ItemPrice + "$";
-            itemTransportCountText.text = "0" + "/" + itemData.ItemData.ItemTransportCount;
+            itemTransportCountText.text = itemInteractable.carriersItem.Count + "/" + itemData.ItemData.ItemTransportCount;
         }
 
         // 「拾う」テキストを表示、非表示にする
