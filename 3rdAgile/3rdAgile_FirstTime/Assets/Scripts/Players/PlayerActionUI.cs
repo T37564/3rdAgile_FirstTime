@@ -51,6 +51,8 @@ public class PlayerActionUI : MonoBehaviour
     // アイテムの運搬人数参照用
     private ItemInteractable itemInteractable = null;
 
+    private bool isCarryingItemExited = false;
+
     /// <summary>
     /// 参照用プレイヤーコントローラー取得、UIの初期化
     /// </summary>
@@ -60,7 +62,6 @@ public class PlayerActionUI : MonoBehaviour
 
         greenArrow = GameObject.FindGameObjectWithTag(GREEN_ARROW_TAG_NAME);
 
-        // 最初はUIを非表示
         ActionUIDisplay(false);
 
         // PlayerController が取得できなかった場合は処理を終了
@@ -81,8 +82,8 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // Itemタグのオブジェクトに触れたときUIを表示&荷物を運んでいないとき
-        if (other.CompareTag(ITEM_TAG_NAME))
+        // Itemタグのオブジェクトに触れたときUIを表示
+        if (other.CompareTag(ITEM_TAG_NAME) && itemInteractable == null)
         {
             itemInteractable = other.GetComponent<ItemInteractable>();
             itemData = other.GetComponent<Item>();
@@ -99,6 +100,25 @@ public class PlayerActionUI : MonoBehaviour
         if (other.CompareTag(ITEM_TAG_NAME))
         {
             ItemUIChangePosition(other.transform);
+
+            // アイテムを持っていて運搬人数が必要人数に達した
+            if (itemInteractable.carriersItem.Count == int.Parse(itemData.ItemData.ItemTransportCount) && itemInteractable.IsHaveItem)
+            {
+                ActionUIDisplay(false);
+                SetVisible(true);
+            }
+            else if (itemInteractable.IsHaveItem)
+            {
+                // まだ人数不足
+                ActionUIDisplay(true);
+                SetVisible(false);
+            }
+            else
+            {
+                // アイテムを持っていない状態
+                ActionUIDisplay(true);
+                SetVisible(false);
+            }
         }
     }
 
@@ -109,11 +129,19 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // 触れていたアイテムに離れたときUI非表示
-        if (other == currentItem)
+        // 持っているアイテムから離れた場合UI非表示
+        if (other == currentItem && itemInteractable.IsHaveItem)
         {
-            currentItem = null;
+            isCarryingItemExited = true;
             ActionUIDisplay(false);
+        }
+        else if (other == currentItem)// アイテムを持っていない状態で離れた場合UI非表示
+        {
+            isCarryingItemExited = false;
+            currentItem = null;
+            itemInteractable = null;
+            ActionUIDisplay(false);
+            SetVisible(false);
         }
     }
 
@@ -124,7 +152,7 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // 対象アイテムがない
+        // アイテムを離したとき
         if (itemInteractable == null)
         {
             ActionUIDisplay(false);
@@ -132,17 +160,18 @@ public class PlayerActionUI : MonoBehaviour
             return;
         }
 
-        // 運搬人数が必要人数に達した
-        if (itemInteractable.carriersItem.Count == int.Parse(itemData.ItemData.ItemTransportCount))
+        // 複数人アイテムを運んでいて運搬人数が足りなくなった時
+        if (itemInteractable != null && itemInteractable.carriersItem.Count != int.Parse(itemData.ItemData.ItemTransportCount) && itemInteractable.IsHaveItem)
         {
-            ActionUIDisplay(false);
-            SetVisible(true);
-        }
-        else
-        {
-            // まだ人数不足
             ActionUIDisplay(true);
             SetVisible(false);
+        }
+
+        // アイテムを遠くから離したとき
+        if (itemInteractable != null && !itemInteractable.IsHaveItem && isCarryingItemExited)
+        {
+            isCarryingItemExited = false;
+            itemInteractable = null;
         }
     }
 
