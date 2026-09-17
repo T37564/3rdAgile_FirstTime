@@ -1,15 +1,19 @@
-using Network.Player;
-using UnityEngine;
-using System.Collections.Generic;
+using ExitGames.Client.Photon.StructWrapping;
 using Fusion;
+using Network.Player;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class ItemInteractable : NetworkBehaviour, IInteractable
 {
     public int RequiredPeople { get; private set; }
 
     // アイテムを運ぶプレイヤーのリスト
-    private List<PlayerController> carriers =
-        new List<PlayerController>();
+    public List<PlayerController> carriers = new List<PlayerController>();
+
+    [Networked, Capacity(4)]
+    public NetworkLinkedList<PlayerRef> carriersItem { get; }
 
     // IInteractableインターフェースの実装
     public Transform Transform => transform;
@@ -20,7 +24,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     [SerializeField] private Vector3 carryOffset = Vector3.zero;
 
     // 運搬中かどうかのフラグ
-    private bool isCarrying = false;
+    public bool isCarrying = false;
 
     // 運搬中で人手が欲しいことを知らせるフラグ
     [Networked] public NetworkBool IsHelpPeople { get; set; }
@@ -48,8 +52,13 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
             return false;
         }
 
-        // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
-        if (carriers.Count >= RequiredPeople)
+        if (carriersItem.Contains(player.Object.InputAuthority))
+        {
+            return false;
+        }
+
+            // 現在の運び手の数が必要人数以上であれば、これ以上運び手を追加できない
+            if (carriers.Count >= RequiredPeople)
         {
             return false;
         }
@@ -64,6 +73,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
         // プレイヤーを運び手リストに追加
         carriers.Add(player);
+        carriersItem.Add(player.Object.InputAuthority);
 
         player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
@@ -148,6 +158,7 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         if (!carriers.Contains(player)) return;
 
         carriers.Remove(player);
+        carriersItem.Remove(player.Object.InputAuthority);
         player.ClearHoldingItem(this);
 
         if (carriers.Count < RequiredPeople)
