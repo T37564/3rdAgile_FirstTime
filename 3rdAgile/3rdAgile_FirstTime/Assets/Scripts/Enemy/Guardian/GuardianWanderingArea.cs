@@ -20,6 +20,7 @@ public class GuardianWanderingArea : NetworkBehaviour
         // Groundタブのオブジェクトで一番近いのを取得する
         foreach (GameObject ground in groundObjects)
         {
+            // 現在のオブジェクトとGroundオブジェクトの距離を計算
             float distance = Vector3.Distance(transform.position,
                 ground.transform.position);
 
