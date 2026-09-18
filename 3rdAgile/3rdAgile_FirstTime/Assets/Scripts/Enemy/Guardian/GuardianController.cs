@@ -53,7 +53,7 @@ public class GuardianController : NetworkBehaviour
         {
             return;
         }
-        Debug.Log($"IsInStartArea = {playerController.IsInStartArea}");
+        //Debug.Log($"IsInStartArea = {playerController.IsInStartArea}");
 
         if (playerController.IsInStartArea)
         {
