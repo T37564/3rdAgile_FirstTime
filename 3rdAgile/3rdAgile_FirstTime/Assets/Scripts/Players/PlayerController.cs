@@ -210,7 +210,7 @@ namespace Network.Player
                 ? carryingMoveSpeed
                 : moveSpeed; 
 
-            Vector3 nextPosition = transform.position + move * speed * Runner.DeltaTime;
+            Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
 
             if (IsHoldingItem && holdingItem != null)
             {
