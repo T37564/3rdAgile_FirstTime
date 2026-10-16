@@ -20,6 +20,7 @@ public class InGameUIController : MonoBehaviour
 
     // 接続切断メッセージのUI
     public VisualElement message = null;
+    public Label amountText = null;
 
     /// <summary>
     /// 使用するUIを取得する
@@ -29,8 +30,10 @@ public class InGameUIController : MonoBehaviour
         // UXML内からHPのVisualElementを取得
         VisualElement root = uiDocument.rootVisualElement;
         VisualElement hp = root.Q<VisualElement>("HP");
+        amountText = root.Q<Label>("AmountText");
 
         message = root.Q<VisualElement>("DisconnectedMessage");
+
 
         // 取得したHPの子要素をすべて取得
         hartUIs = hp.Children().ToArray();
