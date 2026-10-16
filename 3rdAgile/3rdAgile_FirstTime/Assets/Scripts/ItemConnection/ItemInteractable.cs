@@ -82,6 +82,8 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
 
+        PlayPickupSE(player.Object.InputAuthority);
+
         if (CanCarry())
         {
             StartCarry();
@@ -201,5 +203,28 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         IsHelpPeople = true;
         // 運搬状態を終了する
         isCarrying = false;
+    }
+
+    /// <summary>
+    /// アイテムを拾ったプレイヤーだけにSEを再生する
+    /// StateAuthority側から呼び出す
+    /// </summary>
+    public void PlayPickupSE(PlayerRef target)
+    {
+        if (!Object.HasStateAuthority) return;
+
+        RPC_PlayPickupSE(target);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayPickupSE([RpcTarget] PlayerRef target)
+    {
+        if (Runner.LocalPlayer != target) return;
+
+        SEManager seManager = FindAnyObjectByType<SEManager>();
+
+        if (seManager == null) return;
+
+        seManager.SEPlayOneShot(seManager.SEList.treasurePickupSE);
     }
 }
