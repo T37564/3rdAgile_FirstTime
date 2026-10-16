@@ -33,6 +33,10 @@ public class AttackAction : NetworkBehaviour
     [Header("攻撃後硬直")]
     [SerializeField] private float cooldownTime = 0.0f;
 
+    [Header("攻撃範囲オブジェクト")]
+    [SerializeField] private Renderer attackRangeObject;
+
+    [Networked] public NetworkBool isVisible { get; set; } = false;
 
     private float timer = 0.0f;
 
@@ -55,6 +59,9 @@ public class AttackAction : NetworkBehaviour
 
     public override void Spawned()
     {
+        // 開始時に攻撃範囲オブジェクトを非表示にする
+        attackRangeObject.enabled = false;
+
         enemyState = EnemyState.move;
 
         guardianWanderingArea.FindWanderingGround();
@@ -168,7 +175,9 @@ public class AttackAction : NetworkBehaviour
     private void AttackReadyState()
     {
         navMeshAgent.isStopped = true;
-        //Debug.Log("攻撃予備動作: " + Runner.Tick);
+
+        // 攻撃範囲オブジェクトを表示して攻撃範囲を可視化する
+        attackRangeObject.enabled = true;
 
         // 攻撃のターゲットにしているプレイヤーの方を見る
         //transform.LookAt(guardianController.currentPlayer);
@@ -189,7 +198,7 @@ public class AttackAction : NetworkBehaviour
         if (playerController != null && playerController.IsInStartArea)
         {
             Debug.Log("プレイヤーがスタートエリアに入ったため、攻撃をキャンセル");
-
+            attackRangeObject.enabled = false;
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
 
@@ -199,6 +208,7 @@ public class AttackAction : NetworkBehaviour
         // 予備動作中プレイヤーが一定以上の距離から離れたら徘徊する
         if (guardianController.currentDistance > attackDistance)
         {
+            attackRangeObject.enabled = false;
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
             return;
@@ -219,18 +229,11 @@ public class AttackAction : NetworkBehaviour
         if (attackStarted) return;
         attackStarted = true;
 
+        //attackRangeObject.enabled = false;
+
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
         RpcGuardianAttackAnimation();
-
-        // 攻撃対象のプレイヤーのPlayerControllerを取得
-        //PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
-
-        //if (playerController != null)
-        //{
-        //    // プレイヤーにダメージを与える
-        //    playerController.TakeDamage(ATTACK_DAMAGE);
-        //}
     }
 
     public void AttackAnimationFinished()
@@ -259,12 +262,17 @@ public class AttackAction : NetworkBehaviour
     private void CooldownState()
     {
         isIdleNetworked = true;
-
+        attackRangeObject.enabled = false;
         //timer -= Time.deltaTime;
         //if (timer <= 0)
         if (attackTimer.Expired(Runner))
         {
             enemyState = EnemyState.move;
         }
+    }
+
+    public void SetObjectVisible(bool visible)
+    {
+        isVisible = visible;
     }
 }
