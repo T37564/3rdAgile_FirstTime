@@ -3,11 +3,13 @@
 // PlayerActionUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using Fusion;
+using Network.Player;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using TMPro;
-using Network.Player;
 
 public class PlayerActionUI : MonoBehaviour
 {
@@ -51,7 +53,7 @@ public class PlayerActionUI : MonoBehaviour
     // アイテムの運搬人数参照用
     private ItemInteractable itemInteractable = null;
 
-    private bool isCarryingItemExited = false;
+    //private bool isCarryingItemExited = false;
 
     /// <summary>
     /// 参照用プレイヤーコントローラー取得、UIの初期化
@@ -96,30 +98,38 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // アイテムに触れている間はUIの位置をアイテムの位置に合わせて更新する
-        if (other.CompareTag(ITEM_TAG_NAME))
-        {
-            ItemUIChangePosition(other.transform);
+        // 現在の対象アイテム以外は処理しない
+        if (other != currentItem) return;
 
-            // アイテムを持っていて運搬人数が必要人数に達した
-            if (itemInteractable.carriersItem.Count == int.Parse(itemData.ItemData.ItemTransportCount) && itemInteractable.IsHaveItem)
+        if (itemInteractable == null || itemData == null) return;
+        if (itemData.ItemData == null) return;
+
+        ItemUIChangePosition(other.transform);
+
+        // 必要人数を取得
+        if (!int.TryParse(itemData.ItemData.ItemTransportCount, out int requiredCount))
+        {
+            return;
+        }
+
+        // 必要人数がそろっているか判定
+        bool isEnoughPeople = itemInteractable.carriersItem.Count >= requiredCount;
+        // 自分が運搬メンバーに含まれているか
+        PlayerRef myPlayerRef = playerController.Object.InputAuthority;
+        bool isCarryingItem = false;
+        foreach (PlayerRef playerRef in itemInteractable.carriersItem)
+        {
+            if (playerRef == myPlayerRef)
             {
-                ActionUIDisplay(false);
-                SetVisible(true);
-            }
-            else if (itemInteractable.IsHaveItem)
-            {
-                // まだ人数不足
-                ActionUIDisplay(true);
-                SetVisible(false);
-            }
-            else
-            {
-                // アイテムを持っていない状態
-                ActionUIDisplay(true);
-                SetVisible(false);
+                isCarryingItem = true;
+                break;
             }
         }
+
+        // 人数が不足していれば、ほかのプレイヤーも参加できる
+        ActionUIDisplay(!isEnoughPeople);
+        // 矢印は、必要人数がそろい、自分も運搬している場合だけ表示
+        SetVisible(isEnoughPeople && isCarryingItem);
     }
 
     /// <summary>
@@ -129,18 +139,17 @@ public class PlayerActionUI : MonoBehaviour
     {
         if (playerController == null || !playerController.HasInputAuthority) return;
 
-        // 持っているアイテムから離れた場合UI非表示
-        if (other == currentItem && itemInteractable.IsHaveItem)
+        if (other != currentItem) return;
+
+        ActionUIDisplay(false);
+
+        // 持っていないアイテムから離れた場合は参照を解除
+        if (itemInteractable == null || !itemInteractable.IsHaveItem)
         {
-            isCarryingItemExited = true;
-            ActionUIDisplay(false);
-        }
-        else if (other == currentItem)// アイテムを持っていない状態で離れた場合UI非表示
-        {
-            isCarryingItemExited = false;
             currentItem = null;
             itemInteractable = null;
-            ActionUIDisplay(false);
+            itemData = null;
+
             SetVisible(false);
         }
     }
@@ -159,20 +168,6 @@ public class PlayerActionUI : MonoBehaviour
             SetVisible(false);
             return;
         }
-
-        // 複数人アイテムを運んでいて運搬人数が足りなくなった時
-        if (itemInteractable != null && itemInteractable.carriersItem.Count != int.Parse(itemData.ItemData.ItemTransportCount) && itemInteractable.IsHaveItem)
-        {
-            ActionUIDisplay(true);
-            SetVisible(false);
-        }
-
-        // アイテムを遠くから離したとき
-        if (itemInteractable != null && !itemInteractable.IsHaveItem && isCarryingItemExited)
-        {
-            isCarryingItemExited = false;
-            itemInteractable = null;
-        }
     }
 
     /// <summary>
@@ -185,7 +180,7 @@ public class PlayerActionUI : MonoBehaviour
         if (itemData != null && itemInteractable != null)
         {
             // アイテムの金額と運搬人数をUIに反映する
-            itemPriceText.text = itemData.ItemData.ItemPrice + "$";
+            itemPriceText.text = itemData.ItemData.ItemPrice + "K";
             itemTransportCountText.text = itemInteractable.carriersItem.Count + "/" + itemData.ItemData.ItemTransportCount;
         }
 

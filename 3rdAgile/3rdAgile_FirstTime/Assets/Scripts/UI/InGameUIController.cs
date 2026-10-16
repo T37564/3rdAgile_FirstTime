@@ -37,7 +37,6 @@ public class InGameUIController : MonoBehaviour
 
         message = root.Q<VisualElement>("DisconnectedMessage");
 
-
         // Žæ“¾‚µ‚½HP‚ÌŽq—v‘f‚ð‚·‚×‚ÄŽæ“¾
         hartUIs = hp.Children().ToArray();
 
@@ -88,7 +87,7 @@ public class InGameUIController : MonoBehaviour
     /// </summary>
     public void UpdateAmountText()
     {
-        if (amountText != null) return;
+        if (amountText == null) return;
         amountText.text = moneyManager.totalMoney.ToString();
     }
 }

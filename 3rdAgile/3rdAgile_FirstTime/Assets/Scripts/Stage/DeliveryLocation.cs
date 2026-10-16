@@ -6,6 +6,7 @@
 
 using Fusion;
 using Network.Player;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -39,6 +40,9 @@ public class DeliveryLocation : NetworkBehaviour
     private ItemInteractable currentItem;
     private ItemDataStorage currentItemStorage;
 
+    // SEManagerの参照を保持する変数
+    private SEManager SEManager = null;
+
     private void Awake()
     {
         tag = TagName.DELIVERY_BOX;
@@ -65,7 +69,7 @@ public class DeliveryLocation : NetworkBehaviour
 
         int deliveryPlayerCount = CountDeliveryPlayers();
 
-        if(deliveryPlayerCount < currentItem.RequiredPeople) return;
+        if (deliveryPlayerCount < currentItem.RequiredPeople) return;
         //Debug.Log("納品可能かな");
 
         DeliveryCurrentItem();
@@ -153,8 +157,8 @@ public class DeliveryLocation : NetworkBehaviour
         {
             Collider hit = playerHits[i];
 
-            if(hit == null) continue;
-            if(!hit.CompareTag(TagName.PLAYER)) continue;
+            if (hit == null) continue;
+            if (!hit.CompareTag(TagName.PLAYER)) continue;
             if (!hit.TryGetComponent(out PlayerController player)) continue;
 
             if (!player.IsHoldingItem) continue;
@@ -179,12 +183,43 @@ public class DeliveryLocation : NetworkBehaviour
         //ScoreManager.Instance.AddScore(score);
         MoneyManager.Instance.AddAmount(score, requiredPeople);
 
+        // 納品時点の運搬メンバーを取得
+        List<PlayerRef> deliveryPlayers = new List<PlayerRef>();
+
+        foreach (PlayerRef playerRef in currentItem.carriersItem)
+        {
+            deliveryPlayers.Add(playerRef);
+        }
+
+        // 納品効果音を運搬メンバーだけに送信
+        foreach (PlayerRef playerRef in deliveryPlayers)
+        {
+            RPC_PlayDeliverySE(playerRef);
+        }
+
+
         // アイテムを運んでいるプレイヤーを解除する処理
-        currentItem.ReleaseAll(); 
+        currentItem.ReleaseAll();
 
         Runner.Despawn(currentItemNetworkObject);
 
         ClearItem();
+    }
+
+    /// <summary>
+    /// 効果音を再生するRPCメソッド
+    /// </summary>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayDeliverySE([RpcTarget] PlayerRef target)
+    {
+        // 対象プレイヤー以外は再生しない
+        if (Runner.LocalPlayer != target) return;
+
+        SEManager seManager = FindAnyObjectByType<SEManager>();
+
+        if (seManager == null) return;
+
+        seManager.SEPlayOneShot(seManager.SEList.treasureDeliverSE);
     }
 
     private void ClearItem()
@@ -203,5 +238,5 @@ public class DeliveryLocation : NetworkBehaviour
     }
 #endif
 
-    
+
 }

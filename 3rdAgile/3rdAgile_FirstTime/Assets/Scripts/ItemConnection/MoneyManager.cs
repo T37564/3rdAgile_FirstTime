@@ -1,25 +1,44 @@
 using Fusion;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class MoneyManager : SingletonNetworkBehaviour<MoneyManager>
 {
     //[SerializeField] public int currentMoney = 0;
 
-    [Networked] public int totalMoney { get; set; }
+    [Networked, OnChangedRender(nameof(OnTotalMoneyChanged))] public int totalMoney { get; set; }
     //[SerializeField] public TextMeshPro moneyText;
 
-    // オブジェクトが有効になったとき呼ばれる
-    private void OnEnable()
+    // InGameUIController参照用
+    private InGameUIController uiController = null;
+
+    public override void Spawned()
     {
-        // ActionにAddAmountメソッドを登録
-        //ItemGroundChecker.OnGroundedStateChanged += AddAmount;
+        // Spawn時点の金額も表示に反映
+        UpdateMoneyUI();
     }
 
-    // オブジェクトが無効になったとき呼ばれる
-    private void OnDisable()
+    /// <summary>
+    /// 同期された金額が変更されたときに呼ばれる
+    /// </summary>
+    private void OnTotalMoneyChanged()
     {
-        //ItemGroundChecker.OnGroundedStateChanged -= AddAmount;
+        UpdateMoneyUI();
+    }
+
+    /// <summary>
+    /// 各端末のスコアUIを更新する
+    /// </summary>
+    private void UpdateMoneyUI()
+    {
+        if (uiController == null) 
+        {
+            uiController = FindAnyObjectByType<InGameUIController>();
+        }
+
+        uiController.UpdateAmountText();
     }
 
     /// <summary>
