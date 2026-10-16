@@ -40,9 +40,6 @@ public class DeliveryLocation : NetworkBehaviour
     private ItemInteractable currentItem;
     private ItemDataStorage currentItemStorage;
 
-    // SEManager‚ÌQÆ‚ğ•Û‚·‚é•Ï”
-    private SEManager SEManager = null;
-
     private void Awake()
     {
         tag = TagName.DELIVERY_BOX;
