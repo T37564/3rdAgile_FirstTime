@@ -57,7 +57,7 @@ public class GuardianController : NetworkBehaviour
 
         if (playerController.IsInStartArea)
         {
-            Debug.Log("プレイヤーはスタートエリア内にいます。徘徊状態に移行します。");
+            //Debug.Log("プレイヤーはスタートエリア内にいます。徘徊状態に移行します。");
             WanderingState();
         }
         else

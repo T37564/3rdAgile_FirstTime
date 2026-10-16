@@ -16,8 +16,10 @@ public class GenerateEnemyType
 
 public class EnemySpawner : MonoBehaviour
 {
+    [Header("生成する敵の種類")]
     [SerializeField] public GenerateEnemyType[] generateEnemys;
 
+    [Header("生成する敵の数")]
     [SerializeField] private int generateCount = 0;
 
     [SerializeField] private EnemyObjectPlace enemyObjectPlace;
@@ -76,19 +78,29 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
+        // 生成する敵の数だけループ
         for (int i = 0; i < generateCount; i++)
         {
-            NetworkObject enemyPrefab = generateEnemys[i].enemyPrefabObject;
+            // 生成する敵の種類をランダムに選択
+            int enemyIndex = UnityEngine.Random.Range(0, generateEnemys.Length);
 
-            if (enemyPrefab == null)
+            // 生成する敵の種類を取得
+            GenerateEnemyType enemyType = generateEnemys[enemyIndex];
+
+            // 生成する敵のPrefabを取得
+            NetworkObject enemyPrefab = enemyType.enemyPrefabObject;
+
+            if (enemyType == null)
             {
                 Debug.LogError($"{i}番目の敵PrefabはNULLです");
                 continue;
             }
 
-            Vector3 spawnPosition = enemyObjectPlace.GetRandomPosition(generateEnemys[i].stageTypes);
+            //Vector3 spawnPosition = enemyObjectPlace.GetRandomPosition(generateEnemys[i].stageTypes);
+            Vector3 spawnPosition = enemyObjectPlace.GetRandomPosition(enemyType.stageTypes);
 
-            runner.Spawn(enemyPrefab, spawnPosition, Quaternion.identity, null, (runner, spawnedEnemy) =>
+            // NavMesh上に敵を配置させる
+            NetworkObject spawnedEnemy = runner.Spawn(enemyPrefab, spawnPosition, Quaternion.identity, null, (runner, spawnedEnemy) =>
             {
                 NavMeshAgent agent = spawnedEnemy.GetComponent<NavMeshAgent>();
                 if (agent != null)
@@ -117,31 +129,6 @@ public class EnemySpawner : MonoBehaviour
                     }
                 }
             });
-
-            Debug.Log(
-    $"【敵Spawn後】" +
-    $"名前={enemyPrefab.name}, " +
-    $"位置={enemyPrefab.transform.position}, " +
-    $"指定位置={spawnPosition}"
-);
-            //StartCoroutine(CheckEnemyPosition(spawnedEnemy, spawnPosition));
         }
-    }
-
-    private IEnumerator CheckEnemyPosition(NetworkObject enemy,Vector3 spawnPosition)
-    {
-        yield return null;
-
-        Debug.Log($"【1フレーム後】" + $"実際={enemy.transform.position}, " + $"指定={spawnPosition}");
-
-        //if (enemy.transform.position != spawnPosition)
-        //{
-        //    enemy.transform.position = spawnPosition;
-
-        //    Debug.Log(
-        //        $"【位置修正】" +
-        //        $"修正後={enemy.transform.position}"
-        //    );
-        //}
     }
 }
