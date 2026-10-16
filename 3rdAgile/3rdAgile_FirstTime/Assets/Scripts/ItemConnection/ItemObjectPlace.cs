@@ -114,7 +114,7 @@ public class ItemObjectPlace : MonoBehaviour
                 groundColliders.Add(collider);
             }
         }
-        Debug.Log($"è∞ìoò^êî:{groundColliders.Count}");
+        //Debug.Log($"è∞ìoò^êî:{groundColliders.Count}");
     }
 
     public int GetSpawnCount(GamePhase phase)

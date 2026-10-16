@@ -50,6 +50,8 @@ public class GameTimer : NetworkBehaviour
     // スコアUI表示するためのフラグ
     private bool isShowScore = false;
 
+    private bool isSpawned = false;
+
     /// <summary>
     /// 残り時間を秒で返すプロパティ。
     /// タイマーが終了しているか、まだ開始されていない場合は0を返す。
@@ -69,6 +71,8 @@ public class GameTimer : NetworkBehaviour
 
     public override void Spawned()
     {
+        isSpawned = true;
+
         // StateAuthorityを持っているクライアントがタイマーを初期化する
         if (Object.HasStateAuthority)
         {
@@ -87,6 +91,8 @@ public class GameTimer : NetworkBehaviour
     /// </summary>
     private void Update()
     {
+        if(!isSpawned) return;
+
         if (isShowScore) return;
 
         if (CurrentPhase == GamePhase.Finished)
@@ -121,7 +127,7 @@ public class GameTimer : NetworkBehaviour
 
         GamePhase newPhase = GetPhaseByElapsedTime(elapsedTime);
 
-        CurrentPhase = newPhase;
+        //CurrentPhase = newPhase;
 
         // フェーズが変わったときにイベントを呼び出すために、CurrentPhaseを更新する前に比較用の変数と比較して、フェーズが変わったときにイベントを呼び出す
         CurrentPhase = newPhase;

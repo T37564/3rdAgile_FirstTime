@@ -89,8 +89,6 @@ public class EnemyObjectPlace : MonoBehaviour
         }
         BoxCollider ground = grounds[Random.Range(0, grounds.Count)];
 
-        //int index=Random.Range(0, grounds.Count);
-        //BoxCollider ground = enemyGroundColliders[index];
         Physics.SyncTransforms();
         Bounds boxBounds=ground.bounds;
 
@@ -101,7 +99,7 @@ public class EnemyObjectPlace : MonoBehaviour
         
         // ê∂ê¨à íuÇåàíË
         Vector3 position = new Vector3(x, y, z);
-        Debug.Log($"ê∂ê¨à íu: {position}");
+        //Debug.Log($"ê∂ê¨à íu: {position}");
         
         return position;
     }

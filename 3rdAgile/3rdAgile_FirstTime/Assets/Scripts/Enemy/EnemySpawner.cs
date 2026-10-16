@@ -109,23 +109,13 @@ public class EnemySpawner : MonoBehaviour
                         $"Spawn直後: {spawnedEnemy.transform.position}"
                     );
 
-                    if (NavMesh.SamplePosition(
-                        spawnedEnemy.transform.position,
-                        out NavMeshHit hit,
-                        2.0f,
-                        NavMesh.AllAreas))
+                    if (NavMesh.SamplePosition(spawnedEnemy. transform. position, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
                     {
                         agent.Warp(hit.position);
-
-                        Debug.Log(
-                            $"NavMesh上へWarp: {hit.position}"
-                        );
                     }
                     else
                     {
-                        Debug.LogWarning(
-                            "Spawn位置の近くにNavMeshがありません"
-                        );
+                        Debug.LogWarning("Spawn位置の近くにNavMeshがありません");
                     }
                 }
             });
