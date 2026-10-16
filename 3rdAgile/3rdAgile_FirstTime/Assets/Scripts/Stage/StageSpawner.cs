@@ -84,7 +84,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Generate(runner);
 
         navMeshSurface = FindAnyObjectByType<NavMeshSurface>();
-        Debug.Log($"NavMeshSurface : {navMeshSurface}");
+        //Debug.Log($"NavMeshSurface : {navMeshSurface}");
         if (navMeshSurface == null)
         {
             Debug.LogError("NavMeshSurface‚ªæ“¾‚Å‚«‚Ä‚¢‚È‚¢‚½‚ßNavMesh‚ğ¶¬‚Å‚«‚Ü‚¹‚ñ");
