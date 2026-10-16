@@ -17,9 +17,13 @@ public class InGameUIController : MonoBehaviour
 
     // HPのUI
     private VisualElement[] hartUIs = null;
+    // MoneyManagerの参照
+    private MoneyManager moneyManager = null;
 
     // 接続切断メッセージのUI
     public VisualElement message = null;
+    public Label amountText = null;
+
 
     /// <summary>
     /// 使用するUIを取得する
@@ -29,11 +33,15 @@ public class InGameUIController : MonoBehaviour
         // UXML内からHPのVisualElementを取得
         VisualElement root = uiDocument.rootVisualElement;
         VisualElement hp = root.Q<VisualElement>("HP");
+        amountText = root.Q<Label>("AmountText");
 
         message = root.Q<VisualElement>("DisconnectedMessage");
 
         // 取得したHPの子要素をすべて取得
         hartUIs = hp.Children().ToArray();
+
+        // シーン内のMoneyManagerを取得
+        moneyManager = FindAnyObjectByType<MoneyManager>();
     }
 
     /// <summary>
@@ -72,5 +80,14 @@ public class InGameUIController : MonoBehaviour
     public void DisplayDisconnectedMessage()
     {
         message.style.display = DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// スコアUIのスコア表示を更新する
+    /// </summary>
+    public void UpdateAmountText()
+    {
+        if (amountText == null) return;
+        amountText.text = moneyManager.totalMoney.ToString();
     }
 }
