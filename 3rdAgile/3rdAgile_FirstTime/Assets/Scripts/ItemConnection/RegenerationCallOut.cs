@@ -39,7 +39,7 @@ public class RegenerationCallOut : NetworkBehaviour
         {
             if (isGenerateRequest) return;
             isGenerateRequest = true;
-            Debug.Log(transform.position.y);
+            //Debug.Log(transform.position.y);
 
             Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
             //RegenerationCallOutクラスにイベントを通知する
