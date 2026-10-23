@@ -305,6 +305,7 @@ public class AttackAction : NetworkBehaviour
         // 攻撃が命中する時点で範囲内のプレイヤーを取得
         List<PlayerController> playersInRange = GetAttackablePlayers();
 
+        // 攻撃範囲内のプレイヤーにダメージを与える
         foreach (PlayerController player in playersInRange)
         {
             if (player == null) continue;
