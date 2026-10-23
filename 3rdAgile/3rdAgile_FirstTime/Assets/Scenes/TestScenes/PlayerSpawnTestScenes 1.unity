@@ -2115,12 +2115,12 @@ MonoBehaviour:
   scoreUI: {fileID: 9197481963319205126, guid: 3fc1ff9bba4eeb5409ab06a8c01edbd7, type: 3}
   returnButtonUI: {fileID: 1002047322}
   titleTexture:
-  - {fileID: 2800000, guid: ef683ef13cf05454581a563215bf7d12, type: 3}
+  - {fileID: 2800000, guid: 03a76899a2d87a547ba2665c140a9ca4, type: 3}
   - {fileID: 2800000, guid: 158eac31bb7e6ac4dbeb386cb2b2ce08, type: 3}
   - {fileID: 2800000, guid: 33deeed55d9f8544e8cd02998512568e, type: 3}
   - {fileID: 2800000, guid: e91bc6ef118922746822809dd5ac349c, type: 3}
   - {fileID: 2800000, guid: 1eb058f4f83e0aa43902c7d4d7b58fc6, type: 3}
-  - {fileID: 2800000, guid: 51511a07209572c44993b5d6ac1ab072, type: 3}
+  - {fileID: 2800000, guid: ed0577e1b8e378945beb161df8f87e50, type: 3}
 --- !u!4 &1287500635
 Transform:
   m_ObjectHideFlags: 0
