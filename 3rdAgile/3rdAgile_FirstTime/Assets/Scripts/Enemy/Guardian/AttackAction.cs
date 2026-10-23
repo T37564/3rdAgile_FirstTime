@@ -178,7 +178,7 @@ public class AttackAction : NetworkBehaviour
     }
 
     /// <summary>
-    /// 移動処理
+    /// 敵の移動処理
     /// </summary>
     private void MoveState()
     {
@@ -198,8 +198,7 @@ public class AttackAction : NetworkBehaviour
         // プレイヤーがスタートエリア内なら攻撃しない
         if (guardianController.currentPlayer != null)
         {
-            PlayerController playerController =
-                guardianController.currentPlayer.GetComponent<PlayerController>();
+            PlayerController playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
 
             if (playerController != null && playerController.IsInStartArea)
             {
@@ -243,8 +242,7 @@ public class AttackAction : NetworkBehaviour
 
         if (guardianController.currentPlayer != null)
         {
-            playerController =
-                guardianController.currentPlayer.GetComponent<PlayerController>();
+            playerController = guardianController.currentPlayer.GetComponent<PlayerController>();
         }
 
         // プレイヤーがスタートエリア内に入ったら攻撃をキャンセル
@@ -262,8 +260,6 @@ public class AttackAction : NetworkBehaviour
         // 誰も範囲内にいなければ攻撃をキャンセル
         if (playersInRange.Count == 0)
         {
-            Debug.Log("攻撃範囲内にプレイヤーがいないため、攻撃をキャンセル");
-
             RpcSetVisibleAttackRange(false);
             navMeshAgent.isStopped = false;
             enemyState = EnemyState.move;
@@ -291,6 +287,10 @@ public class AttackAction : NetworkBehaviour
         RpcGuardianAttackAnimation();
     }
 
+    /// <summary>
+    /// 攻撃アニメーション終了時範囲内の
+    /// プレイヤーにダメージを与える処理
+    /// </summary>
     public void AttackAnimationFinished()
     {
         if (!Object.HasStateAuthority) return;
@@ -325,7 +325,8 @@ public class AttackAction : NetworkBehaviour
     {
         isIdleNetworked = true;
         RpcSetVisibleAttackRange(false);
-        
+
+        // 攻撃後のクールダウンが終了したら移動状態に戻す
         if (attackTimer.Expired(Runner))
         {
             enemyState = EnemyState.move;
