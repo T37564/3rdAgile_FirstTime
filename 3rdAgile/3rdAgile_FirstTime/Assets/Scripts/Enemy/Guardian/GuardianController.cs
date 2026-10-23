@@ -67,6 +67,8 @@ public class GuardianController : NetworkBehaviour
 
     private void WanderingState()
     {
+        // NavMeshAgentがNavMesh上にあるかどうかを確認
+        // タグやレイヤーの設定が間違っていないか調べる
         if (!navMeshAgent.isOnNavMesh)
         {
             Debug.LogWarning("NavMeshAgentがNavMesh上にありません。");
