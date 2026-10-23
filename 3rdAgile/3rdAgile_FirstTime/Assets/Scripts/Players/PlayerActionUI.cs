@@ -180,8 +180,8 @@ public class PlayerActionUI : MonoBehaviour
         if (itemData != null && itemInteractable != null)
         {
             // アイテムの金額と運搬人数をUIに反映する
-            itemPriceText.text = itemData.ItemData.ItemPrice + "コイン";
-            itemTransportCountText.text = "<color=red>" + itemInteractable.carriersItem.Count + "</color>/" + "/" + itemData.ItemData.ItemTransportCount;
+            itemPriceText.text = itemData.ItemData.ItemPrice;
+            itemTransportCountText.text = "<color=#FF0000>" + itemInteractable.carriersItem.Count + "</color>" + "/" + itemData.ItemData.ItemTransportCount;
         }
 
         // 「拾う」テキストを表示、非表示にする
