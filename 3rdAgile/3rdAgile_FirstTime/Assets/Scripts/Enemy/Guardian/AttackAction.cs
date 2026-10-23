@@ -115,6 +115,10 @@ public class AttackAction : NetworkBehaviour
         animator.SetTrigger("IsAttack");
     }
 
+    /// <summary>
+    /// ホスト側とクライアント側で攻撃範囲オブジェクトの表示・非表示を同期する処理
+    /// </summary>
+    /// <param name="visible"></param>
     [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
     private void RpcSetVisibleAttackRange(bool visible)
     {
@@ -125,10 +129,11 @@ public class AttackAction : NetworkBehaviour
     }
 
     /// <summary>
-    /// 攻撃範囲内にいる、攻撃可能なプレイヤーを取得する(仮)
+    /// 攻撃範囲内にいる、攻撃可能なプレイヤーを取得する
     /// </summary>
     private List<PlayerController> GetAttackablePlayers()
     {
+        // 攻撃範囲内のプレイヤーを格納するリスト
         List<PlayerController> playersInRange = new List<PlayerController>();
 
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
@@ -137,8 +142,7 @@ public class AttackAction : NetworkBehaviour
         {
             if (playerObject == null) continue;
 
-            PlayerController playerController =
-                playerObject.GetComponent<PlayerController>();
+            PlayerController playerController = playerObject.GetComponent<PlayerController>();
 
             if (playerController == null) continue;
 
@@ -146,10 +150,7 @@ public class AttackAction : NetworkBehaviour
             if (playerController.IsInStartArea) continue;
 
             // 敵とプレイヤーの距離を計算
-            float distance = Vector3.Distance(
-                transform.position,
-                playerObject.transform.position
-            );
+            float distance = Vector3.Distance(transform.position, playerObject.transform.position);
 
             // 攻撃範囲内ならリストに追加
             if (distance <= attackDistance)
@@ -157,7 +158,6 @@ public class AttackAction : NetworkBehaviour
                 playersInRange.Add(playerController);
             }
         }
-
         return playersInRange;
     }
 
@@ -195,7 +195,6 @@ public class AttackAction : NetworkBehaviour
         // 攻撃範囲内のプレイヤーを取得
         List<PlayerController> playersInRange = GetAttackablePlayers();
 
-        //Debug.Log(guardianController.currentDistance);
         // プレイヤーがスタートエリア内なら攻撃しない
         if (guardianController.currentPlayer != null)
         {
@@ -212,11 +211,7 @@ public class AttackAction : NetworkBehaviour
         if (playersInRange.Count > 0)
         {
             Debug.Log($"攻撃準備：対象プレイヤー数 = {playersInRange.Count}");
-
-            attackTimer = TickTimer.CreateFromSeconds(
-                Runner,
-                attackReadyTime
-            );
+            attackTimer = TickTimer.CreateFromSeconds(Runner, attackReadyTime);
 
             enemyState = EnemyState.attackReady;
             navMeshAgent.isStopped = true;
@@ -235,7 +230,7 @@ public class AttackAction : NetworkBehaviour
         RpcSetVisibleAttackRange(true);
 
         // 攻撃のターゲットにしているプレイヤーの方を見る
-        //transform.LookAt(guardianController.currentPlayer);
+        transform.LookAt(guardianController.currentPlayer);
 
         isMoveNetworked = false;
         isIdleNetworked = true;
@@ -291,8 +286,6 @@ public class AttackAction : NetworkBehaviour
         if (attackStarted) return;
         attackStarted = true;
 
-        //attackRangeObject.enabled = false;
-
         // 攻撃の実装
         // 攻撃が完了したらクールダウン状態に移行
         RpcGuardianAttackAnimation();
@@ -332,8 +325,7 @@ public class AttackAction : NetworkBehaviour
     {
         isIdleNetworked = true;
         RpcSetVisibleAttackRange(false);
-        //timer -= Time.deltaTime;
-        //if (timer <= 0)
+        
         if (attackTimer.Expired(Runner))
         {
             enemyState = EnemyState.move;
