@@ -1,0 +1,89 @@
+.container {
+    padding: 12px;
+}
+
+.title {
+    font-size: 18px;
+    unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    unity-font-style: bold;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.selected-object {
+    margin-bottom: 8px;
+}
+
+.todo-field {
+    min-height: 60px;
+    margin-bottom: 6px;
+}
+
+#add-button {
+    height: 28px;
+    margin-bottom: 10px;
+}
+
+.todo-list {
+    flex-grow: 1;
+    min-height: 120px;
+}
+
+.todo-row{
+    flex-direction: row;
+    align-items: center;
+}
+
+.todo-toggle{
+    flex-grow: 1;
+}
+
+#delete-button{
+    width: 70px;
+}
+
+.no-selection{
+    margin-top: 8px;
+    margin-bottom: 12px;
+    unity-font-style: italic;
+}
+
+#registered-foldout{
+    margin-top: 12px;
+}
+
+.registered-list{
+    min-height: 120px;
+    margin-top: 4px;
+}
+
+.registered-row {
+    flex-direction: row;
+    align-items: center;
+    height: 32px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.registered-name {
+    flex-grow: 1;
+}
+
+.todo-progress {
+    min-width: 50px;
+    unity-text-align: middle-right;
+}
+
+.remove-button {
+    width: 70px;
+    margin-left: 6px;
+}
+
+.unregister-button{
+    margin-top: 12px;
+    height: 28px;
+}

@@ -2141,6 +2141,7 @@ GameObject:
   - component: {fileID: 1289484022}
   - component: {fileID: 1289484025}
   - component: {fileID: 1289484026}
+  - component: {fileID: 1289484027}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2279,6 +2280,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTracking
   target: {fileID: 0}
+--- !u!114 &1289484027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289484021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320fdee09bb05e34a90192ab15252929, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraWallOcclusion
+  playerTarget: {fileID: 0}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 4096
+  sphereRadius: 0.3
+  showDebugRay: 1
 --- !u!1 &1308445004
 GameObject:
   m_ObjectHideFlags: 0

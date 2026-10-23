@@ -1,3 +1,4 @@
+
 #nullable enable
 
 using Fusion;
@@ -11,15 +12,11 @@ using Random = UnityEngine.Random;
 
 public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    #region ステージパス
+    #region Stage Paths
 
-    private readonly string START_ROOM_PATH = "Stages/Start";
-    private readonly string STRAIGHT_CORRIDOR_PATH = "Stages/StraightCorridor";
-    private readonly string ROOM_PATH = "Stages/Room";
-    private readonly string T_CORRIDOR_PATH = "Stages/TCorridor";
-    private readonly string CROSS_CORRIDOR_PATH = "Stages/CrossCorridor";
-    private readonly string GUARDIAN_ROOM_PATH = "Stages/GuardianRoom";
-    private readonly string DEAD_END_PATH = "Stages/DeadEnd";
+    private const string START_ROOM_PATH = "Stages/Room 2";
+    private const string STRAIGHT_CORRIDOR_PATH = "Stages/Aisle";
+    private const string ROOM_PATH = "Stages/Room 1";
 
     #endregion
 
@@ -35,27 +32,48 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private NetworkObject straightCorridorPrefab = null!;
 
     [Header("--- Generate Settings ---")]
-    [SerializeField] private float chunkSize = 10.0f;
 
-    [Tooltip("Start部屋を含めない通常部屋の数")]
+    [Tooltip("各Prefabの中心間距離")]
+    [Min(0.1f)]
+    [SerializeField] private float chunkSize = 12f;
+
+    [Tooltip("開始部屋を除いた通常部屋の数")]
+    [Min(0)]
     [SerializeField] private int targetRoomCount = 10;
 
-    [Tooltip("生成を試す最大回数。詰まり防止用")]
+    [Tooltip("生成を試す最大回数")]
+    [Min(1)]
     [SerializeField] private int maxGenerateAttempts = 500;
 
     [Header("--- Corridor Settings ---")]
-    [SerializeField] private CorridorLongAxis corridorLongAxis = CorridorLongAxis.Z;
 
-    private readonly Dictionary<Vector2Int, NetworkObject> placedChunks = new();
+    [Tooltip("通路Prefabのローカル長軸")]
+    [SerializeField]
+    private CorridorLongAxis corridorLongAxis = CorridorLongAxis.Z;
+
+    [Header("--- Debug Settings ---")]
+
+    [SerializeField] private bool showChunkGizmos = true;
+
+    [SerializeField]
+    private Color roomGizmoColor =
+        new Color(0f, 0.8f, 1f, 1f);
+
+    [SerializeField]
+    private Color corridorGizmoColor =
+        new Color(0f, 1f, 0.4f, 1f);
+
+    private readonly Dictionary<Vector2Int, NetworkObject>
+        placedChunks = new();
+
     private readonly List<Vector2Int> roomPositions = new();
 
-    // 部屋を生成した後に処理を行うイベント
-    //public static Action? OnMapGenerated;
-    public static Action? OnMapGenerated;
+    private readonly HashSet<Vector2Int> corridorPositions = new();
 
+    public static Action? OnMapGenerated;
     public static Action? OnNavMeshGenerated;
 
-    private NavMeshSurface navMeshSurface;
+    private NavMeshSurface? navMeshSurface;
 
     private static readonly Vector2Int[] Directions =
     {
@@ -65,85 +83,271 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Vector2Int.left
     };
 
+    #region Unity
+
     private void Awake()
     {
-        Debug.Log($"Awake Object = {gameObject.name}");
-        startRoomPrefab = Resources.Load<NetworkObject>(START_ROOM_PATH);
-        roomPrefab = Resources.Load<NetworkObject>(ROOM_PATH);
-        straightCorridorPrefab = Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
+        Debug.Log($"StageSpawner Awake : {gameObject.name}");
 
+        LoadPrefabs();
     }
 
-    /// <summary>
-    /// シーンロード完了時
-    /// </summary>
+    private void LoadPrefabs()
+    {
+        startRoomPrefab =
+            Resources.Load<NetworkObject>(START_ROOM_PATH);
+
+        roomPrefab =
+            Resources.Load<NetworkObject>(ROOM_PATH);
+
+        straightCorridorPrefab =
+            Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
+
+        if (startRoomPrefab == null ||
+            roomPrefab == null ||
+            straightCorridorPrefab == null)
+        {
+            Debug.LogError(
+                "StageSpawner : Prefabの読み込みに失敗しました。"
+            );
+        }
+    }
+
+    #endregion
+
+    #region Fusion
+
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log("StageSpawner OnSceneLoadDone");
-        if (!runner.IsServer) return;
+
+        // ステージ生成はサーバーのみ
+        if (!runner.IsServer)
+            return;
+
+        if (!ValidateSettings())
+            return;
+
         Generate(runner);
 
-        navMeshSurface = FindAnyObjectByType<NavMeshSurface>();
-        //Debug.Log($"NavMeshSurface : {navMeshSurface}");
-        if (navMeshSurface == null)
-        {
-            Debug.LogError("NavMeshSurfaceが取得できていないためNavMeshを生成できません");
-            return;
-        }
-        navMeshSurface.BuildNavMesh();
-
-        // NavMesh生成完了後にイベントを実行
-        OnNavMeshGenerated?.Invoke();
+        BuildNavMesh();
     }
+
+    #endregion
+
+    #region Generate
+
+    private bool ValidateSettings()
+    {
+        if (startRoomPrefab == null ||
+            roomPrefab == null ||
+            straightCorridorPrefab == null)
+        {
+            Debug.LogError(
+                "StageSpawner : 必要なPrefabが設定されていません。"
+            );
+
+            return false;
+        }
+
+        if (chunkSize <= 0f)
+        {
+            Debug.LogError(
+                "StageSpawner : chunkSizeは0より大きくしてください。"
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
     private void Generate(NetworkRunner runner)
     {
         placedChunks.Clear();
         roomPositions.Clear();
+        corridorPositions.Clear();
 
         Vector2Int startPos = Vector2Int.zero;
 
-        PlaceChunk(runner, startPos, startRoomPrefab, Quaternion.identity);
+        // 開始部屋
+        PlaceChunk(
+            runner,
+            startPos,
+            startRoomPrefab,
+            Quaternion.identity
+        );
+
         roomPositions.Add(startPos);
 
         int createdRoomCount = 0;
         int attempts = 0;
 
-        while (createdRoomCount < targetRoomCount && attempts < maxGenerateAttempts)
+        while (createdRoomCount < targetRoomCount &&
+               attempts < maxGenerateAttempts)
         {
             attempts++;
 
-            Vector2Int baseRoomPos = roomPositions[Random.Range(0, roomPositions.Count)];
-            List<Vector2Int> shuffledDirections = GetShuffledDirections();
+            // 既存の部屋をランダムに選択
+            Vector2Int baseRoomPos =
+                roomPositions[
+                    Random.Range(0, roomPositions.Count)
+                ];
 
-            foreach (Vector2Int dir in shuffledDirections)
+            List<Vector2Int> directions =
+                GetShuffledDirections();
+
+            bool generated = false;
+
+            foreach (Vector2Int dir in directions)
             {
-                Vector2Int corridorPos = baseRoomPos + dir;
-                Vector2Int roomPos = baseRoomPos + dir * 2;
+                // 部屋 → 通路 → 部屋
+                Vector2Int corridorPos =
+                    baseRoomPos + dir;
 
-                if (!CanPlace(corridorPos)) continue;
-                if (!CanPlace(roomPos)) continue;
+                Vector2Int nextRoomPos =
+                    baseRoomPos + dir * 2;
 
-                PlaceChunk(runner, corridorPos, straightCorridorPrefab, GetCorridorRotation(dir));
+                if (!CanPlacePair(
+                    corridorPos,
+                    nextRoomPos))
+                {
+                    continue;
+                }
 
-                // 部屋の生成
-                PlaceChunk(runner, roomPos, roomPrefab, Quaternion.identity);
+                Quaternion corridorRotation =
+                    GetCorridorRotation(dir);
 
-                roomPositions.Add(roomPos);
+                // 通路を配置
+                PlaceChunk(
+                    runner,
+                    corridorPos,
+                    straightCorridorPrefab,
+                    corridorRotation
+                );
+
+                corridorPositions.Add(corridorPos);
+
+                // 部屋は4方向に入口があるので回転不要
+                PlaceChunk(
+                    runner,
+                    nextRoomPos,
+                    roomPrefab,
+                    Quaternion.identity
+                );
+
+                roomPositions.Add(nextRoomPos);
+
                 createdRoomCount++;
+
+                generated = true;
 
                 break;
             }
+
+            if (!generated)
+            {
+                continue;
+            }
         }
-        
-        // すべての部屋を生成した後イベント実行
-        OnMapGenerated?.Invoke();
-        //navMeshSurface.BuildNavMesh();
+
+        Debug.Log(
+            $"Stage生成完了 : " +
+            $"通常部屋 {createdRoomCount} 個 / " +
+            $"通路 {corridorPositions.Count} 個"
+        );
 
         if (createdRoomCount < targetRoomCount)
         {
-            Debug.LogWarning($"部屋を {targetRoomCount} 個生成できませんでした。生成数: {createdRoomCount}");
+            Debug.LogWarning(
+                $"目標部屋数に到達できませんでした。" +
+                $"生成数 : {createdRoomCount}"
+            );
         }
+
+        OnMapGenerated?.Invoke();
     }
+
+    #endregion
+
+    #region Placement
+
+    private bool CanPlacePair(
+        Vector2Int corridorPos,
+        Vector2Int roomPos)
+    {
+        // 同じ座標には配置しない
+        if (corridorPos == roomPos)
+            return false;
+
+        // 通路位置の確認
+        if (placedChunks.ContainsKey(corridorPos))
+            return false;
+
+        // 部屋位置の確認
+        if (placedChunks.ContainsKey(roomPos))
+            return false;
+
+        return true;
+    }
+
+    private void PlaceChunk(
+        NetworkRunner runner,
+        Vector2Int gridPos,
+        NetworkObject prefab,
+        Quaternion rotation)
+    {
+        Vector3 worldPos = GridToWorld(gridPos);
+
+        NetworkObject instance = runner.Spawn(
+            prefab,
+            worldPos,
+            rotation
+        );
+
+        placedChunks.Add(gridPos, instance);
+    }
+
+    private Vector3 GridToWorld(Vector2Int gridPos)
+    {
+        return new Vector3(
+            gridPos.x * chunkSize,
+            transform.position.y,
+            gridPos.y * chunkSize
+        ) + new Vector3(
+            transform.position.x,
+            0f,
+            transform.position.z
+        );
+    }
+
+    #endregion
+
+    #region Rotation
+
+    private Quaternion GetCorridorRotation(Vector2Int dir)
+    {
+        bool needVertical =
+            dir == Vector2Int.up ||
+            dir == Vector2Int.down;
+
+        return corridorLongAxis switch
+        {
+            CorridorLongAxis.Z => needVertical
+                ? Quaternion.Euler(0f, 90f, 0f)
+                : Quaternion.identity,
+
+            CorridorLongAxis.X => needVertical
+                ? Quaternion.identity
+                : Quaternion.Euler(0f, 90f, 0f),
+
+            _ => Quaternion.identity
+        };
+    }
+
+    #endregion
+
+    #region Utility
 
     private List<Vector2Int> GetShuffledDirections()
     {
@@ -152,46 +356,67 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             .ToList();
     }
 
-    private bool CanPlace(Vector2Int gridPos)
-    {
-        return !placedChunks.ContainsKey(gridPos);
-    }
+    #endregion
 
-    private void PlaceChunk(NetworkRunner runner, Vector2Int gridPos, NetworkObject prefab, Quaternion rotation)
-    {
-        Vector3 worldPos = GridToWorld(gridPos);
-        NetworkObject instance = runner.Spawn(prefab, worldPos, rotation);
-        placedChunks.Add(gridPos, instance);
-    }
+    #region NavMesh
 
-    private Vector3 GridToWorld(Vector2Int gridPos)
+    private void BuildNavMesh()
     {
-        return new Vector3(
-            gridPos.x * chunkSize,
-            0.0f,
-            gridPos.y * chunkSize
-        );
-    }
+        navMeshSurface =
+            FindAnyObjectByType<NavMeshSurface>();
 
-    private Quaternion GetCorridorRotation(Vector2Int dir)
-    {
-        bool needVertical = dir == Vector2Int.up || dir == Vector2Int.down;
-
-        return corridorLongAxis switch
+        if (navMeshSurface == null)
         {
-            CorridorLongAxis.Z => needVertical
-                ? Quaternion.Euler(0.0f, 90.0f, 0.0f)
-                : Quaternion.identity,
+            Debug.LogError(
+                "StageSpawner : NavMeshSurfaceが見つかりません。"
+            );
 
-            CorridorLongAxis.X => needVertical
-                ? Quaternion.identity
-                : Quaternion.Euler(0.0f, 90.0f, 0.0f),
+            return;
+        }
 
-            _ => Quaternion.identity
-        };
+        navMeshSurface.BuildNavMesh();
+
+        Debug.Log("NavMesh生成完了");
+
+        OnNavMeshGenerated?.Invoke();
     }
 
-    #region 未使用コールバック
+    #endregion
+
+    #region Gizmos
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!showChunkGizmos)
+            return;
+
+        foreach (var pair in placedChunks)
+        {
+            Vector2Int gridPos = pair.Key;
+
+            Vector3 worldPos = GridToWorld(gridPos);
+
+            bool isCorridor =
+                corridorPositions.Contains(gridPos);
+
+            Gizmos.color = isCorridor
+                ? corridorGizmoColor
+                : roomGizmoColor;
+
+            Gizmos.DrawWireCube(
+                worldPos,
+                new Vector3(
+                    chunkSize,
+                    2f,
+                    chunkSize
+                )
+            );
+        }
+    }
+
+    #endregion
+
+    #region Unused Callbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
 
