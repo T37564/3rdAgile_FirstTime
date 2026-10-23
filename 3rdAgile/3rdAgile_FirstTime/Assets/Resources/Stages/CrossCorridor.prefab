@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d68fd8a4781314e851985146e6ab31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StagePlice
-  stageType: 0
+  stageType: 3
 --- !u!1 &4279269224654646887
 GameObject:
   m_ObjectHideFlags: 0

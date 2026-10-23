@@ -5150,7 +5150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be0e80d8a91bd424cbfbcc1605ec7202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageConnector
-  direction: 0
+  direction: 2
 --- !u!1 &8779570243154118743
 GameObject:
   m_ObjectHideFlags: 0
