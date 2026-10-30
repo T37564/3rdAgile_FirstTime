@@ -35,17 +35,15 @@ public class TimerUI : MonoBehaviour
     private void Update()
     {
         // GameTimer参照が未設定の場合は処理しない
-        if (gameTimer == null)
-            return;
+        if (gameTimer == null) return;
 
         // timerLabelが取得できていない場合は処理しない
-        if (timerLabel == null)
-            return;
+        if (timerLabel == null) return;
 
         // Spawn前はNetworkedプロパティにアクセスできないため処理しない
-        if (gameTimer.Object == null || !gameTimer.Object.IsValid)
-            return;
+        if (gameTimer.Object == null || !gameTimer.Object.IsValid) return;
 
+        if (!CountDownUI.isCountDownFinished) return;
         // ゲームの残り時間を取得
         float time = gameTimer.RemainingTime;
 

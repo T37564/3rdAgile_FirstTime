@@ -47,6 +47,19 @@ namespace Network.Player
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            playerInput.DeactivateInput();
+
+            CountDownUI.OnCountDownFinished += HandleCountDownFinished;
+        }
+
+        private void HandleCountDownFinished()
+        {
+            playerInput.ActivateInput();
+        }
+
+        private void OnDestroy()
+        {
+            CountDownUI.OnCountDownFinished -= HandleCountDownFinished;
         }
 
         #region ÉCÉxÉìÉgìoò^Ç∆âèú
@@ -166,7 +179,7 @@ namespace Network.Player
         private void OnTriggerEnter(Collider other)
         {
             var interactable = other.GetComponent<IInteractable>();
-            if(interactable != null)
+            if (interactable != null)
                 interactables.Add(interactable);
 
 
@@ -193,7 +206,7 @@ namespace Network.Player
         private void OnTriggerExit(Collider other)
         {
             var interactable = other.GetComponent<IInteractable>();
-            if(interactable != null)
+            if (interactable != null)
                 interactables.Remove(interactable);
         }
     }
