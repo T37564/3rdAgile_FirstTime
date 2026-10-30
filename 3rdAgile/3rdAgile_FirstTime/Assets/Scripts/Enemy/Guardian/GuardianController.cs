@@ -30,8 +30,6 @@ public class GuardianController : NetworkBehaviour
 
     public override void Spawned()
     {
-        Debug.Log($"[Enemy Spawned] {gameObject.name} Position={transform.position}");
-
         guardianWanderingArea.FindWanderingGround();
     }
 

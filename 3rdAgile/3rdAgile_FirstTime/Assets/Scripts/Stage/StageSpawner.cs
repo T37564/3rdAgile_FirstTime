@@ -388,8 +388,6 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         navMeshSurface.BuildNavMesh();
 
-        Debug.Log("NavMeshê∂ê¨äÆóπ");
-
         OnNavMeshGenerated?.Invoke();
     }
 
