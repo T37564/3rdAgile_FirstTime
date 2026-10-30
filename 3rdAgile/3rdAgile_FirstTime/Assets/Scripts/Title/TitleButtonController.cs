@@ -3,6 +3,7 @@
 // TitleButtonController.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
+using Fusion;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -79,7 +80,8 @@ public class TitleButtonController : MonoBehaviour
     {
         // NetworkRunnerが存在するか確認
         if (networkGameStarter == null || networkGameStarter.networkRunner == null) return;
-
+        // NetworkRunnerを取得
+        NetworkRunner runner = networkGameStarter.networkRunner;
         // ルーム内の人数を取得
         int playerCount = networkGameStarter.networkRunner.ActivePlayers.Count();
 
@@ -92,6 +94,13 @@ public class TitleButtonController : MonoBehaviour
             return;
         }
 
+        // 新規プレイヤーの参加を禁止する
+        runner.SessionInfo.IsOpen = false;
+
+        // ルーム一覧にも表示されないようにする
+        runner.SessionInfo.IsVisible = false;
+
+        // ゲームシーンへ移動するコルーチンを開始
         StartCoroutine(LoadSceneCorutine());
     }
 
