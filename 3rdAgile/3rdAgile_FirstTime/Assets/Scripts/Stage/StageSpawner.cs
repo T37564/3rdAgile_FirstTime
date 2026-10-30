@@ -87,8 +87,6 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
-        Debug.Log($"StageSpawner Awake : {gameObject.name}");
-
         LoadPrefabs();
     }
 
@@ -102,15 +100,6 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         straightCorridorPrefab =
             Resources.Load<NetworkObject>(STRAIGHT_CORRIDOR_PATH);
-
-        if (startRoomPrefab == null ||
-            roomPrefab == null ||
-            straightCorridorPrefab == null)
-        {
-            Debug.LogError(
-                "StageSpawner : Prefabの読み込みに失敗しました。"
-            );
-        }
     }
 
     #endregion
@@ -119,8 +108,6 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        Debug.Log("StageSpawner OnSceneLoadDone");
-
         // ステージ生成はサーバーのみ
         if (!runner.IsServer)
             return;
@@ -189,52 +176,30 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             attempts++;
 
             // 既存の部屋をランダムに選択
-            Vector2Int baseRoomPos =
-                roomPositions[
-                    Random.Range(0, roomPositions.Count)
-                ];
+            Vector2Int baseRoomPos = roomPositions[Random.Range(0, roomPositions.Count)];
 
-            List<Vector2Int> directions =
-                GetShuffledDirections();
+            List<Vector2Int> directions = GetShuffledDirections();
 
             bool generated = false;
 
             foreach (Vector2Int dir in directions)
             {
                 // 部屋 → 通路 → 部屋
-                Vector2Int corridorPos =
-                    baseRoomPos + dir;
+                Vector2Int corridorPos = baseRoomPos + dir;
 
-                Vector2Int nextRoomPos =
-                    baseRoomPos + dir * 2;
+                Vector2Int nextRoomPos = baseRoomPos + dir * 2;
 
-                if (!CanPlacePair(
-                    corridorPos,
-                    nextRoomPos))
-                {
-                    continue;
-                }
+                if (!CanPlacePair(corridorPos, nextRoomPos)) continue;
 
-                Quaternion corridorRotation =
-                    GetCorridorRotation(dir);
+                Quaternion corridorRotation = GetCorridorRotation(dir);
 
                 // 通路を配置
-                PlaceChunk(
-                    runner,
-                    corridorPos,
-                    straightCorridorPrefab,
-                    corridorRotation
-                );
+                PlaceChunk(runner, corridorPos, straightCorridorPrefab, corridorRotation);
 
                 corridorPositions.Add(corridorPos);
 
                 // 部屋は4方向に入口があるので回転不要
-                PlaceChunk(
-                    runner,
-                    nextRoomPos,
-                    roomPrefab,
-                    Quaternion.identity
-                );
+                PlaceChunk(runner, nextRoomPos, roomPrefab, Quaternion.identity);
 
                 roomPositions.Add(nextRoomPos);
 
@@ -251,12 +216,6 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             }
         }
 
-        Debug.Log(
-            $"Stage生成完了 : " +
-            $"通常部屋 {createdRoomCount} 個 / " +
-            $"通路 {corridorPositions.Count} 個"
-        );
-
         if (createdRoomCount < targetRoomCount)
         {
             Debug.LogWarning(
@@ -265,8 +224,12 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
             );
         }
 
+        UpdateRoomEntrances();
+
         OnMapGenerated?.Invoke();
     }
+
+    
 
     #endregion
 
@@ -321,6 +284,55 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         );
     }
 
+    private void UpdateRoomEntrances()
+    {
+        foreach (Vector2Int roomPos in roomPositions)
+        {
+            if (!placedChunks.TryGetValue(
+                roomPos, out NetworkObject room))
+            {
+                continue;
+            }
+
+            if (!room.TryGetComponent(
+                out RoomEntranceController controller))
+            {
+                Debug.LogWarning(
+                    $"RoomEntranceControllerがありません : {roomPos}");
+
+                continue;
+            }
+
+            RoomEntranceController.EntranceDirection openDirections =
+                RoomEntranceController.EntranceDirection.None;
+
+            if (corridorPositions.Contains(roomPos + Vector2Int.up))
+            {
+                openDirections |=
+                    RoomEntranceController.EntranceDirection.North;
+            }
+
+            if (corridorPositions.Contains(roomPos + Vector2Int.down))
+            {
+                openDirections |=
+                    RoomEntranceController.EntranceDirection.South;
+            }
+
+            if (corridorPositions.Contains(roomPos + Vector2Int.right))
+            {
+                openDirections |=
+                    RoomEntranceController.EntranceDirection.East;
+            }
+
+            if (corridorPositions.Contains(roomPos + Vector2Int.left))
+            {
+                openDirections |=
+                    RoomEntranceController.EntranceDirection.West;
+            }
+
+            controller.SetOpenDirections(openDirections);
+        }
+    }
     #endregion
 
     #region Rotation

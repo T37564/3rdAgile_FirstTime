@@ -23,12 +23,6 @@ public class CameraWallOcclusion : MonoBehaviour
     {
         if (playerTarget == null)
         {
-            if (showDebug)
-                Debug.LogWarning(
-                    "[WallOcclusion] Player TargetÇ™ñ¢ê›íËÇ≈Ç∑",
-                    this
-                );
-
             RestoreWalls();
             return;
         }
@@ -78,15 +72,6 @@ public class CameraWallOcclusion : MonoBehaviour
 
             if (wall == null)
             {
-                if (showDebug)
-                {
-                    Debug.LogWarning(
-                        $"[WallOcclusion] " +
-                        $"{collider.name} Ç…ìñÇΩÇ¡ÇΩÇ™ " +
-                        "OccludableWallÇ™å©Ç¬Ç©ÇËÇ‹ÇπÇÒ"
-                    );
-                }
-
                 continue;
             }
 
@@ -110,14 +95,6 @@ public class CameraWallOcclusion : MonoBehaviour
             wall.SetVisible(true);
             return true;
         });
-
-        if (showDebug && count > 0)
-        {
-            Debug.Log(
-                $"[WallOcclusion] Hitêî: {count}, " +
-                $"åüèoÇµÇΩï«: {detectedWalls.Count}"
-            );
-        }
     }
 
     private void RestoreWalls()
