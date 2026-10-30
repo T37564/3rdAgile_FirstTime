@@ -212,6 +212,7 @@ MonoBehaviour:
   uiDocument: {fileID: 0}
   scoreUI: {fileID: 0}
   returnButtonUI: {fileID: 0}
+  titleTexture: []
 --- !u!1 &134459758
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,6 +456,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 242815015}
   m_CullTransparentMesh: 1
+--- !u!1001 &377173025
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -25.020401
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00000005137963
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.952342
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70710677
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3516280874466901644, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4289545053865059382, guid: 988902642c4855d4481abc49f035d335, type: 3}
+      propertyPath: m_Name
+      value: SM_woodenbox01
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 988902642c4855d4481abc49f035d335, type: 3}
 --- !u!1 &484507678
 GameObject:
   m_ObjectHideFlags: 0
@@ -1044,7 +1102,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1130362354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1571,9 +1629,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VirtualKeyboardController
   playerInput: {fileID: 784276322}
+  backAction: {fileID: 0}
   uiDocument: {fileID: 1792496928}
   titleButtonController: {fileID: 0}
   uiAssetData: {fileID: 0}
+  seManager: {fileID: 0}
+  titleUI: {fileID: 0}
 --- !u!1 &1799163535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1875,3 +1936,4 @@ SceneRoots:
   - {fileID: 1549724203}
   - {fileID: 1130362357}
   - {fileID: 1799163537}
+  - {fileID: 377173025}
