@@ -26,7 +26,7 @@ public class GuardianController : NetworkBehaviour
     private Vector3 wanderingPoint;
 
     // 徘徊目的地に到着したと判断する距離
-    [SerializeField] private float wanderingArrivalDistance = 1.0f;
+    [SerializeField] private float wanderingArrivalDistance = 0.0f;
 
     public override void Spawned()
     {
@@ -43,11 +43,10 @@ public class GuardianController : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if(!HasStateAuthority) return;
-        //Debug.Log($"[AI開始前] {transform.position}");
+        // 一番近いプレイヤーを探す
         FindNearestPlayer();
 
         PlayerController playerController = currentPlayer?.GetComponent<PlayerController>();
-
 
         if (playerController == null)
         {
@@ -61,10 +60,14 @@ public class GuardianController : NetworkBehaviour
         }
         else
         {
+            // プレイヤーがスタートエリア外にいる場合、追跡を中断しない
             ChaseState();
         }
     }
 
+    /// <summary>
+    /// 徘徊状態に移行するメソッド
+    /// </summary>
     private void WanderingState()
     {
         // NavMeshAgentがNavMesh上にあるかどうかを確認
@@ -81,6 +84,7 @@ public class GuardianController : NetworkBehaviour
         {
             isWandering = true;
 
+            // 徘徊時に向かう目的地を更新
             wanderingPoint = guardianWanderingArea.GetRandomPoint();
 
             // NavMeshAgentの目的地を設定
@@ -89,6 +93,7 @@ public class GuardianController : NetworkBehaviour
             return;
         }
 
+        // 徘徊目的地に到着したかどうかを確認
         if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance<= wanderingArrivalDistance)
         {
             wanderingPoint = guardianWanderingArea.GetRandomPoint();
@@ -97,6 +102,9 @@ public class GuardianController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// 指定したプレイヤーを追跡するメソッド
+    /// </summary>
     private void ChaseState()
     {
         isWandering = false;
@@ -117,6 +125,8 @@ public class GuardianController : NetworkBehaviour
             targetPos.y = transform.position.y;
 
             navMeshAgent.isStopped = false;
+
+            // 指定した目標に向かって移動する
             navMeshAgent.SetDestination(targetPos);
         }
         else
@@ -126,7 +136,7 @@ public class GuardianController : NetworkBehaviour
     }
 
     /// <summary>
-    /// プレイヤーの中で一番近いプレイヤーを追いかけるメソッド
+    /// プレイヤーの中で一番近いプレイヤーを設定するメソッド
     /// </summary>
     private void FindNearestPlayer()
     {
