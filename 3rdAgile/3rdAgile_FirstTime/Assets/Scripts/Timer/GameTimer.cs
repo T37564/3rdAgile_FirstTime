@@ -21,6 +21,7 @@ public class GamePhaseTime
 /// </summary>
 public class GameTimer : NetworkBehaviour
 {
+
     // ゲームのフェーズが変わるときに呼び出されるイベント
     public event Action<GamePhase> OnPhaseChanged;
     // タイムアップになったときに呼び出されるイベント
@@ -73,15 +74,12 @@ public class GameTimer : NetworkBehaviour
     {
         isSpawned = true;
 
-        // StateAuthorityを持っているクライアントがタイマーを初期化する
         if (Object.HasStateAuthority)
         {
-            GameTimerTick = TickTimer.CreateFromSeconds(Runner, totalTime);
-            isStartedTimer = true;
+            isStartedTimer = false;
             CurrentPhase = GamePhase.Phase1;
         }
 
-        // フェーズの初期値をpreviousPhaseに設定しておく
         previousPhase = CurrentPhase;
     }
 
@@ -110,26 +108,30 @@ public class GameTimer : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        // StateAuthorityを持っているクライアントがタイマーの更新を行う
+        // StateAuthorityを持っているクライアントのみ処理
         if (!Object.HasStateAuthority) return;
 
-        // タイマーが終了している場合はフェーズをFinishedに設定して終了
-        if (isStartedTimer && GameTimerTick.Expired(Runner))
+        // カウントダウンが終了するまで待機
+        if (!CountDownUI.isCountDownFinished) return;
+
+        // ゲームタイマーが未開始なら開始する
+        if (!isStartedTimer)
+        {
+            GameTimerTick = TickTimer.CreateFromSeconds(Runner, totalTime);
+            isStartedTimer = true;
+        }
+
+        // 制限時間が終了したらゲームを終了する
+        if (GameTimerTick.Expired(Runner))
         {
             CurrentPhase = GamePhase.Finished;
-
             return;
         }
 
-        // 経過時間を計算して、現在のフェーズを更新する
-
+        // 経過時間から現在のフェーズを更新
         float elapsedTime = totalTime - RemainingTime;
-
         GamePhase newPhase = GetPhaseByElapsedTime(elapsedTime);
 
-        //CurrentPhase = newPhase;
-
-        // フェーズが変わったときにイベントを呼び出すために、CurrentPhaseを更新する前に比較用の変数と比較して、フェーズが変わったときにイベントを呼び出す
         CurrentPhase = newPhase;
     }
 

@@ -23,6 +23,10 @@ public class CountDownUI : MonoBehaviour
     // 使用するフォントのサイズ
     private readonly float START_MESSAGE_FONT_SIZE = 100.0f;
 
+    // カウントダウンが終了したかどうかのフラグ
+    public static bool isCountDownFinished = false;
+
+    public static event System.Action OnCountDownFinished;
 
     [Header("カウントダウン時に使用するテキスト")]
     [SerializeField] private TextMeshProUGUI countText = null;
@@ -63,5 +67,9 @@ public class CountDownUI : MonoBehaviour
         yield return new WaitForSeconds(START_MESSAGE_DURATION_SECONDS);
         countText.DOFade(0.0f, START_MESSAGE_DURATION_SECONDS);
         countDownBackImage.DOFade(0.0f, START_MESSAGE_DURATION_SECONDS);
+
+        // カウントダウン終了フラグを立てる
+        isCountDownFinished = true;
+        OnCountDownFinished?.Invoke();
     }
 }
