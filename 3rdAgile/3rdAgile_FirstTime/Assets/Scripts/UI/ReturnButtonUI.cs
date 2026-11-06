@@ -86,14 +86,19 @@ public class ReturnButtonUI : NetworkBehaviour
     /// </summary>
     private void OnDisable()
     {
-        hostButton.clicked -= HostClickedRoomDisband;
-        clientButton.clicked -= ClientClickedLeaveRoom;
+        if (hostButton != null)
+        {
+            hostButton.clicked -= HostClickedRoomDisband;
+            hostButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
+            hostButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        }
 
-        // マウスが入った＆出たを登録解除
-        hostButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
-        hostButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
-        clientButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
-        clientButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        if (clientButton != null)
+        {
+            clientButton.clicked -= ClientClickedLeaveRoom;
+            clientButton.UnregisterCallback<MouseEnterEvent>(OnMouseEnter);
+            clientButton.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        }
     }
 
     /// <summary>
