@@ -1,6 +1,7 @@
 using Fusion;
 using Network.Player;
 using System.Collections.Generic;
+using Unity.Multiplayer.PlayMode;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -227,9 +228,10 @@ public class AttackAction : NetworkBehaviour
 
         // 攻撃範囲オブジェクトを表示して攻撃範囲を可視化する
         RpcSetVisibleAttackRange(true);
-
+        Vector3 targetPos = guardianController.currentPlayer.position;
+        targetPos.y = transform.position.y;
         // 攻撃のターゲットにしているプレイヤーの方を見る
-        transform.LookAt(guardianController.currentPlayer);
+        transform.LookAt(targetPos);
 
         isMoveNetworked = false;
         isIdleNetworked = true;
