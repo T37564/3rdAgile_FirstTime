@@ -31,7 +31,8 @@ public class ScoreUI : MonoBehaviour
         // MoneyManager‚ªæ“¾‚Å‚«‚Ä‚¢‚È‚¢ê‡‚Íˆ—‚µ‚È‚¢
         if (moneyManager == null) return;
 
-
+        uiDocument.rootVisualElement.Clear();
+        scoreUI.CloneTree(uiDocument.rootVisualElement);
         // UIDocument‚Ìƒ‹[ƒg—v‘f‚ğæ“¾
         VisualElement root = uiDocument.rootVisualElement;
         // UXML“à‚©‚çLabel "Score" ‚ğæ“¾
