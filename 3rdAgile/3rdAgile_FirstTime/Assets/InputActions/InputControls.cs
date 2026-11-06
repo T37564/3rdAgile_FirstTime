@@ -154,6 +154,15 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Hold"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraPosition"",
+                    ""type"": ""Button"",
+                    ""id"": ""4f574331-c93a-49b4-bd5f-9757f28816f1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -352,6 +361,28 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ItemDroped"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bbaa4ea8-896c-4a6d-aa4a-09ad00980002"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b0255d14-8342-4980-adc1-46e2f5c7d32b"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -909,6 +940,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_ItemPicked = m_Player.FindAction("ItemPicked", throwIfNotFound: true);
         m_Player_ItemDroped = m_Player.FindAction("ItemDroped", throwIfNotFound: true);
+        m_Player_CameraPosition = m_Player.FindAction("CameraPosition", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1008,6 +1040,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_ItemPicked;
     private readonly InputAction m_Player_ItemDroped;
+    private readonly InputAction m_Player_CameraPosition;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1047,6 +1080,10 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ItemDroped".
         /// </summary>
         public InputAction @ItemDroped => m_Wrapper.m_Player_ItemDroped;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CameraPosition".
+        /// </summary>
+        public InputAction @CameraPosition => m_Wrapper.m_Player_CameraPosition;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1094,6 +1131,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @ItemDroped.started += instance.OnItemDroped;
             @ItemDroped.performed += instance.OnItemDroped;
             @ItemDroped.canceled += instance.OnItemDroped;
+            @CameraPosition.started += instance.OnCameraPosition;
+            @CameraPosition.performed += instance.OnCameraPosition;
+            @CameraPosition.canceled += instance.OnCameraPosition;
         }
 
         /// <summary>
@@ -1126,6 +1166,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @ItemDroped.started -= instance.OnItemDroped;
             @ItemDroped.performed -= instance.OnItemDroped;
             @ItemDroped.canceled -= instance.OnItemDroped;
+            @CameraPosition.started -= instance.OnCameraPosition;
+            @CameraPosition.performed -= instance.OnCameraPosition;
+            @CameraPosition.canceled -= instance.OnCameraPosition;
         }
 
         /// <summary>
@@ -1399,6 +1442,13 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnItemDroped(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CameraPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCameraPosition(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -10,10 +10,11 @@ namespace Network.Player
     public struct PlayerInputData : INetworkInput
     {
         public Vector2 move;
-        //public NetworkBool tryPick;
 
-        public NetworkBool tryInteract;
+        // ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©
+        public NetworkBool interactPressed;
 
-        public NetworkBool tryDrop;
+        // ’·‰Ÿ‚µ‚ª¬—§‚µ‚Ä‚¢‚é‚©
+        public NetworkBool interactHeld;
     }
 }

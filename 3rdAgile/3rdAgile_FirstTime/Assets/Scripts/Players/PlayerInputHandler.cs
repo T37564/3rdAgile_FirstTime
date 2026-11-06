@@ -20,6 +20,9 @@ namespace Network.Player
 
         // プレイヤーの移動入力を保存するための変数
         private Vector2 moveInput = Vector2.zero;
+        private bool hasItem = false;
+        private bool interactPressed = false;
+        private bool interactHeld = false;
 
         // 拾う入力
         private bool interactHoldCompleted = false;
@@ -76,6 +79,7 @@ namespace Network.Player
             playerInput.actions["ItemPicked"].performed += OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled += OnInteractCanceled;
 
+            playerInput.actions["ItemPicked"].started += OnInteractStarted;
             playerInput.actions["ItemDroped"].performed += OnItemDropedPerformed;
             playerInput.actions["ItemDroped"].canceled += OnItemDropedCanceled;
         }
@@ -90,11 +94,12 @@ namespace Network.Player
             playerInput.actions["Move"].performed -= OnMove;
             playerInput.actions["Move"].canceled -= OnMove;
 
+            playerInput.actions["ItemPicked"].started -= OnInteractStarted;
             playerInput.actions["ItemPicked"].performed -= OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled -= OnInteractCanceled;
 
-            playerInput.actions["ItemDroped"].performed -= OnItemDropedPerformed;
-            playerInput.actions["ItemDroped"].canceled -= OnItemDropedCanceled;
+            //playerInput.actions["ItemDroped"].performed -= OnItemDropedPerformed;
+            //playerInput.actions["ItemDroped"].canceled -= OnItemDropedCanceled;
         }
         #endregion
 
@@ -110,13 +115,19 @@ namespace Network.Player
         #endregion
 
         #region アイテムを拾う等Aボタン長押し処理
+        public void OnInteractStarted(InputAction.CallbackContext context)
+        {
+            interactPressed = true;
+            interactHeld = false;
+        }
+
         /// <summary>
         /// ボタンの長押し入力が成立したタイミングで発火
         /// </summary>
         public void OnInteractPerformed(InputAction.CallbackContext context)
         {
             // 長押し成立フラグを立てる
-            interactHoldCompleted = true;
+            interactHeld = true;
         }
 
         /// <summary>
@@ -124,14 +135,8 @@ namespace Network.Player
         /// </summary>
         public void OnInteractCanceled(InputAction.CallbackContext context)
         {
-            // 長押し入力が成立していなかったら何もせずメソッドから抜ける
-            if (!interactHoldCompleted) return;
-
-            //成立したとホストに通知するためのbool値をtrueで保存
-            interactTriggered = true;
-
-            // ボタンが離されたので再度長押し判定をとれるようにfalseに
-            interactHoldCompleted = false;
+            interactPressed = false;
+            interactHeld = false;
         }
         #endregion
 
@@ -161,16 +166,12 @@ namespace Network.Player
         /// </summary>
         public PlayerInputData GetInput()
         {
-            PlayerInputData data = new PlayerInputData
+            return new PlayerInputData
             {
                 move = moveInput,
-                tryInteract = interactTriggered,
-                tryDrop = dropTriggered
+                interactPressed = interactPressed,
+                interactHeld = interactHeld
             };
-
-            interactTriggered = false;
-            dropTriggered = false;
-            return data;
         }
 
         /// <summary>

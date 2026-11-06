@@ -48,6 +48,9 @@ namespace Network.Player
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
 
+        [Networked] public NetworkBool PreviousInteractPressed { get; set; }
+        [Networked] public NetworkBool PreviousInteractHeld { get; set; }
+
         [Networked] public NetworkBool IsAlive { get; set; }
         #endregion
 
@@ -165,22 +168,31 @@ namespace Network.Player
 
             if (!Object.HasStateAuthority) return;
 
+            // 入力状態の変化を検出
+            bool justPressed =
+                input.interactPressed && !PreviousInteractPressed;
+
+            bool justHeld =
+                input.interactHeld && !PreviousInteractHeld;
+
+            // 前回の入力状態を更新
+            PreviousInteractPressed = input.interactPressed;
+            PreviousInteractHeld = input.interactHeld;
+
             // 死亡中は移動やインタラクトを受け付けない
-            if (IsAlive)
+            if (!IsAlive) return;
+
+            // 移動処理
+            Move(input.move);
+
+            // インタラクト処理
+            if (justPressed && IsHoldingItem)
             {
-                // 移動処理
-                Move(input.move);
-
-                // インタラクト処理
-                if (input.tryInteract)
-                {
-                    TryInteract();
-                }
-
-                if (input.tryDrop)
-                {
-                    TryDropItem();
-                }
+                TryDropItem();
+            }
+            else if (justHeld && !IsHoldingItem)
+            {
+                TryInteract();
             }
         }
 
@@ -212,7 +224,7 @@ namespace Network.Player
 
             float speed = IsHoldingItem
                 ? carryingMoveSpeed
-                : moveSpeed; 
+                : moveSpeed;
 
             Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
 
@@ -340,7 +352,7 @@ namespace Network.Player
         {
             if (prevAlive && !IsAlive)
             {
-                animator.SetBool("IsDeath",true);
+                animator.SetBool("IsDeath", true);
                 OnPlayerDied?.Invoke();
             }
 
