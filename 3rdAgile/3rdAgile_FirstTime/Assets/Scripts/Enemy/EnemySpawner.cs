@@ -105,10 +105,6 @@ public class EnemySpawner : MonoBehaviour
                 NavMeshAgent agent = spawnedEnemy.GetComponent<NavMeshAgent>();
                 if (agent != null)
                 {
-                    Debug.Log(
-                        $"Spawn直後: {spawnedEnemy.transform.position}"
-                    );
-
                     if (NavMesh.SamplePosition(spawnedEnemy. transform. position, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
                     {
                         agent.Warp(hit.position);

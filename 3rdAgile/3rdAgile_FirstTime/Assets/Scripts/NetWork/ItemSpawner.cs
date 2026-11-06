@@ -67,7 +67,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// </summary>
     private void SpawnItems(GamePhase phase,NetworkRunner runner)
     {
-        Debug.Log($"SpawnItems 呼び出し Phase={phase}");
         // フェーズごとに出現させるアイテムの数を取得
         int spawnCount = itemObjectPlace.GetSpawnCount(phase);
 
@@ -95,7 +94,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
                     // アイテムにRegenerationCallOutがついていたら、再配置要求イベントを登録する
                     if (regenerationCallOut != null)
                     {
-                        Debug.Log("再配置を要求");
                         regenerationCallOut.OnNeedRegenerate += HandleNeedRegenerate;
                     }
                 });
@@ -183,8 +181,6 @@ public class ItemSpawner : MonoBehaviour, INetworkRunnerCallbacks
         
         if (data == null) return;
         
-        Debug.Log(obj.name + " に " + data.name + " を設定");
-
         // アイテムの情報をセットする
         storage.SetData(data);
     }
