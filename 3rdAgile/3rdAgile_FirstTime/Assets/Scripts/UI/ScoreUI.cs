@@ -31,13 +31,10 @@ public class ScoreUI : MonoBehaviour
         // MoneyManagerが取得できていない場合は処理しない
         if (moneyManager == null) return;
 
-        // ScoreUIに変更
         uiDocument.rootVisualElement.Clear();
         scoreUI.CloneTree(uiDocument.rootVisualElement);
-
         // UIDocumentのルート要素を取得
         VisualElement root = uiDocument.rootVisualElement;
-
         // UXML内からLabel "Score" を取得
         Label scoreLabel = root.Q<Label>("Score");
 

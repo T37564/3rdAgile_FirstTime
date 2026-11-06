@@ -5003,9 +5003,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e567f0cd10943b8488959947c5fe1a76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemInteractable
+  carriers: []
+  _carriersItem: []
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}
+  isCarrying: 0
+  _IsHaveItem:
+    _value: 0
   _IsHelpPeople:
     _value: 0
 --- !u!54 &2142278982236377383
@@ -5105,3 +5110,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Item
   itemUINameData: {fileID: 11400000, guid: 00f250f818e79ec45a2943623753e9e7, type: 2}
+  sampleMasterData: {fileID: 11400000, guid: f3966eaea876f70459dcbc469fc004f2, type: 2}

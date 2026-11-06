@@ -34,6 +34,9 @@ public class CountDownUI : MonoBehaviour
     [Header("カウントダウン時に使用する背景")]
     [SerializeField] private Image countDownBackImage = null;
 
+    [Header("カウントダウン時に使用する背景")]
+    [SerializeField] private GameObject countDownCanvas = null;
+
     /// <summary>
     /// カウントダウン開始処理
     /// </summary>
@@ -67,6 +70,8 @@ public class CountDownUI : MonoBehaviour
         yield return new WaitForSeconds(START_MESSAGE_DURATION_SECONDS);
         countText.DOFade(0.0f, START_MESSAGE_DURATION_SECONDS);
         countDownBackImage.DOFade(0.0f, START_MESSAGE_DURATION_SECONDS);
+
+        countDownCanvas.SetActive(false);
 
         // カウントダウン終了フラグを立てる
         isCountDownFinished = true;

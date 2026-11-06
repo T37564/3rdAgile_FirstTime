@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static Unity.Collections.Unicode;
 
 public class PlayerActionUI : MonoBehaviour
 {
@@ -53,7 +54,8 @@ public class PlayerActionUI : MonoBehaviour
     // アイテムの運搬人数参照用
     private ItemInteractable itemInteractable = null;
 
-    //private bool isCarryingItemExited = false;
+    // ゲーム参加人数を保持する変数
+    private int numberOfParticipants = 0;
 
     /// <summary>
     /// 参照用プレイヤーコントローラー取得、UIの初期化
@@ -75,6 +77,11 @@ public class PlayerActionUI : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+
+        NetworkRunner runner = NetworkGameStarter.Instance.networkRunner;
+
+        if (runner == null) return;
+        numberOfParticipants = runner.ActivePlayers.Count();
     }
 
     /// <summary>
@@ -181,7 +188,18 @@ public class PlayerActionUI : MonoBehaviour
         {
             // アイテムの金額と運搬人数をUIに反映する
             itemPriceText.text = itemData.ItemData.ItemPrice;
-            itemTransportCountText.text = "<color=#FF0000>" + itemInteractable.carriersItem.Count + "</color>" + "/" + itemData.ItemData.ItemTransportCount;
+
+            // 伝説の宝箱だった場合
+            if (itemData.SampleMasterData != null && itemData.SampleMasterData.id == 16)
+            {
+                // 表示人数を部屋にいる人数にする
+                itemTransportCountText.text = "<color=#FF0000>" + itemInteractable.carriersItem.Count + "</color>" + "/" + numberOfParticipants;
+
+            }
+            else
+            {
+                itemTransportCountText.text = "<color=#FF0000>" + itemInteractable.carriersItem.Count + "</color>" + "/" + itemData.ItemData.ItemTransportCount;
+            }
         }
 
         // 「拾う」テキストを表示、非表示にする

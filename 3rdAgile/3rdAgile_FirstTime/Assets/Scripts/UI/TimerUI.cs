@@ -52,6 +52,6 @@ public class TimerUI : MonoBehaviour
         int seconds = Mathf.FloorToInt(time % 60);
 
         // 00:00Œ`Ž®‚ÅUI‚É•\Ž¦
-        timerLabel.text = $"{minutes:00}:{seconds:00}";
+        timerLabel.text = $"{minutes}:{seconds:00}";
     }
 }
