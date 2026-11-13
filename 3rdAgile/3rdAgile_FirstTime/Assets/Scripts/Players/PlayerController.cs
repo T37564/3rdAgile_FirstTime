@@ -45,6 +45,9 @@ namespace Network.Player
         [Header("アイテムを持っているときの最大距離")]
         [SerializeField] private float maxCarryDistance = 1.0f;
 
+        [Header("FPS視点のマウス感度")]
+        [SerializeField] private float mouseSensitivity = 0.1f;
+
         #region ネットワーク共有変数
         [Networked] public NetworkBool IsHoldingItem { get; set; }
 
@@ -169,11 +172,9 @@ namespace Network.Player
             if (!Object.HasStateAuthority) return;
 
             // 入力状態の変化を検出
-            bool justPressed =
-                input.interactPressed && !PreviousInteractPressed;
+            bool justPressed = input.interactPressed && !PreviousInteractPressed;
 
-            bool justHeld =
-                input.interactHeld && !PreviousInteractHeld;
+            bool justHeld = input.interactHeld && !PreviousInteractHeld;
 
             // 前回の入力状態を更新
             PreviousInteractPressed = input.interactPressed;
@@ -182,8 +183,13 @@ namespace Network.Player
             // 死亡中は移動やインタラクトを受け付けない
             if (!IsAlive) return;
 
+            if (input.isFPS)
+            {
+                RotateFPS(input.lookX);
+            }
+
             // 移動処理
-            Move(input.move);
+            Move(input.move, input.isFPS);
 
             // インタラクト処理
             if (justPressed && IsHoldingItem)
@@ -213,34 +219,17 @@ namespace Network.Player
         /// <summary>
         /// 受け取ったVector2型を使って移動
         /// </summary>
-        private void Move(Vector2 moveInput)
+        private void Move(Vector2 moveInput, bool isFPS)
         {
-            Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
+            Vector3 move = CalculateMoveDirection(moveInput, isFPS);
 
-            if (move.sqrMagnitude > 1f)
-            {
-                move.Normalize();
-            }
 
-            float speed = IsHoldingItem
-                ? carryingMoveSpeed
-                : moveSpeed;
+            float speed = IsHoldingItem ? carryingMoveSpeed : moveSpeed;
 
             Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
 
             if (IsHoldingItem && holdingItem != null)
             {
-                //Vector3 direction = holdingItem.Transform.position - transform.position;
-
-                //direction.y = 0f;
-
-                //if (direction.sqrMagnitude > 0.01f)
-                //{
-                //    currentAngle = Quaternion.LookRotation(direction);
-
-                //    transform.rotation = currentAngle;
-                //}
-
                 Vector3 itemPosition = holdingItem.Transform.position;
 
                 Vector3 offset = nextPosition - itemPosition;
@@ -254,7 +243,7 @@ namespace Network.Player
                     nextPosition.z = itemPosition.z + offset.z;
                 }
             }
-            else if (move.sqrMagnitude > 0.01f)
+            else if (!isFPS &&move.sqrMagnitude > 0.01f)
             {
                 currentAngle = Quaternion.LookRotation(move);
 
@@ -264,6 +253,23 @@ namespace Network.Player
             transform.position = nextPosition;
 
             UpdateAnimation(moveInput);
+        }
+
+        private Vector3 CalculateMoveDirection(Vector2 input, bool isFPS)
+        {
+            if (isFPS)
+            {
+                return transform.forward * input.y + transform.right * input.x;
+            }
+
+            return new Vector3(input.x, 0f, input.y);
+        }
+
+        private void RotateFPS(float lookX)
+        {
+            float yaw = lookX * mouseSensitivity;
+
+            transform.Rotate(0.0f, yaw, 0.0f);
         }
 
         /// <summary>
@@ -308,8 +314,7 @@ namespace Network.Player
 
                 if (interactable.Transform == transform) continue;
 
-                float sqrDistance =
-                    (interactable.Transform.position - transform.position).sqrMagnitude;
+                float sqrDistance = (interactable.Transform.position - transform.position).sqrMagnitude;
 
                 if (sqrDistance < minSqrDistance)
                 {
@@ -324,6 +329,7 @@ namespace Network.Player
         public void SetHoldingItem(ItemInteractable item)
         {
             if (!Object.HasStateAuthority) return;
+
             holdingItem = item;
             IsHoldingItem = true;
         }
@@ -331,6 +337,7 @@ namespace Network.Player
         {
             if (!Object.HasStateAuthority) return;
             if (holdingItem != item) return;
+            
             holdingItem = null;
             IsHoldingItem = false;
         }

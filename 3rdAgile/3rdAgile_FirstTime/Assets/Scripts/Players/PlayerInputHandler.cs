@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 using System.Collections.Generic;
 
 namespace Network.Player
@@ -20,17 +21,14 @@ namespace Network.Player
 
         // プレイヤーの移動入力を保存するための変数
         private Vector2 moveInput = Vector2.zero;
-        private bool hasItem = false;
         private bool interactPressed = false;
         private bool interactHeld = false;
 
-        // 拾う入力
-        private bool interactHoldCompleted = false;
-        private bool interactTriggered = false;
+        private Vector2 lookInput;
+        public Vector2 LookInput => lookInput;
+        private bool isFPS = false;
 
-        // 離す入力
-        private bool dropHoldCompleted = false;
-        private bool dropTriggered = false;
+        private float accumulatedLookX = 0f;
 
         // プレイヤーがインタラクト可能なオブジェクトを保存するリスト
         private List<IInteractable> interactables = new List<IInteractable>();
@@ -41,8 +39,9 @@ namespace Network.Player
 
         public string tagName = "";
 
-        // アイテムを拾う等の長押し入力が成立したかどうかを保存するための変数
-        private bool picked = false;
+        public event Action OnViewSwitch;
+
+        [SerializeField] private Transform cameraTransform;
 
         /// <summary>
         /// 初期化
@@ -65,6 +64,11 @@ namespace Network.Player
             CountDownUI.OnCountDownFinished -= HandleCountDownFinished;
         }
 
+        public void SetCamera(Transform cameraTarget)
+        {
+            cameraTransform = cameraTarget;
+        }
+
         #region イベント登録と解除
         /// <summary>
         /// イベント登録
@@ -76,12 +80,14 @@ namespace Network.Player
             playerInput.actions["Move"].performed += OnMove;
             playerInput.actions["Move"].canceled += OnMove;
 
+            playerInput.actions["ItemPicked"].started += OnInteractStarted;
             playerInput.actions["ItemPicked"].performed += OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled += OnInteractCanceled;
+            
+            playerInput.actions["Look"].performed += OnLook;
+            playerInput.actions["Look"].canceled += OnLook;
 
-            playerInput.actions["ItemPicked"].started += OnInteractStarted;
-            playerInput.actions["ItemDroped"].performed += OnItemDropedPerformed;
-            playerInput.actions["ItemDroped"].canceled += OnItemDropedCanceled;
+            playerInput.actions["CameraPosition"].performed += OnViewChange;
         }
 
         /// <summary>
@@ -97,9 +103,11 @@ namespace Network.Player
             playerInput.actions["ItemPicked"].started -= OnInteractStarted;
             playerInput.actions["ItemPicked"].performed -= OnInteractPerformed;
             playerInput.actions["ItemPicked"].canceled -= OnInteractCanceled;
+            
+            playerInput.actions["Look"].performed -= OnLook;
+            playerInput.actions["Look"].canceled -= OnLook;
 
-            //playerInput.actions["ItemDroped"].performed -= OnItemDropedPerformed;
-            //playerInput.actions["ItemDroped"].canceled -= OnItemDropedCanceled;
+            playerInput.actions["CameraPosition"].performed -= OnViewChange;
         }
         #endregion
 
@@ -140,38 +148,51 @@ namespace Network.Player
         }
         #endregion
 
-        #region アイテムを離す
-        /// <summary>
-        /// 長押しが成立したら発火
-        /// </summary>
-        public void OnItemDropedPerformed(InputAction.CallbackContext context)
+        #region プレイヤーの視点を切り替える入力
+        public void SetViewMode(bool fps)
         {
-            dropHoldCompleted = true;
-            Debug.Log("成立！");
+            isFPS = fps;
+
+            if (!isFPS)
+            {
+                lookInput = Vector2.zero;
+                accumulatedLookX = 0f;
+            }
         }
 
-        /// <summary>
-        /// 長押し入力がキャンセルされたら発火
-        /// </summary>
-        public void OnItemDropedCanceled(InputAction.CallbackContext context)
+        public void OnViewChange(InputAction.CallbackContext context)
         {
-            if (!dropHoldCompleted) return;
-            dropTriggered = true;
-            dropHoldCompleted = false;
+            // 視点切り替えの処理をここに追加
+            OnViewSwitch?.Invoke();
         }
         #endregion
+
+        private void OnLook(InputAction.CallbackContext context)
+        {
+            lookInput = context.ReadValue<Vector2>();
+
+            if (!isFPS) return;
+
+            accumulatedLookX += lookInput.x;
+        }
 
         /// <summary>
         /// 保存した情報を入力構造体に渡す
         /// </summary>
         public PlayerInputData GetInput()
         {
-            return new PlayerInputData
+            PlayerInputData data = new PlayerInputData
             {
                 move = moveInput,
                 interactPressed = interactPressed,
-                interactHeld = interactHeld
+                interactHeld = interactHeld,
+                isFPS = isFPS,
+                lookX = accumulatedLookX
             };
+
+            accumulatedLookX = 0f;
+
+            return data;
         }
 
         /// <summary>
