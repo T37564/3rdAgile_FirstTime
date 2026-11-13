@@ -82,6 +82,15 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
 
+        // 運搬中の処理
+        if (isCarrying)
+        {
+            //if(itemDataStorage. && this.gameObject.name == "MimicChest")
+            //{
+            //    Debug.Log("宝箱を拾った");
+            //}
+        }
+
         PlayPickupSE(player.Object.InputAuthority);
 
         if (CanCarry())
