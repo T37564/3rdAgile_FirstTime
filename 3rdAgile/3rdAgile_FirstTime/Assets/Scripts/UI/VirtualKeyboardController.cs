@@ -263,6 +263,8 @@ public class VirtualKeyboardController : MonoBehaviour
     {
         // クリックされたボタンの表示文字を取得
         string text = keys[index].text;
+        // 指定された数字をハイライトにする処理
+        StartCoroutine(Highlight(index));
 
         // ボタンの種類に応じて処理を分岐
         if (text == "消")
@@ -280,9 +282,6 @@ public class VirtualKeyboardController : MonoBehaviour
             // 入力した数字を追加する
             AddNumericalInputFromKeyboard(int.Parse(text));
         }
-
-        // 指定された数字をハイライトにする処理
-        StartCoroutine(Highlight(index));
     }
 
     /// <summary>
