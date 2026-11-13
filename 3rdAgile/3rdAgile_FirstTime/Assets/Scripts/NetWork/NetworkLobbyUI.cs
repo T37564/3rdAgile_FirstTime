@@ -77,7 +77,7 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
         int count = runner.ActivePlayers.Count();
 
         // プレイヤー人数表示を更新
-        lobbyUI.playerCount.text = $"参加人数：{count}/{MAX_PLAYER_COUNT}";
+        lobbyUI.playerCount.text = $"{count}/{MAX_PLAYER_COUNT}";
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer)
         {
             // ルームの暗証番号を表示
-            lobbyUI.roomPIN.text = $"ルーム暗証番号：{runner.SessionInfo.Name}";
+            lobbyUI.roomPIN.text = $"{runner.SessionInfo.Name}";
             // ゲーム開始ボタンを表示
             lobbyUI.gameStartButton.style.display = DisplayStyle.Flex;
         }
