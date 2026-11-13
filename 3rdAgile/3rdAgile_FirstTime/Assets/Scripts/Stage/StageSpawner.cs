@@ -55,16 +55,11 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private bool showChunkGizmos = true;
 
-    [SerializeField]
-    private Color roomGizmoColor =
-        new Color(0f, 0.8f, 1f, 1f);
+    [SerializeField] private Color roomGizmoColor = new Color(0f, 0.8f, 1f, 1f);
 
-    [SerializeField]
-    private Color corridorGizmoColor =
-        new Color(0f, 1f, 0.4f, 1f);
+    [SerializeField] private Color corridorGizmoColor = new Color(0f, 1f, 0.4f, 1f);
 
-    private readonly Dictionary<Vector2Int, NetworkObject>
-        placedChunks = new();
+    private readonly Dictionary<Vector2Int, NetworkObject> placedChunks = new();
 
     private readonly List<Vector2Int> roomPositions = new();
 
@@ -109,13 +104,19 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         // ステージ生成はサーバーのみ
-        if (!runner.IsServer)
-            return;
+        if (!runner.IsServer) return;
 
-        if (!ValidateSettings())
-            return;
+        if (!ValidateSettings()) return;
 
-        Generate(runner);
+        DungeonMapSync? mapSync = FindAnyObjectByType<DungeonMapSync>();
+
+        if (mapSync == null)
+        {
+            Debug.LogError("DungeonMapSyncが見つかりません。");
+            return;
+        }
+
+        Generate(runner, mapSync);
 
         BuildNavMesh();
     }
@@ -149,7 +150,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return true;
     }
 
-    private void Generate(NetworkRunner runner)
+    private void Generate(NetworkRunner runner, DungeonMapSync mapSync)
     {
         placedChunks.Clear();
         roomPositions.Clear();
@@ -226,10 +227,33 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         UpdateRoomEntrances();
 
+        List<MapChunkData> mapData = CreateMapData();
+
+        mapSync.SetMapData(mapData);
+
         OnMapGenerated?.Invoke();
     }
 
-    
+    #region Map Data
+    private List<MapChunkData> CreateMapData()
+    {
+        List<MapChunkData> data = new();
+
+        foreach (Vector2Int position in roomPositions)
+        {
+            MapChunkType type = position == Vector2Int.zero ? MapChunkType.StartRoom : MapChunkType.Room;
+
+            data.Add(new MapChunkData(position.x, position.y, type));
+        }
+
+        foreach (Vector2Int position in corridorPositions)
+        {
+            data.Add(new MapChunkData(position.x, position.y, MapChunkType.Corridor));
+        }
+
+        return data;
+    }
+    #endregion
 
     #endregion
 
