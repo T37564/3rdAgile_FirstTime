@@ -83,12 +83,12 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         Debug.Log(player.name + " が持った");
 
         // 運搬中の処理
-        if (isCarrying)
+        // GetString()の中の文字はKeyに入力している文字と同じ文字を入力し、アイテムを指定するときはValueの文字を指定する
+        if (itemDataStorage.sampleMasterData.GetString("Name") == "SmallChest" || 
+            itemDataStorage.sampleMasterData.GetString("Name") == "MimicChest" ||
+            itemDataStorage.sampleMasterData.GetString("Name") == "LegendaryChest")
         {
-            //if(itemDataStorage. && this.gameObject.name == "MimicChest")
-            //{
-            //    Debug.Log("宝箱を拾った");
-            //}
+            Debug.Log("宝箱を拾った");
         }
 
         PlayPickupSE(player.Object.InputAuthority);
