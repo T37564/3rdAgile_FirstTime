@@ -172,11 +172,9 @@ namespace Network.Player
             if (!Object.HasStateAuthority) return;
 
             // 入力状態の変化を検出
-            bool justPressed =
-                input.interactPressed && !PreviousInteractPressed;
+            bool justPressed = input.interactPressed && !PreviousInteractPressed;
 
-            bool justHeld =
-                input.interactHeld && !PreviousInteractHeld;
+            bool justHeld = input.interactHeld && !PreviousInteractHeld;
 
             // 前回の入力状態を更新
             PreviousInteractPressed = input.interactPressed;
@@ -274,19 +272,6 @@ namespace Network.Player
             transform.Rotate(0.0f, yaw, 0.0f);
         }
 
-        private Vector3 CalculateTPSMovement(Vector2 input)
-        {
-            return new Vector3(input.x, 0f, input.y);
-        }
-
-        private Vector3 CalculateFPSMovement(Vector2 input)
-        {
-            Vector3 forward = transform.forward;
-            Vector3 right = transform.right;
-
-            return forward * input.y + right * input.x;
-        }
-
         /// <summary>
         /// インタラクト処理
         /// </summary>
@@ -329,8 +314,7 @@ namespace Network.Player
 
                 if (interactable.Transform == transform) continue;
 
-                float sqrDistance =
-                    (interactable.Transform.position - transform.position).sqrMagnitude;
+                float sqrDistance = (interactable.Transform.position - transform.position).sqrMagnitude;
 
                 if (sqrDistance < minSqrDistance)
                 {
@@ -345,6 +329,7 @@ namespace Network.Player
         public void SetHoldingItem(ItemInteractable item)
         {
             if (!Object.HasStateAuthority) return;
+
             holdingItem = item;
             IsHoldingItem = true;
         }
@@ -352,6 +337,7 @@ namespace Network.Player
         {
             if (!Object.HasStateAuthority) return;
             if (holdingItem != item) return;
+            
             holdingItem = null;
             IsHoldingItem = false;
         }
