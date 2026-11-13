@@ -16,5 +16,9 @@ namespace Network.Player
 
         // ’·‰Ÿ‚µ‚ª¬—§‚µ‚Ä‚¢‚é‚©
         public NetworkBool interactHeld;
+
+        public NetworkBool isFPS;
+
+        public float lookX;
     }
 }
