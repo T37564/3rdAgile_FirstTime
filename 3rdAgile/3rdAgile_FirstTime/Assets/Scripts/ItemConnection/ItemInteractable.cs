@@ -15,6 +15,15 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     [Networked, Capacity(4)]
     public NetworkLinkedList<PlayerRef> carriersItem { get; }
 
+    [Header("開くときの角度")]
+    [SerializeField] private Vector3 openRotation;
+
+    [Header("閉じるときの角度")]
+    [SerializeField] private Vector3 closeRotation;
+
+    [Header("宝箱の蓋")]
+    [SerializeField] private Transform chestLid;
+
     // IInteractableインターフェースの実装
     public Transform Transform => transform;
 
@@ -40,6 +49,14 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         // アイテムの必要人数を取得
         // 必要人数の情報が書かれていなかった場合の保険として1人に設定する（無くてもいい）
         RequiredPeople = itemDataStorage.itemData.GetInt("RequiredPeople", 1);
+
+        if (itemDataStorage.sampleMasterData.GetString("Name") == "SmallChest" ||
+            itemDataStorage.sampleMasterData.GetString("Name") == "MimicChest" ||
+            itemDataStorage.sampleMasterData.GetString("Name") == "LegendaryChest")
+        {
+            OpenChest();
+        }
+            
     }
 
     public bool CanInteract(PlayerController player)
@@ -82,15 +99,6 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
         player.SetHoldingItem(this);
         Debug.Log(player.name + " が持った");
 
-        // 運搬中の処理
-        // GetString()の中の文字はKeyに入力している文字と同じ文字を入力し、アイテムを指定するときはValueの文字を指定する
-        if (itemDataStorage.sampleMasterData.GetString("Name") == "SmallChest" || 
-            itemDataStorage.sampleMasterData.GetString("Name") == "MimicChest" ||
-            itemDataStorage.sampleMasterData.GetString("Name") == "LegendaryChest")
-        {
-            Debug.Log("宝箱を拾った");
-        }
-
         PlayPickupSE(player.Object.InputAuthority);
 
         if (CanCarry())
@@ -102,6 +110,22 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
             // 人数が不足しているとき
             IsHelpPeople = true;
         }
+    }
+
+    /// <summary>
+    /// 宝箱の蓋を開く
+    /// </summary>
+    private void OpenChest()
+    {
+        chestLid.localRotation = Quaternion.Euler(openRotation);
+    }
+
+    /// <summary>
+    /// 宝箱の蓋を閉じる
+    /// </summary>
+    private void CloseChest()
+    {
+        chestLid.localRotation = Quaternion.Euler(closeRotation);
     }
 
     /// <summary>
@@ -117,6 +141,15 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     {
         isCarrying = true;
         IsHelpPeople = false;
+        // 運搬中の処理
+        //GetString()の中の文字はKeyに入力している文字と同じ文字を入力し、アイテムを指定するときはValueの文字を指定する
+        if (itemDataStorage.sampleMasterData.GetString("Name") == "SmallChest" ||
+            itemDataStorage.sampleMasterData.GetString("Name") == "MimicChest" ||
+            itemDataStorage.sampleMasterData.GetString("Name") == "LegendaryChest")
+        {
+            Debug.Log("宝箱を拾った");
+            CloseChest();
+        }
 
         Vector3 center = GetCarriersCenter();
         carryOffset = transform.position - center;

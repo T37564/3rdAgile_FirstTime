@@ -2463,6 +2463,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTracking
   target: {fileID: 0}
+  transitionDuration: 0.5
+  mouseSensitivity: 0.1
 --- !u!114 &1289484027
 MonoBehaviour:
   m_ObjectHideFlags: 0

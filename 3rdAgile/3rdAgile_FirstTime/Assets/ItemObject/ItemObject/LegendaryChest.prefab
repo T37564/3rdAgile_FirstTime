@@ -4997,6 +4997,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemInteractable
   carriers: []
   _carriersItem: []
+  openRotation: {x: 0, y: 90, z: 0}
+  closeRotation: {x: -65, y: 90, z: 0}
+  chestLid: {fileID: 7287271215325645797}
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}
@@ -5113,11 +5116,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100194776410255154, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: lengthInSec
-      value: 1.7
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 100194776410255154, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: startDelay.scalar
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100194776410255154, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 100194776410255154, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
+      propertyPath: InitialModule.startSpeed.minScalar
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 100194776410255154, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -5219,25 +5230,29 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7421483099272835232, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 0.59437037
       objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.38304555
       objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: 0.59437037
       objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.38304555
       objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -65.6
       objectReference: {fileID: 0}
     - target: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -5251,5 +5266,10 @@ PrefabInstance:
 --- !u!4 &3483474767587104852 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3316803802724495495, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
+  m_PrefabInstance: {fileID: 2184367470081353939}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7287271215325645797 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8895163604789371702, guid: 1a7001b3e6d7b50449651cf8d4e367b3, type: 3}
   m_PrefabInstance: {fileID: 2184367470081353939}
   m_PrefabAsset: {fileID: 0}

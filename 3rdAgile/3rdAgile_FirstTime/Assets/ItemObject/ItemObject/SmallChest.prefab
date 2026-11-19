@@ -161,6 +161,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemInteractable
   carriers: []
   _carriersItem: []
+  openRotation: {x: -15, y: 90, z: 0}
+  closeRotation: {x: -70, y: 90, z: 0}
+  chestLid: {fileID: 7987618042586992976}
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}
@@ -5171,6 +5174,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EpicChest_PF_URP
       objectReference: {fileID: 0}
+    - target: {fileID: 4055532930216225143, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5179,5 +5186,10 @@ PrefabInstance:
 --- !u!4 &7261868020195407988 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1007677142558321877, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
+  m_PrefabInstance: {fileID: 7583124408629990561}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7987618042586992976 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 568882037329102321, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
   m_PrefabInstance: {fileID: 7583124408629990561}
   m_PrefabAsset: {fileID: 0}
