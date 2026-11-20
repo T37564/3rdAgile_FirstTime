@@ -13,11 +13,20 @@ public class DungeonMapSync : NetworkBehaviour
 
     [Networked] public NetworkBool IsMapReady { get; set; }
 
-    public void SetMapData(IReadOnlyList<MapChunkData> mapData)
+    [Networked] public Vector3 StageOrigin { get; set; }
+
+    [Networked] public float ChunkSize { get; set; }
+
+    public void SetMapData(IReadOnlyList<MapChunkData> mapData, Vector3 stageOrigin, float chunkSize)
     {
+        if (Object == null) return;
+        if (!Object.IsValid) return;
         if(!Object.HasStateAuthority) return;
 
         IsMapReady = false;
+
+        StageOrigin = stageOrigin;
+        ChunkSize = chunkSize;
 
         int count = Mathf.Min(mapData.Count, MAX_CHUNKS);
 

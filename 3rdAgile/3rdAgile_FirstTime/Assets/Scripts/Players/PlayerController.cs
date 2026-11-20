@@ -109,34 +109,41 @@ namespace Network.Player
         /// </summary>
         public override void Spawned()
         {
-            // ローカルプレイヤーだけがPlayerInputHandlerを持つことになる
             inputHandler = GetComponent<PlayerInputHandler>();
+            animator = GetComponent<Animator>();
 
-            if (Object.HasInputAuthority)
-            {
-                // ローカルプレイヤーのPlayerInputHandlerをPlayerInputGetterに登録
-                PlayerInputGetter inputGetter = FindAnyObjectByType<PlayerInputGetter>();
-                if (inputGetter != null)
-                {
-                    inputGetter.RegisterLocalInput(inputHandler);
-                }
-            }
-
+            // StateAuthority側でネットワーク状態を初期化
             if (Object.HasStateAuthority)
             {
                 IsAlive = true;
                 IsHoldingItem = false;
+
                 interactLayerMask = LayerMask.GetMask("Item", "Player");
+
+                isInStartArea = true;
             }
 
+            // ローカルの状態を初期化
             prevAlive = IsAlive;
             prevHoldingItem = IsHoldingItem;
-
             prevHp = playerHp;
 
-            isInStartArea = true;
+            // 自分が操作するプレイヤーだけ入力とマップを登録
+            if (!Object.HasInputAuthority) return;
 
-            animator = GetComponent<Animator>();
+            PlayerInputGetter inputGetter = FindAnyObjectByType<PlayerInputGetter>();
+
+            if (inputGetter != null)
+            {
+                inputGetter.RegisterLocalInput(inputHandler);
+            }
+
+            DungeonMapPlayerMarker marker = FindAnyObjectByType<DungeonMapPlayerMarker>();
+
+            if (marker != null)
+            {
+                marker.SetPlayer(transform);
+            }
         }
 
         /// <summary>
@@ -243,7 +250,7 @@ namespace Network.Player
                     nextPosition.z = itemPosition.z + offset.z;
                 }
             }
-            else if (!isFPS &&move.sqrMagnitude > 0.01f)
+            else if (!isFPS && move.sqrMagnitude > 0.01f)
             {
                 currentAngle = Quaternion.LookRotation(move);
 
@@ -337,7 +344,7 @@ namespace Network.Player
         {
             if (!Object.HasStateAuthority) return;
             if (holdingItem != item) return;
-            
+
             holdingItem = null;
             IsHoldingItem = false;
         }

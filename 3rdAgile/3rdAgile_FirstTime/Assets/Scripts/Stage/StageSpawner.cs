@@ -227,9 +227,7 @@ public class StageSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         UpdateRoomEntrances();
 
-        List<MapChunkData> mapData = CreateMapData();
-
-        mapSync.SetMapData(mapData);
+        mapSync.SetMapData(CreateMapData(), transform.position, chunkSize);
 
         OnMapGenerated?.Invoke();
     }

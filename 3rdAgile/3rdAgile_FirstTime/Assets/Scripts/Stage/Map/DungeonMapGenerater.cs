@@ -8,6 +8,7 @@ public class DungeonMapGenerater : MonoBehaviour
 
     private int minX;
     private int minY;
+
     private int mapWidthInChunks;
     private int mapHeightInChunks;
 
@@ -23,15 +24,17 @@ public class DungeonMapGenerater : MonoBehaviour
     [SerializeField] private Color startRoomColor = Color.yellow;
 
     private Texture2D generatedTexture;
-    private bool generated = false;
+    public bool generated {  get; private set; }
 
     private void Update()
     {
         if(generated) return;
-        if(mapSync == null) return;
+        if(mapSync == null || mapSync.Object == null || !mapSync.Object.IsValid) return;
         if(!mapSync.IsMapReady) return;
+        if (mapSync.ChunkCount <= 0) return;
 
         GenerateMap();
+
         generated = true;
     }
 
@@ -41,8 +44,9 @@ public class DungeonMapGenerater : MonoBehaviour
 
         if (count <= 0) return;
 
-        int minX = int.MaxValue;
-        int minY = int.MaxValue;
+        minX = int.MaxValue;
+        minY = int.MaxValue;
+
         int maxX = int.MinValue;
         int maxY = int.MinValue;
 
@@ -52,6 +56,7 @@ public class DungeonMapGenerater : MonoBehaviour
 
             minX = Mathf.Min(minX, chunk.X);
             minY = Mathf.Min(minY, chunk.Y);
+
             maxX = Mathf.Max(maxX, chunk.X);
             maxY = Mathf.Max(maxY, chunk.Y);
         }
@@ -99,10 +104,28 @@ public class DungeonMapGenerater : MonoBehaviour
         mapImage.texture = generatedTexture;
     }
 
-    public Vector2 WorldTpMapPosition(Vector3 worldPosition, Vector3 stageOrigin, float chunkSize)
+    public Vector2 WorldToMapPosition(Vector3 worldPosition, Vector3 stageOrigin, float chunkSize)
     {
         float gridX = (worldPosition.x - stageOrigin.x) / chunkSize;
         float gridY = (worldPosition.z - stageOrigin.z) / chunkSize;
+
+        float normalizedX = (gridX - minX + 0.5f) / mapWidthInChunks;
+        float normalizedY = (gridY - minY + 0.5f) / mapHeightInChunks;
+
+        Rect rect = MapRect.rect;
+
+        return new Vector2((normalizedX - MapRect.pivot.x) * rect.width, (normalizedY - MapRect.pivot.y) * rect.height);
+    }
+
+    public Vector2 WorldToMapPosition(Vector3 worldPosition)
+    {
+        if(!generated || mapSync.ChunkSize <= 0.0f) return Vector2.zero;
+
+        Vector3 origin = mapSync.StageOrigin;
+        float chunkSize = mapSync.ChunkSize;
+
+        float gridX = (worldPosition.x - origin.x) / chunkSize;
+        float gridY = (worldPosition.z - origin.z) / chunkSize;
 
         float normalizedX = (gridX - minX + 0.5f) / mapWidthInChunks;
         float normalizedY = (gridY - minY + 0.5f) / mapHeightInChunks;
