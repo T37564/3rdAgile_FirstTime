@@ -17,6 +17,9 @@ public class TimerUI : MonoBehaviour
     // 残り時間を表示するLabel
     private Label timerLabel = null;
 
+    // スタート時のタイマー初期値が0になるバグを防ぐ
+    private bool isTimerStart = false;
+
     /// <summary>
     /// UIDocument生成後、タイマー表示用のLabelを取得する
     /// </summary>
@@ -44,14 +47,21 @@ public class TimerUI : MonoBehaviour
         if (gameTimer.Object == null || !gameTimer.Object.IsValid) return;
 
         if (!CountDownUI.isCountDownFinished) return;
+
         // ゲームの残り時間を取得
         float time = gameTimer.RemainingTime;
+
+        if (0 < time)
+        {
+            isTimerStart = true;
+        }
 
         // 秒数を「分」と「秒」に変換
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
 
-        // 00:00形式でUIに表示
+        if (!isTimerStart) return;
+        // 0:00形式でUIに表示
         timerLabel.text = $"{minutes}:{seconds:00}";
     }
 }
