@@ -38,6 +38,9 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             // オブジェクトスポーン
             NetworkObject spawnedPlayerObject = runner.Spawn(inGamePlayerPrefab.playerPrefabs[i], inGamePlayerPrefab.playerSpawnPositions[i],
                                                              inGamePlayerPrefab.playerSpawnRotations[0], players[i]);
+            
+            
+
             // PlayerRef と NetworkObject を紐づける
             playerObjects[players[i]] = spawnedPlayerObject;
         }
@@ -73,6 +76,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     #endregion
+
+    #region Unused Callbacks
 
     #region Input
     /// <summary>
@@ -206,5 +211,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     /// ゲームの継続・オブジェクトの再割り当てなどを行う。
     /// </summary>
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    #endregion
     #endregion
 }
