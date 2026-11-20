@@ -39,8 +39,6 @@ public class ItemDataStorage : NetworkBehaviour
 
     private void ApplyData()
     {
-        //sampleMasterData = ItemDatabase.Instance.GetById(dataId);
-
         if (sampleMasterData == null)
         {
             Debug.LogError("SampleMasterData‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");

@@ -39,7 +39,6 @@ public class RegenerationCallOut : NetworkBehaviour
         {
             if (isGenerateRequest) return;
             isGenerateRequest = true;
-            //Debug.Log(transform.position.y);
 
             Debug.LogWarning("アイテムが地面に配置されていないので再配置するよう要請する");
             //RegenerationCallOutクラスにイベントを通知する
@@ -58,6 +57,7 @@ public class RegenerationCallOut : NetworkBehaviour
 
     private void OnDrawGizmosSelected()
     {
+        // Scene上にrayを可視化する
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
     }
