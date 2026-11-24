@@ -192,7 +192,6 @@ public class ItemObjectPlace : MonoBehaviour
             //そのアイテムをGameObjectとして返す
             if (randomProbability < current)
             {
-                //int itemIndex = UnityEngine.Random.Range(0, item.items.Length);
                 return item.itemPrefab;
             }
         }
@@ -217,6 +216,10 @@ public class ItemObjectPlace : MonoBehaviour
         };
     }
 
+    /// <summary>
+    /// アイテムを配置する床のBoxColliderをランダムに取得するメソッド
+    /// </summary>
+    /// <returns></returns>
     private BoxCollider GetRandomGround()
     {
         if (groundColliders.Count == 0)
@@ -227,6 +230,7 @@ public class ItemObjectPlace : MonoBehaviour
 
         int index = UnityEngine.Random.Range(0,groundColliders.Count);
 
+        // 取得したBoxColliderを返す
         return groundColliders[index];
     }
 
@@ -257,7 +261,6 @@ public class ItemObjectPlace : MonoBehaviour
 
         // 決められた座標を返り値にする
         return new Vector3(randomX, randomY, randomZ);
-        //return pos;
     }
 
     /// <summary>
