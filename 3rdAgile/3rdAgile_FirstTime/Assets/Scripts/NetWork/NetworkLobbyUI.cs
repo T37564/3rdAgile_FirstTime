@@ -87,11 +87,12 @@ public class NetworkLobbyUI : MonoBehaviour, INetworkRunnerCallbacks
     {
         this.lobbyUI = lobbyUI;
 
+        // ルームの暗証番号を表示
+        lobbyUI.roomPIN.text = $"{runner.SessionInfo.Name}";
+
         // ホストのみ処理する
         if (runner.IsServer)
         {
-            // ルームの暗証番号を表示
-            lobbyUI.roomPIN.text = $"{runner.SessionInfo.Name}";
             // ゲーム開始ボタンを表示
             lobbyUI.gameStartButton.style.display = DisplayStyle.Flex;
         }
