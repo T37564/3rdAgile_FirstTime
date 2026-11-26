@@ -3,11 +3,9 @@
 // LobbyUI.cs
 // Create.by TakahashiSaya
 //-----------------------------------------------------------------------------------
-using DG.Tweening.Core.Easing;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class LobbyUI : MonoBehaviour
