@@ -16,13 +16,18 @@ public class RoomEntranceController : NetworkBehaviour
     [System.Serializable]
     private class EntrancePair
     {
-        public GameObject entrance;
+        public GameObject[] entrances;
         public GameObject wall;
 
         public void SetOpen(bool isOpen)
         {
-            if (entrance != null)
-                entrance.SetActive(isOpen);
+            if (entrances != null)
+            {
+                foreach (var entrance in entrances)
+                {
+                    entrance.SetActive(isOpen);
+                }
+            }
 
             if (wall != null)
                 wall.SetActive(!isOpen);
