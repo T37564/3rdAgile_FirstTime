@@ -2475,16 +2475,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomEntranceController
   north:
-    entrance: {fileID: 7256056364606299827}
+    entrances:
+    - {fileID: 7256056364606299827}
+    - {fileID: 977206653680875389}
     wall: {fileID: 1948535514029703502}
   south:
-    entrance: {fileID: 7114774425817769555}
+    entrances:
+    - {fileID: 7114774425817769555}
+    - {fileID: 2385568378284440180}
     wall: {fileID: 4558094900818265405}
   east:
-    entrance: {fileID: 6460825153589490425}
+    entrances:
+    - {fileID: 6460825153589490425}
+    - {fileID: 7633849752389349665}
     wall: {fileID: 4057209398933529257}
   west:
-    entrance: {fileID: 3128051971358425080}
+    entrances:
+    - {fileID: 3128051971358425080}
+    - {fileID: 3964705570497608851}
     wall: {fileID: 4882646585617028878}
   _OpenDirections: 0
 --- !u!1 &8931751302244454624
