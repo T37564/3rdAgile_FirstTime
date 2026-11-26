@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PrefabData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPrefabData
   playerPrefabs:
-  - {fileID: -8137458445721675518, guid: ea5d9126517f8334394c836b02e645d1, type: 3}
+  - {fileID: 1458725296672467525, guid: ea5d9126517f8334394c836b02e645d1, type: 3}
   - {fileID: -7295163730024411932, guid: 65231ffe9f43c24478d142c481fbcc2c, type: 3}
-  - {fileID: -2787309591237798139, guid: 117095430f115a7409b8c72b2861ac5b, type: 3}
-  - {fileID: -8579772963901048626, guid: 26400aac7dce2f042bd0d611bbdc0c6b, type: 3}
+  - {fileID: 5074935283761432384, guid: 117095430f115a7409b8c72b2861ac5b, type: 3}
+  - {fileID: 597325825097146328, guid: 26400aac7dce2f042bd0d611bbdc0c6b, type: 3}
   playerSpawnPositions:
   - {x: -3.3, y: -1.4, z: -2.1}
   - {x: -1.3, y: -1.4, z: -1.6}
