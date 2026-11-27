@@ -143,7 +143,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3632090126605938222
 Transform:
   m_ObjectHideFlags: 0
@@ -5129,6 +5129,7 @@ MonoBehaviour:
   openRotation: {x: 0, y: 90, z: 0}
   closeRotation: {x: -65, y: 90, z: 0}
   chestLid: {fileID: 7287271215325645797}
+  particleObject: {fileID: 5595348406186227373}
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}

@@ -24,6 +24,9 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
     [Header("宝箱の蓋")]
     [SerializeField] private Transform chestLid;
 
+    [Header("オブジェクトのパーティクル")]
+    [SerializeField] private GameObject particleObject;
+ 
     // IInteractableインターフェースの実装
     public Transform Transform => transform;
 
@@ -114,18 +117,22 @@ public class ItemInteractable : NetworkBehaviour, IInteractable
 
     /// <summary>
     /// 宝箱の蓋を開く
+    /// particleObjectを有効化してパーティクルを再生する
     /// </summary>
     private void OpenChest()
     {
         chestLid.localRotation = Quaternion.Euler(openRotation);
+        particleObject.SetActive(true);
     }
 
     /// <summary>
     /// 宝箱の蓋を閉じる
+    /// particleObjectを無効化してパーティクルを停止する
     /// </summary>
     private void CloseChest()
     {
         chestLid.localRotation = Quaternion.Euler(closeRotation);
+        particleObject.SetActive(false);
     }
 
     /// <summary>
