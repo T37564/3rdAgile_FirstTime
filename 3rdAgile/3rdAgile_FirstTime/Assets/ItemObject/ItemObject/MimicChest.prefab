@@ -5037,7 +5037,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &164669240061238328
 Transform:
   m_ObjectHideFlags: 0
@@ -10023,6 +10023,7 @@ MonoBehaviour:
   openRotation: {x: -15, y: 90, z: 0}
   closeRotation: {x: -70, y: 90, z: 0}
   chestLid: {fileID: 2150176603108373777}
+  particleObject: {fileID: 4588868771497273820}
   itemDataStorage: {fileID: 0}
   followSpeed: 8
   carryOffset: {x: 0, y: 0.5, z: 0}
@@ -11572,6 +11573,10 @@ PrefabInstance:
     - target: {fileID: 2123551918613886121, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
       propertyPath: m_Name
       value: EpicChest_PF_URP
+      objectReference: {fileID: 0}
+    - target: {fileID: 3482245731242656865, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4055532930216225143, guid: 9ab336a49e99f674b900bcdf76eb623c, type: 3}
       propertyPath: m_Enabled
