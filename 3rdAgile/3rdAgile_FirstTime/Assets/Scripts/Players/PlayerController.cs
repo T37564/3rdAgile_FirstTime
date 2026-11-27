@@ -60,6 +60,8 @@ namespace Network.Player
         // ローカルでプレイヤーの入力を受け取るためのコンポーネント
         private PlayerInputHandler inputHandler;
 
+        private CharacterController characterController;
+
         // アニメーション制御用のコンポーネント
         private Animator animator;
 
@@ -111,6 +113,7 @@ namespace Network.Player
         {
             inputHandler = GetComponent<PlayerInputHandler>();
             animator = GetComponent<Animator>();
+            characterController = GetComponent<CharacterController>();
 
             // StateAuthority側でネットワーク状態を初期化
             if (Object.HasStateAuthority)
@@ -228,13 +231,24 @@ namespace Network.Player
         /// </summary>
         private void Move(Vector2 moveInput, bool isFPS)
         {
-            Vector3 move = CalculateMoveDirection(moveInput, isFPS);
+            Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
 
+            // 斜め移動の速度補正
+            if (move.sqrMagnitude > 1f)
+            {
+                move.Normalize();
+            }
 
-            float speed = IsHoldingItem ? carryingMoveSpeed : moveSpeed;
+            // アイテム所持状態による速度変更
+            float speed = IsHoldingItem
+                ? carryingMoveSpeed
+                : moveSpeed;
 
-            Vector3 nextPosition = transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
+            // 移動予定座標
+            Vector3 nextPosition =
+                transform.position + move * carryingMoveSpeed * Runner.DeltaTime;
 
+            // アイテム運搬時の移動制限
             if (IsHoldingItem && holdingItem != null)
             {
                 Vector3 itemPosition = holdingItem.Transform.position;
@@ -242,7 +256,8 @@ namespace Network.Player
                 Vector3 offset = nextPosition - itemPosition;
                 offset.y = 0f;
 
-                if (offset.sqrMagnitude > maxCarryDistance * maxCarryDistance)
+                if (offset.sqrMagnitude >
+                    maxCarryDistance * maxCarryDistance)
                 {
                     offset = offset.normalized * maxCarryDistance;
 
@@ -250,14 +265,17 @@ namespace Network.Player
                     nextPosition.z = itemPosition.z + offset.z;
                 }
             }
-            else if (!isFPS && move.sqrMagnitude > 0.01f)
+            else if (move.sqrMagnitude > 0.01f)
             {
                 currentAngle = Quaternion.LookRotation(move);
-
                 transform.rotation = currentAngle;
             }
 
-            transform.position = nextPosition;
+            // 現在座標からの移動量を計算
+            Vector3 displacement = nextPosition - transform.position;
+
+            // 衝突判定を伴う移動
+            characterController.Move(displacement);
 
             UpdateAnimation(moveInput);
         }
